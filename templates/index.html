@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Chatbot LLM</title>
+    <style>
+        #chatWindow {
+            width: 80%;
+            height: 300px;
+            border: 1px solid #ccc;
+            overflow-y: scroll;
+            padding: 10px;
+            margin-bottom: 10px;
+        }
+        #userInput {
+            width: 78%;
+            padding: 10px;
+        }
+        #sendButton {
+            width: 20%;
+        }
+    </style>
+</head>
+<body>
+    <h1>Chatbot LLM</h1>
+    <div id="chatWindow"></div>
+    <input type="text" id="userInput" placeholder="Type your message...">
+    <button id="sendButton" onclick="sendMessage()">Send</button>
+
+    <script>
+        function sendMessage() {
+            var input = document.getElementById('userInput');
+            var message = input.value;
+            input.value = '';
+
+            if(message.trim() === '') return;
+
+            var userMessage = document.createElement('div');
+            userMessage.textContent = "You: " + message;
+            document.getElementById('chatWindow').appendChild(userMessage);
+
+            fetch('/response', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({prompt: message}),
+            })
+            .then(response => response.json())
+            .then(data => {
+                var aiMessage = document.createElement('div');
+                aiMessage.textContent = "AI: " + data.message;
+                document.getElementById('chatWindow').appendChild(aiMessage);
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+            });
+        }
+
+        document.getElementById('userInput').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                sendMessage();
+            }
+        });
+    </script>
+</body>
+</html>
