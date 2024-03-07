@@ -1,6 +1,5 @@
 from flask import Flask, request, jsonify, render_template, session
 import os
-import openai as oai
 import langchain_openai as lcai
 from utils import mLangChain
 from langchain_community.document_loaders import WebBaseLoader

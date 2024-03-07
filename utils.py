@@ -36,7 +36,7 @@ class mLangChain:
     def __init__(self,mlimit=100):
         self.client_prompt = lcai.AzureOpenAI(
             openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
-            openai_api_version="2023-12-01-preview",
+            openai_api_version="2024-02-15-preview",
             azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
             deployment_name="TEST",
             model_name="gpt-3.5-turbo-instruct",
@@ -52,12 +52,12 @@ class mLangChain:
             openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
             azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
             azure_deployment="NUHAI-GPT4",
-            openai_api_version="2023-12-01-preview",
+            openai_api_version="2024-02-15-preview",
             model_name="gpt-4",
         )
         self.embeddings = lcai.AzureOpenAIEmbeddings(
             openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
-            openai_api_version="2023-12-01-preview",
+            openai_api_version="2024-02-15-preview",
             azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
             deployment="TEST-Embedding",
         )
