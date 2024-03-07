@@ -9,14 +9,23 @@ function createMessageElement(messageText, msgClass) {
   }
   if (msgClass === "info"){
     article.classList.add('message', 'is-info', 'msg-info');
+    const header = document.createElement('div');
+    header.classList.add('message-header');
+    header.textContent = msgClass.toUpperCase();
+    article.appendChild(header);
   }
   if (msgClass === "emo"){
     article.classList.add('message', 'is-primary', 'msg-primary');
+    const header = document.createElement('div');
+    header.classList.add('message-header');
+    header.textContent = msgClass.toUpperCase();
+    article.appendChild(header);
   }
-  const div = document.createElement('div');
-  div.classList.add('message-body');
-  div.textContent = messageText;
-  article.appendChild(div);
+  
+  const body = document.createElement('div');
+  body.classList.add('message-body');
+  body.textContent = messageText;
+  article.appendChild(body);
   return article
 }
 
@@ -29,6 +38,7 @@ function sendMessage() {
     console.log('Working now')
 
     const loader = document.getElementById('loader');
+    const sloader = document.getElementById('sloader');
 
     if(message.trim() === '') return;
 
@@ -50,11 +60,14 @@ function sendMessage() {
         chatDiv.appendChild(aiMessage);
         chatDiv.scrollTop = chatDiv.scrollHeight;
         loader.style.display = 'none';
+        sloader.style.display = 'block';
 
         var infoMessage = createMessageElement(data.support_info, "info")
         supportDiv.appendChild(infoMessage);
         var emoMessage = createMessageElement(data.support_emo, "emo")
         supportDiv.appendChild(emoMessage);
+        supportDiv.scrollTop = supportDiv.scrollHeight;
+        sloader.style.display = 'none';
     })
     .catch((error) => {
         console.error('Error:', error);
