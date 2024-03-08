@@ -34,7 +34,7 @@ class mOpenAI:
 
 class mLangChain:
     def __init__(self,mlimit=100):
-        self.client_prompt = lcai.AzureOpenAI(
+        self.client_completion = lcai.AzureOpenAI(
             openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
             openai_api_version="2024-02-15-preview",
             azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
@@ -61,7 +61,7 @@ class mLangChain:
             azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
             deployment="TEST-Embedding",
         )
-        self.prompt_template = ChatPromptTemplate.from_messages([
+        self.qa_prompt = ChatPromptTemplate.from_messages([
             ("system", "Your vocabulary is limited to a 5 year old american."),
             ("user", "{input}")
         ])
@@ -71,7 +71,7 @@ class mLangChain:
         self.prompt_limit = limit
 
     def set_prompt(self, system, user):
-        self.prompt_template = ChatPromptTemplate.from_messages([
+        self.qa_prompt = ChatPromptTemplate.from_messages([
             ("system", system),
             ("user", user)
         ])
@@ -80,15 +80,22 @@ class mLangChain:
         self.text_splitter = RecursiveCharacterTextSplitter(chunk_size=1000, chunk_overlap=200)
         self.documents = self.text_splitter.split_documents(docs)
         self.vector = FAISS.from_documents(self.documents, self.embeddings)
-        self.document_chain = create_stuff_documents_chain(self.client_prompt, self.prompt_template)
+        self.document_chain = create_stuff_documents_chain(self.client_completion, self.qa_prompt)
         self.retriever = self.vector.as_retriever()
         self.retrieval_chain = create_retrieval_chain(self.retriever, self.document_chain)
 
     def set_chain_history(self):
-        self.contextualize_history_system_prompt = """Given a chat history and the latest user question \
+        self.contextualize_history_system_prompt = """
+        Given a chat history and the latest user question \
         which might reference context in the chat history, formulate a standalone question \
         which can be understood without the chat history. Do NOT answer the question, \
-        just reformulate it if needed and otherwise return it as is."""
+        just reformulate with context from history if needed OR ELSE return it as is.\
+        
+        Chat history = {chat_history} \
+        Question = {input} \
+        
+        Reformulate the question.
+        """
         self.contextualize_history_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", self.contextualize_history_system_prompt),
@@ -96,7 +103,7 @@ class mLangChain:
                 ("user", "{input}"),
             ]
         )
-        self.history_chain = self.contextualize_history_prompt | self.client_prompt
+        self.history_chain = self.contextualize_history_prompt | self.client_completion
 
 
     def set_agent(self, name="<tool>", description="<desc>", system='You are a helpful assistant', input='{input}'):
@@ -120,12 +127,12 @@ class mLangChain:
         # Send a completion call to generate an answer
         print('Sending a test completion job')
         # response = self.client(start_phrase)
-        response = self.client_prompt.invoke(start_phrase)
+        response = self.client_completion.invoke(start_phrase)
 
         print(start_phrase + response)
 
     def demo_chain(self, start_phrase=None):
-        chain = self.prompt_template | self.client_prompt
+        chain = self.qa_prompt | self.client_completion
         response = chain.invoke({"input": start_phrase})
 
         print(start_phrase + response)
@@ -155,8 +162,8 @@ class mLangChain:
                 RunnablePassthrough.assign(
                     context=self.history_chain | self.retriever
                 )
-                | self.prompt_template
-                | self.client_prompt
+                | self.qa_prompt
+                | self.client_completion
         )
 
         chat_history = []

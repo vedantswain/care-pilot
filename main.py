@@ -39,7 +39,7 @@ def get_prompt_sender_tone(client_LC):
             ("user", "{input}"),
         ]
     )
-    chain = template | client_LC.client_prompt
+    chain = template | client_LC.client_completion
     return chain
 
 
@@ -59,7 +59,7 @@ def get_prompt_empathize_sender(client_LC):
             ("user", sender),
         ]
     )
-    chain = template | client_LC.client_prompt
+    chain = template | client_LC.client_completion
     return chain
 
 def get_prompt_sender_mentalstate(client_LC):
@@ -73,7 +73,7 @@ def get_prompt_sender_mentalstate(client_LC):
             ("user", "{input}"),
         ]
     )
-    chain = template | client_LC.client_prompt
+    chain = template | client_LC.client_completion
     return chain
 
 def get_prompt_receiver_mentalstate(client_LC):
@@ -87,7 +87,7 @@ def get_prompt_receiver_mentalstate(client_LC):
             ("user", "{input}"),
         ]
     )
-    chain = template | client_LC.client_prompt
+    chain = template | client_LC.client_completion
     return chain
 
 
@@ -104,7 +104,7 @@ def get_prompt_receiver_identity(client_LC):
             ("user", "{input}"),
         ]
     )
-    chain = template | client_LC.client_prompt
+    chain = template | client_LC.client_completion
     return chain
 
 
@@ -157,7 +157,7 @@ def sender_agent():
             ("system", prompt),
         ]
     )
-    chain = template | client_LC.client_prompt
+    chain = template | client_LC.client_completion
     return chain
 
 def create_chain():

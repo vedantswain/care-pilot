@@ -3,7 +3,7 @@
 <head>
     <meta charset="utf-8">
 <!--    <meta http-equiv="refresh" content="2;">-->
-    <title>Chat UI</title>
+    <title>Pro-Pilot Prototype</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.1/css/bulma.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style_chat.css') }}">
@@ -19,21 +19,21 @@
     <script src="{{ url_for('static', filename='script_chat.js') }}"></script>
 </head>
 <body>
-<nav class="navbar is-dark">
+<nav class="navbar">
     <div class="container">
         <div class="navbar-brand">
-            <span class="navbar-item is-size-4">ChatUI</span>
+            <span class="navbar-item is-size-4">Service Chat</span>
             <div class="navbar-burger burger" data-target="navMenu">
                 <span></span>
                 <span></span>
                 <span></span>
             </div>
         </div>
-        <div class="navbar-menu" id="navMenu">
-            <div class="navbar-end">
-                <a class="navbar-item">Profile</a>
-            </div>
-        </div>
+<!--        <div class="navbar-menu" id="navMenu">-->
+<!--            <div class="navbar-end">-->
+<!--                <a class="navbar-item">Profile</a>-->
+<!--            </div>-->
+<!--        </div>-->
     </div>
 </nav>
 
@@ -43,7 +43,7 @@
         <div>
             <div style="margin-top: 8%; margin-left: 10%;">
                 <p>
-                    <strong>Customer Response</strong>
+                    <strong>Customer Queue</strong>
                 </p>
             </div>
         </div>
@@ -66,35 +66,24 @@
 <!--        </div>-->
         <!--chat list-->
        <div class="list">
-           <a class="list-item active box" href="http://127.0.0.1:5000/?product=pizza&grateful=0&ranting=0&expression=0">
-               <div class="media">
-                   <div class="media-content is-hidden-mobile">
-                       <div class="content">
-                           <p>
-                               <strong>User's Name</strong>
-                               <br><small>Pizza</small>
-                           </p>
-                       </div>
-                   </div>
-               </div>
-           </a>
-<!--            <a class="list-item box">-->
-<!--                <div class="media">-->
-<!--                    <div class="media-left">-->
-<!--                        <figure class="image is-48x48 is-32x32-mobile">-->
-<!--                            <img src="https://via.placeholder.com/150" alt="Image" class="is-rounded">-->
-<!--                        </figure>-->
-<!--                    </div>-->
-<!--                    <div class="media-content is-hidden-mobile">-->
-<!--                        <div class="content">-->
-<!--                            <p>-->
-<!--                                <strong>User's Name</strong>-->
-<!--                                <br><small class="has-text-weight-semibold">1 new message</small>-->
-<!--                            </p>-->
-<!--                        </div>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </a>-->
+            <a class="list-item box" href="../?product=pizza&grateful=0&ranting=0&expression=0">
+                <div class="media">
+                    <div class="media-left">
+                        <figure class="image is-48x48 is-32x32-mobile">
+                            <img src="https://via.placeholder.com/150" alt="Image" class="is-rounded">
+                        </figure>
+                    </div>
+                    <div class="media-content is-hidden-mobile">
+                        <div class="content">
+                            <p>
+                                <strong>User's Name</strong>
+                                <br><small class="has-text-weight-semibold">1 new message</small>
+                                <br><small>Pizza</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </a>
        </div>
     </div>
     <div class="column is-9-desktop is-8-tablet is-10-mobile is-paddingless">
@@ -117,15 +106,15 @@
                     </div>
                 </div>
             </div>
-            <div class="navbar-end">
-                <div class="media-content">
-                    <div class="content">
-                        <p>
-                            <strong>Pro-Pilot Response</strong>
-                        </p>
-                    </div>
-                </div>
-            </div>
+<!--            <div class="navbar-end">-->
+<!--                <div class="media-content">-->
+<!--                    <div class="content">-->
+<!--                        <p>-->
+<!--                            <strong>Pro-Pilot</strong>-->
+<!--                        </p>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--            </div>-->
 <!--            <div class="navbar-end">-->
 <!--                <a class="navbar-item">-->
 <!--						<span class="icon is-size-2">-->
@@ -175,7 +164,12 @@
                     </form>
                 </div>
             </div>
-            <div class="column is-hidden-mobile sidebar-profile"  id="supportWindow" style="display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 80vh;">
+            <div class="column is-hidden-mobile sidebar-profile"  id="supportWindow" style="display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 80vh; margin-right: 4em;">
+                <div class="content">
+                    <p>
+                        <strong>Pro-Pilot</strong>
+                    </p>
+                </div>
                 <span class="loader" id="sloader" style="display: none; order: 9999; padding: 2%;"></span>
             </div>
         </div>
