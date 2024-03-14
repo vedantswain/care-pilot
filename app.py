@@ -78,8 +78,8 @@ def generate_response():
     session["chat_history"] = messages_to_dict(chat_history)
     # session["chat_history"] = chat_history
 
-    response_cw_info = agent_coworker_info().invoke({'complaint':session.get("init_msg")})
-    response_cw_emo = agent_coworker_emo().invoke({'complaint':session.get("init_msg")})
+    response_cw_info = agent_coworker_info().invoke({'complaint':response, "chat_history": chat_history})
+    response_cw_emo = agent_coworker_emo().invoke({'complaint':response})
 
     print(response)
     print(response_cw_info)
@@ -87,7 +87,7 @@ def generate_response():
 
     return jsonify({
         "message": response,
-        "support_info":response_cw_info,
+        "support_info":response_cw_info.content,
         "support_emo":response_cw_emo
     })
 

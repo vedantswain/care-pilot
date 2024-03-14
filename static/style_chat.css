@@ -149,6 +149,10 @@ html, body {
 	border-left: 1px solid #dedede;
 }
 
+pre {
+  white-space: pre-wrap;
+}
+
 .message.is-info:not(:nth-last-child(-n+2)) .message-header {
   background-color: #757575;
   color: white;

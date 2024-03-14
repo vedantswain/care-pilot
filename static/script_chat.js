@@ -1,6 +1,8 @@
 function createMessageElement(messageText, msgClass) {
   const article = document.createElement('article');
 
+  let body = document.createElement('div');
+
   if (msgClass === "out"){
     article.classList.add('message', 'is-dark', 'msg-outgoing');
   }
@@ -13,6 +15,9 @@ function createMessageElement(messageText, msgClass) {
     header.classList.add('message-header');
     header.textContent = msgClass.toUpperCase();
     article.appendChild(header);
+
+     body = document.createElement('pre');
+     messageText = marked.parse(messageText);
   }
   if (msgClass === "emo"){
     article.classList.add('message', 'is-primary', 'msg-primary');
@@ -20,12 +25,15 @@ function createMessageElement(messageText, msgClass) {
     header.classList.add('message-header');
     header.textContent = msgClass.toUpperCase();
     article.appendChild(header);
+
+     body = document.createElement('pre');
+     messageText = marked.parse(messageText);
   }
   
-  const body = document.createElement('div');
   body.classList.add('message-body');
-  body.textContent = messageText;
+  body.innerHTML = messageText;
   article.appendChild(body);
+
   return article
 }
 

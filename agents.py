@@ -29,10 +29,29 @@ llmchat = lcai.AzureChatOpenAI(
     model_name="gpt-4",
 )
 
+def get_historical_context_chain():
+    contextualize_q_system_prompt = """Given a chat history and the latest user input \
+        which might reference context in the chat history, formulate a standalone statement \
+        which can be understood without the chat history. Do NOT respond to the statement, \
+        just reformulate it if needed and otherwise return it as is."""
+    contextualize_q_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", contextualize_q_system_prompt),
+            MessagesPlaceholder(variable_name="chat_history"),
+            ("user", "{complaint}"),
+        ]
+    )
+    contextualize_q_chain = contextualize_q_prompt | llmchat | StrOutputParser()
+    return contextualize_q_chain
+
 def agent_coworker_info():
     client = mLangChain()
     prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
-                Provide the representative the natural next question to solve the customer's {complaint}
+                Help the representative address a customer's {complaint}. \
+                You may provide the ONE immediate next step for troubleshooting. \
+                OR provide solutions to resolve the customers needs. \
+                
+                Be concise. 
             """
     template = ChatPromptTemplate.from_messages(
         [
@@ -40,6 +59,14 @@ def agent_coworker_info():
         ]
     )
     chain = template | client.client_completion
+
+    chain = (RunnablePassthrough.assign(
+                        context=get_historical_context_chain()
+                    )
+                     | template
+                     | llmchat
+                     )
+
     return chain
 
 
@@ -47,7 +74,11 @@ def agent_coworker_emo():
     client = mLangChain()
     prompt = """Your role is to help a service representative by providing EMOTIONAL SUPPORT. \
                 The representative received a {complaint}. \
-                Describe how the representative might feel after reading the tonality of this {complaint}.
+                Describe how the representative might feel after reading the tonality of this {complaint}. \
+                
+                Mood:\
+                Stress-level:\
+                Work-load:\
             """
     template = ChatPromptTemplate.from_messages(
         [
