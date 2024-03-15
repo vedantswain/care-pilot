@@ -39,32 +39,85 @@ sender_initial = agent_sender_fewshot_twitter()
 sender_agent = mAgentCustomer()
 
 
-
 @app.route('/')
 def hello():
-    val_product = request.args.get('product')
-    val_grateful = request.args.get('grateful')
-    val_ranting = request.args.get('ranting')
-    val_expressive = request.args.get('expressive')
+    return render_template('index_chat.html')
 
-    user_input = {
-        "product": val_product,
-        "is_grateful": 'grateful' if val_grateful==0 else 'NOT grateful',
-        "is_ranting": 'ranting' if val_ranting==0 else 'NOT ranting',
-        "is_expressive": 'expressive' if val_expressive==0 else 'NOT expressive'
-    }
+@app.route('/get-reply', methods=['GET','POST'])
+def getReply():
 
-    response = sender_initial.invoke(user_input)
-    # session["init_msg"] = response
-    session["chat_history"] = messages_to_dict([AIMessage(content=response)])
+    if request.method == 'GET':
+        # Handle GET request
+        val_product = request.args.get('product')
+        val_grateful = request.args.get('grateful')
+        val_ranting = request.args.get('ranting')
+        val_expressive = request.args.get('expressive')
 
-    print("FEW-SHOT TWITTER", response)
+        user_input = {
+            "product": val_product,
+            "is_grateful": 'grateful' if val_grateful==0 else 'NOT grateful',
+            "is_ranting": 'ranting' if val_ranting==0 else 'NOT ranting',
+            "is_expressive": 'expressive' if val_expressive==0 else 'NOT expressive'
+        }
 
-    return render_template('index_chat.html',  initial_msg=response)
+        response = sender_initial.invoke(user_input)
+        session["product"] = val_product
+        session["chat_history"] = messages_to_dict([AIMessage(content=response)])
+
+    elif request.method == 'POST':
+        prompt = request.json.get("prompt")
+
+        retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
+        chat_history = messages_from_dict(retrieve_from_session)
+
+        result = sender_agent.invoke({"input": prompt, "chat_history": chat_history})
+        response = result
+
+        chat_history.extend([HumanMessage(content=prompt), AIMessage(content=response)])
+        session["chat_history"] = messages_to_dict(chat_history)
+
+    return jsonify({
+        "message": response
+    })
+
+
+@app.route('/get-emo-support', methods=['POST'])
+def getEmoSupport():
+    reply = request.json.get("client_reply")
+    support_type = request.json.get("type")
+
+    retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
+    chat_history = messages_from_dict(retrieve_from_session)
+
+    if support_type=="reframe_client":
+        response_cw_emo = agent_coworker_emo_reframe().invoke({'complaint':reply, "chat_history": chat_history})
+        response = response_cw_emo.content
+    if support_type=="reflect":
+        response_cw_emo = agent_coworker_emo().invoke({'complaint':reply})
+        response = response_cw_emo
+
+    return jsonify({
+        "message": response
+    })
+
+
+@app.route('/get-info-support', methods=['POST'])
+def getInfoSupport():
+    reply = request.json.get("client_reply")
+    # support_type = request.json.get("type")
+
+    retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
+    chat_history = messages_from_dict(retrieve_from_session)
+
+    response_cw_info = agent_coworker_info().invoke({'product': session['product'],'complaint':reply, "chat_history": chat_history})
+    response = response_cw_info.content
+
+    return jsonify({
+        "message": response
+    })
 
 @app.route('/response', methods=['POST'])
 def generate_response():
-    prompt = request.json.get("prompt")
 
     retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
     chat_history = messages_from_dict(retrieve_from_session)
@@ -78,17 +131,15 @@ def generate_response():
     session["chat_history"] = messages_to_dict(chat_history)
     # session["chat_history"] = chat_history
 
-    response_cw_info = agent_coworker_info().invoke({'complaint':response, "chat_history": chat_history})
+    response_cw_info = agent_coworker_info().invoke({'product': session['product'],'complaint':response, "chat_history": chat_history})
     response_cw_emo = agent_coworker_emo().invoke({'complaint':response})
-
-    print(response)
-    print(response_cw_info)
-    print(response_cw_emo)
+    response_cw_emo_reframe = agent_coworker_emo_reframe().invoke({'complaint':response, "chat_history": chat_history})
 
     return jsonify({
         "message": response,
         "support_info":response_cw_info.content,
-        "support_emo":response_cw_emo
+        "support_emo":response_cw_emo,
+        "support_emo_reframe":response_cw_emo_reframe.content,
     })
 
 if __name__ == "__main__":

@@ -114,13 +114,20 @@ html, body {
 }
 
 .flex-item-1 {
-    flex-grow: 1;
+    flex-grow: 3;
 }
 
 .flex-item-2 {
 	width: 100%;
     height: 80px;
     padding: 10px 12px;
+
+
+    flex-grow: 1;
+    position: sticky;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
 }
 
 .flex-item-2 .field.has-addons .control:first-child {
@@ -153,6 +160,10 @@ pre {
   white-space: pre-wrap;
 }
 
+.card .is-emo {
+    margin-top: 8px;
+}
+
 .message.is-info:not(:nth-last-child(-n+2)) .message-header {
   background-color: #757575;
   color: white;
@@ -173,98 +184,68 @@ pre {
   color: #757575;
 }
 
+/*Spinner*/
 .loader {
-    animation: rotate 1s infinite;
-    height: 50px;
-    width: 50px;
-    border: 8px solid #f3f3f3; /* Light grey */
-    border-top: 8px solid #3498db; /* Blue */
-    border-radius: 50%;
-  }
+  border: 4px solid rgba(0, 0, 0, 0.1);
+  border-top: 4px solid #333;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
 
-  /* .loader:before,
-  .loader:after {
-    border-radius: 50%;
-    content: "";
-    display: block;
-    height: 20px;
-    width: 20px;
-  }
-  .loader:before {
-    animation: ball1 1s infinite;
-    background-color: #fff;
-    box-shadow: 30px 0 0 #ff3d00;
-    margin-bottom: 10px;
-  }
-  .loader:after {
-    animation: ball2 1s infinite;
-    background-color: #ff3d00;
-    box-shadow: 30px 0 0 #fff;
-  } */
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
 
-  /* .sloader {
-    animation: rotate 1s infinite;
-    height: 50px;
-    width: 50px;
-  } */
+/*Typing Dots*/
+.typing {
+  position: relative;
+  width: 40px;
+  height: 40px;
+}
 
-  /* .sloader:before,
-  .sloader:after {
-    border-radius: 50%;
-    content: "";
-    display: block;
-    height: 20px;
-    width: 20px;
-  }
-  .sloader:before {
-    animation: ball1 1s infinite;
-    background-color: #fff;
-    box-shadow: 30px 0 0 #ff3d00;
-    margin-bottom: 10px;
-  }
-  .sloader:after {
-    animation: ball2 1s infinite;
-    background-color: #ff3d00;
-    box-shadow: 30px 0 0 #fff;
-  } */
+.typing:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #333;
+  animation: oscillate 0.5s ease-in-out infinite alternate;
+}
 
-  @keyframes rotate {
-    0% { transform: rotate(0deg) scale(0.8) }
-    50% { transform: rotate(360deg) scale(1.2) }
-    100% { transform: rotate(720deg) scale(0.8) }
-  }
+.typing:after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #333;
+  animation: oscillate 0.3s ease-in-out infinite alternate;
+}
 
-  @keyframes ball1 {
-    0% {
-      box-shadow: 30px 0 0 #ff3d00;
-    }
-    50% {
-      box-shadow: 0 0 0 #ff3d00;
-      margin-bottom: 0;
-      transform: translate(15px, 15px);
-    }
-    100% {
-      box-shadow: 30px 0 0 #ff3d00;
-      margin-bottom: 10px;
-    }
-  }
+.typing:before {
+  left: 0;
+}
 
-  @keyframes ball2 {
-    0% {
-      box-shadow: 30px 0 0 #fff;
-    }
-    50% {
-      box-shadow: 0 0 0 #fff;
-      margin-top: -20px;
-      transform: translate(15px, 15px);
-    }
-    100% {
-      box-shadow: 30px 0 0 #fff;
-      margin-top: 0;
-    }
-  }
+.typing:after {
+  right: 0;
+}
 
-  .co-pilot-title {
+@keyframes oscillate {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(20px);
+  }
+}
+
+.co-pilot-title {
     font-size: 24px;
     font-weight: bold;
     padding: 10px;

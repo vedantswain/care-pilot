@@ -29,7 +29,7 @@ llmchat = lcai.AzureChatOpenAI(
     model_name="gpt-4",
 )
 
-def get_historical_context_chain():
+def get_historical_info_context_chain():
     contextualize_q_system_prompt = """Given a chat history and the latest user input \
         which might reference context in the chat history, formulate a standalone statement \
         which can be understood without the chat history. Do NOT respond to the statement, \
@@ -47,25 +47,28 @@ def get_historical_context_chain():
 def agent_coworker_info():
     client = mLangChain()
     prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
-                Help the representative address a customer's {complaint}. \
-                You may provide the ONE immediate next step for troubleshooting. \
-                OR provide solutions to resolve the customers needs. \
+                Help the representative address a customer's complaints about {product}. \
+                The representative's next message should aim to do ONLY ONE of the following:\
+                1) Request the customer to perform ONE immediate next step for troubleshooting. OR \
+                2) Provide a solution to resolve the customer's need. \
                 
-                Be concise. 
+                Customer message: {complaint}
+                Representative response: 
             """
     template = ChatPromptTemplate.from_messages(
         [
             ("system", prompt),
+            ("user", "{product}: {complaint}"),
         ]
     )
     chain = template | client.client_completion
 
     chain = (RunnablePassthrough.assign(
-                        context=get_historical_context_chain()
-                    )
-                     | template
-                     | llmchat
-                     )
+        context=get_historical_info_context_chain()
+    )
+             | template
+             | llmchat
+             )
 
     return chain
 
@@ -86,6 +89,38 @@ def agent_coworker_emo():
         ]
     )
     chain = template | client.client_completion
+    return chain
+
+def agent_coworker_emo_reframe():
+    client = mLangChain()
+
+    prompt = """Reframe the latest customer message to help empathize with them.\                
+                Here are some examples of reframing:
+                
+                Complaint: Why on earth do you need my zipcode? Fine, it's 10001, but hurry up and fix this mess. 
+                Reframe: The customer is frustrated with the network disruptions and needs an urgent resolution.
+                
+                Complaint: Yeah, finally, it's about time you asked for that. It's #784593. Now hurry up and figure out what mess you've made with my order! 
+                Reframe: The customer has been waiting on their order for a long time and is feeling frustrated. They are communicating while they are very hungry.
+                
+                Complaint: {complaint}
+                Reframe:
+            """
+    template = ChatPromptTemplate.from_messages(
+        [
+            ("system", prompt),
+            ("user", "{complaint}"),
+        ]
+    )
+    # chain = template | client.client_completion
+
+    chain = (RunnablePassthrough.assign(
+        context=get_historical_info_context_chain()
+    )
+             | template
+             | llmchat
+             )
+
     return chain
 
 

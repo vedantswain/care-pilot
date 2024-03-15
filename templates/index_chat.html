@@ -6,6 +6,7 @@
     <title>Pro-Pilot Prototype</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="{{ url_for('static', filename='style_chat.css') }}">
     <style>
         .msg-incoming {
@@ -16,56 +17,23 @@
             align-self: flex-end;
         }
     </style>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked@12.0.1/lib/marked.umd.min.js"></script>
     <script src="{{ url_for('static', filename='script_chat.js') }}"></script>
 </head>
 <body>
-<nav class="navbar">
-    <div class="container">
-        <div class="navbar-brand">
-            <span class="navbar-item is-size-4">Service Chat</span>
-            <div class="navbar-burger burger" data-target="navMenu">
-                <span></span>
-                <span></span>
-                <span></span>
-            </div>
-        </div>
-<!--        <div class="navbar-menu" id="navMenu">-->
-<!--            <div class="navbar-end">-->
-<!--                <a class="navbar-item">Profile</a>-->
-<!--            </div>-->
-<!--        </div>-->
-    </div>
-</nav>
 
 <!--sidebar-left-->
 <div class="columns is-mobile">
     <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-user hero is-fullheight">
+
         <div>
             <div style="margin-top: 8%; margin-left: 10%;">
                 <p>
-                    <strong>Customer Queue</strong>
+                    <strong>Queue</strong>
                 </p>
             </div>
         </div>
-        
-        <!--search bar-->
-<!--        <div class="top-field is-hidden-mobile has-text-centered">-->
-<!--            <form>-->
-<!--                <div class="field">-->
-<!--                    <p class="control has-icons-right">-->
-<!--                        <input class="input" type="search" placeholder="Search...">-->
-<!--                        <span class="icon is-small is-right">-->
-<!--								<svg class="bi bi-search" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">-->
-<!--									<path fill-rule="evenodd" d="M10.442 10.442a1 1 0 011.415 0l3.85 3.85a1 1 0 01-1.414 1.415l-3.85-3.85a1 1 0 010-1.415z" clip-rule="evenodd"/>-->
-<!--									<path fill-rule="evenodd" d="M6.5 12a5.5 5.5 0 100-11 5.5 5.5 0 000 11zM13 6.5a6.5 6.5 0 11-13 0 6.5 6.5 0 0113 0z" clip-rule="evenodd"/>-->
-<!--								</svg>-->
-<!--							</span>-->
-<!--                    </p>-->
-<!--                </div>-->
-<!--            </form>-->
-<!--        </div>-->
-        <!--chat list-->
+
        <div class="list">
             <a class="list-item box" href="../?product=pizza&grateful=0&ranting=0&expression=0">
                 <div class="media">
@@ -87,7 +55,7 @@
             </a>
        </div>
     </div>
-    <div class="column is-9-desktop is-8-tablet is-10-mobile is-paddingless">
+    <div class="column is-6-desktop is-4-tablet is-8-mobile is-paddingless">
         <nav class="navbar has-shadow user-nav">
             <div class="navbar-start">
                 <div class="media">
@@ -99,23 +67,24 @@
                     <div class="media-content">
                         <div class="content">
                             <p>
-                                <strong>Customer Name</strong>
+                                <strong>Client Name</strong>
                                 <br>
                                 <small>online</small>
                             </p>
+
                         </div>
                     </div>
                 </div>
             </div>
-<!--            <div class="navbar-end">-->
-<!--                <div class="media-content">-->
-<!--                    <div class="content">-->
-<!--                        <p>-->
-<!--                            <strong>Pro-Pilot</strong>-->
-<!--                        </p>-->
-<!--                    </div>-->
-<!--                </div>-->
-<!--            </div>-->
+            <div class="navbar-end">
+                <div class="media-content">
+                    <div class="content">
+                        <div style="display: flex">
+                            <span id="typing" class="typing"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
 <!--            <div class="navbar-end">-->
 <!--                <a class="navbar-item">-->
 <!--						<span class="icon is-size-2">-->
@@ -136,44 +105,64 @@
 
         <!-- Main Content columns: One for chat window another for profile -->
         <div class="columns">
-            <div class="column is-8 is-12-mobile is-flex hero is-fullheight message-window">
-                <div class="flex-item-1" id="chatWindow" style=" width: 100%; display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 80vh;">
-                    <article class="message is-warning msg-incoming">
-                        <div class="message-body">
-                            {{ initial_msg }}
+            <div class="column is-12 is-12-mobile is-flex hero is-fullheight message-window">
+
+                    <div class="flex-item-1" id="chatWindow" style=" width: 100%; display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 60vh;">
+                        <!--                    <article class="message is-warning msg-incoming">-->
+                        <!--                        <div class="message-body">-->
+                        <!--                            {{ initial_msg }}-->
+                        <!--                        </div>-->
+                        <!--                    </article>-->
+                        <!--                    <article class="message is-dark msg-outgoing">-->
+                        <!--                        <div class="message-body">-->
+                        <!--                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.-->
+                        <!--                        </div>-->
+                        <!--                    </article>-->
+                    </div>
+                    <div class="flex-item-2">
+                        <div id="co-pilot">
+
                         </div>
-                    </article>
-<!--                    <article class="message is-dark msg-outgoing">-->
-<!--                        <div class="message-body">-->
-<!--                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.-->
-<!--                        </div>-->
-<!--                    </article>-->
-                    <span class="loader" id="loader" style="display: none; order: 9999; padding: 2%;"></span>
-                </div>
-                <div class="flex-item-2">
-                    <form onsubmit="sendMessage(); return false;">
-                        <div class="field has-addons">
-                            <div class="control">
-                                <input class="input" type="text" placeholder="Type your message..." id="messageInput">
+
+                        <form onsubmit="sendMessage(); return false;">
+                            <div class="field has-addons">
+                                <div class="control">
+                                    <textarea class="textarea" type="text" placeholder="Type your message..." id="messageInput"></textarea>
+                                </div>
+                                <div class="control">
+                                    <button type="submit" class="button" id="sendButton" onclick="sendMessage()">
+                                        <svg height="36px" width="36px" viewBox="0 0 36 36"><g fill="none" fill-rule="evenodd"><g><polygon points="0 36 36 36 36 0 0 0"></polygon><path d="M31.1059281,19.4468693 L10.3449666,29.8224462 C8.94594087,30.5217547 7.49043432,29.0215929 8.17420251,27.6529892 C8.17420251,27.6529892 10.7473302,22.456697 11.4550902,21.0955966 C12.1628503,19.7344961 12.9730756,19.4988922 20.4970248,18.5264632 C20.7754304,18.4904474 21.0033531,18.2803547 21.0033531,17.9997309 C21.0033531,17.7196073 20.7754304,17.5095146 20.4970248,17.4734988 C12.9730756,16.5010698 12.1628503,16.2654659 11.4550902,14.9043654 C10.7473302,13.5437652 8.17420251,8.34697281 8.17420251,8.34697281 C7.49043432,6.9788693 8.94594087,5.47820732 10.3449666,6.1775158 L31.1059281,16.553593 C32.298024,17.1488555 32.298024,18.8511065 31.1059281,19.4468693" fill="#363636"></path></g></g></svg>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="control">
-                                <button type="submit" class="button" id="sendButton" onclick="sendMessage()">
-                                    <svg height="36px" width="36px" viewBox="0 0 36 36"><g fill="none" fill-rule="evenodd"><g><polygon points="0 36 36 36 36 0 0 0"></polygon><path d="M31.1059281,19.4468693 L10.3449666,29.8224462 C8.94594087,30.5217547 7.49043432,29.0215929 8.17420251,27.6529892 C8.17420251,27.6529892 10.7473302,22.456697 11.4550902,21.0955966 C12.1628503,19.7344961 12.9730756,19.4988922 20.4970248,18.5264632 C20.7754304,18.4904474 21.0033531,18.2803547 21.0033531,17.9997309 C21.0033531,17.7196073 20.7754304,17.5095146 20.4970248,17.4734988 C12.9730756,16.5010698 12.1628503,16.2654659 11.4550902,14.9043654 C10.7473302,13.5437652 8.17420251,8.34697281 8.17420251,8.34697281 C7.49043432,6.9788693 8.94594087,5.47820732 10.3449666,6.1775158 L31.1059281,16.553593 C32.298024,17.1488555 32.298024,18.8511065 31.1059281,19.4468693" fill="#363636"></path></g></g></svg>
-                                </button>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="column is-hidden-mobile sidebar-profile"  id="supportWindow" style="display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 80vh; margin-right: 4em;">
-                <div class="content">
-                    <p>
-                        <strong>Pro-Pilot</strong>
-                    </p>
-                </div>
-                <span class="loader" id="sloader" style="display: none; order: 9999; padding: 2%;"></span>
+                        </form>
+                    </div>
+
             </div>
         </div>
+    </div>
+    <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-profile is-fullheight" style="display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 80vh; margin-right: 4em;">
+
+        <div id="supportWindow" style="padding: 32px 32px 16px 16px;">
+<!--            <article class="message is-primary msg-primary">-->
+<!--                <div class="message-header">-->
+<!--                    REFRAME CLIENT-->
+<!--                </div>-->
+<!--                <pre class="message-body">-->
+<!--                                    {{ initial_emo_reframe }}-->
+<!--                                </pre>-->
+<!--            </article>-->
+<!--            <article class="message is-primary msg-primary">-->
+<!--                <div class="message-header">-->
+<!--                    REFLECT ON YOURSELF-->
+<!--                </div>-->
+<!--                <pre class="message-body">-->
+<!--                                    {{ initial_emo }}-->
+<!--                                </pre>-->
+<!--            </article>-->
+<!--            <span class="sloader" id="sloader" style="display: block; order: 9999; padding: 2%;"></span>-->
+        </div>
+
     </div>
 </div>
 
