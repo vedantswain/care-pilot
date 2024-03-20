@@ -27,8 +27,8 @@ app.config["MONGO_URI"] = os.getenv("AZURE_COSMOS_MONGO_CONNSTRING")
 mongo = PyMongo(app, tlsCAFile=certifi.where())
 client = mongo.cx
 
-db = client[DB_NAME]
-print(client.list_databases())
+# db = client[DB_NAME]
+# print(client.list_databases())
 
 sender_agent = None
 chat_history = [
@@ -116,31 +116,7 @@ def getInfoSupport():
         "message": response
     })
 
-@app.route('/response', methods=['POST'])
-def generate_response():
 
-    retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
-    chat_history = messages_from_dict(retrieve_from_session)
-
-
-    result = sender_agent.invoke({"input": prompt, "chat_history": chat_history})
-    response = result
-
-    chat_history.extend([HumanMessage(content=prompt), AIMessage(content=response)])
-
-    session["chat_history"] = messages_to_dict(chat_history)
-    # session["chat_history"] = chat_history
-
-    response_cw_info = agent_coworker_info().invoke({'product': session['product'],'complaint':response, "chat_history": chat_history})
-    response_cw_emo = agent_coworker_emo().invoke({'complaint':response})
-    response_cw_emo_reframe = agent_coworker_emo_reframe().invoke({'complaint':response, "chat_history": chat_history})
-
-    return jsonify({
-        "message": response,
-        "support_info":response_cw_info.content,
-        "support_emo":response_cw_emo,
-        "support_emo_reframe":response_cw_emo_reframe.content,
-    })
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080)
