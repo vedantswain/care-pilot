@@ -27,7 +27,7 @@
     <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-user hero is-fullheight">
 
         <div>
-            <div style="margin-top: 8%; margin-left: 10%;">
+            <div style="margin-top: 8%; margin-left: 5%;">
                 <p>
                     <strong>Queue</strong>
                 </p>
@@ -54,6 +54,8 @@
                 </div>
             </a>
        </div>
+       <div id="troubleWindow" style="padding: 32px 32px 16px 16px;">
+       </div>
     </div>
     <div class="column is-6-desktop is-4-tablet is-8-mobile is-paddingless">
         <nav class="navbar has-shadow user-nav">
@@ -71,20 +73,19 @@
                                 <br>
                                 <small>online</small>
                             </p>
-
                         </div>
                     </div>
+                    <span id="typing" class="typing"></span>
                 </div>
             </div>
-            <div class="navbar-end">
+            <!-- <div class="navbar-end">
                 <div class="media-content">
                     <div class="content">
-                        <div style="display: flex">
-                            <span id="typing" class="typing"></span>
+                        <div style="display: flex"> 
                         </div>
                     </div>
                 </div>
-            </div>
+            </div> -->
 <!--            <div class="navbar-end">-->
 <!--                <a class="navbar-item">-->
 <!--						<span class="icon is-size-2">-->
@@ -121,7 +122,6 @@
                     </div>
                     <div class="flex-item-2">
                         <div id="co-pilot">
-
                         </div>
 
                         <form onsubmit="sendMessage(); return false;">

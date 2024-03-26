@@ -23,9 +23,9 @@ print(os.getenv("AZURE_OPENAI_ENDPOINT"))
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.secret_key = 'your_secret_key'  # Required for session to work
-app.config["MONGO_URI"] = os.getenv("AZURE_COSMOS_MONGO_CONNSTRING")
-mongo = PyMongo(app, tlsCAFile=certifi.where())
-client = mongo.cx
+# app.config["MONGO_URI"] = os.getenv("AZURE_COSMOS_MONGO_CONNSTRING")
+# mongo = PyMongo(app, tlsCAFile=certifi.where())
+# client = mongo.cx
 
 # db = client[DB_NAME]
 # print(client.list_databases())
@@ -110,6 +110,21 @@ def getInfoSupport():
     chat_history = messages_from_dict(retrieve_from_session)
 
     response_cw_info = agent_coworker_info().invoke({'product': session['product'],'complaint':reply, "chat_history": chat_history})
+    # response = response_cw_info.content
+
+    return jsonify({
+        "message": response_cw_info
+    })
+
+@app.route('/get-trouble-support', methods=['POST'])
+def getTroubleSupport():
+    reply = request.json.get("client_reply")
+    # support_type = request.json.get("type")
+
+    retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
+    chat_history = messages_from_dict(retrieve_from_session)
+
+    response_cw_info = agent_coworker_trouble().invoke({'product': session['product'],'complaint':reply, "chat_history": chat_history})
     response = response_cw_info.content
 
     return jsonify({
