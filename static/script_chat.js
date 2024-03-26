@@ -17,61 +17,80 @@ function createMessageElement(messageText, msgClass, messageHeader='') {
   return article
 }
 
-function createSupportPane(messageText, msgClass, messageHeader=''){
+
+function createSupportPane(messageText, msgClass){
     const article = document.createElement('div');
     article.classList.add('card');
-    const header = document.createElement('div');
-    header.classList.add('card-header');
-    const headerTitle = document.createElement('div');
-    headerTitle.classList.add('card-header-title');
-    headerTitle.textContent = messageHeader.toUpperCase();
-    header.appendChild(headerTitle)
 
     const body = document.createElement('div');
     body.classList.add('card-content');
     innerContent = document.createElement('pre');
-    messageText = marked.parse(messageText);
-    innerContent.innerHTML = messageText;
+    markedmsgText = marked.parse(messageText);
+    innerContent.innerHTML = markedmsgText;
     body.appendChild(innerContent);
 
     if (msgClass === "info"){
-        const button = document.createElement('button');
-        button.classList.add('card-header-icon')
-        const span = document.createElement('span');
-        span.classList.add('icon', 'is-small');
-        const icon = document.createElement('i');
-        icon.classList.add('fas', 'fa-copy');
-        span.appendChild(icon)
-        button.appendChild(span)
+        // let header = body.querySelector('.card-header');
+        // if (!header) {
+        //     header = document.createElement('div');
+        //     header.classList.add('card-header');
+        //     body.insertBefore(header, body.firstChild); // Insert at the top
+        // }
 
-        header.appendChild(button)
+        // const button = document.createElement('button');
+        // button.classList.add('card-header-icon');
+        // const span = document.createElement('span');
+        // span.classList.add('icon', 'is-small');
+        // const icon = document.createElement('i');
+        // icon.classList.add('fas', 'fa-copy');
+        // span.appendChild(icon);
+        // button.appendChild(span);
+        // header.appendChild(button);
+        // //article.appendChild(header);
+        // button.addEventListener('click', () => {
+        //     navigator.clipboard.writeText(messageText)
+        //         .then(() => {
+        //             const textarea = document.getElementById('messageInput');
+        //             textarea.value = messageText;
+        //         })
+        //         .catch(err => {
+        //             console.error('Could not copy text: ', err);
+        //         });
+        // });
 
         article.classList.add('is-info')
     }
     if (msgClass === "emo"){
         article.classList.add('is-emo')
     }
-    article.appendChild(header);
+    if (msgClass === "trouble"){
+        article.classList.add('is-trouble')
+    }
+    //article.appendChild(header);
     article.appendChild(body);
 
     return article
 }
 
-function createLoader(parentId='co-pilot', loaderId='info-loader'){
-    const infoDiv = document.getElementById(parentId);
-
+function createLoader(loaderId='info-loader') {
     const loader = document.createElement('span');
     loader.classList.add('loader');
     loader.id = loaderId
-
-    infoDiv.appendChild(loader)
-
-    return loader
+    return loader;
 }
 
 function retrieveInfoSupport(message){
-    let loader = createLoader()
     const infoDiv = document.getElementById('co-pilot');
+
+    const header = document.createElement('div');
+    header.classList.add('card-header');
+    const headerTitle = document.createElement('div');
+    headerTitle.classList.add('card-header-title');
+    headerTitle.textContent = "Suggested Response".toUpperCase();
+    let loader = createLoader()
+    header.appendChild(headerTitle);
+    header.appendChild(loader);
+    infoDiv.appendChild(header);
 
     fetch('/get-info-support', {
             method: 'POST',
@@ -82,10 +101,21 @@ function retrieveInfoSupport(message){
         })
         .then(response => response.json())
         .then(data => {
-            var infoMessage = createSupportPane(data.message, "info", "Suggested Response")
-            infoDiv.appendChild(infoMessage);
+            const responseContainer = document.createElement('div');
+            responseContainer.style.display = 'flex';
+            responseContainer.style.flexDirection = 'row';
+            responseContainer.style.justifyContent = 'space-around';
+            responseContainer.style.alignItems = 'center';
+            data.message.forEach((message) => {
+                var infoMessage = createSupportPane(message, "info");
+                responseContainer.appendChild(infoMessage);
+            });
+            infoDiv.appendChild(responseContainer);
             document.getElementById('info-loader').remove();
-
+            // var infoMessage = createSupportPane(data.message, "info", "Suggested Response")
+            // console.log(infoMessage);
+            // infoDiv.appendChild(infoMessage);
+            // document.getElementById('info-loader').remove();
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -93,9 +123,37 @@ function retrieveInfoSupport(message){
 }
 
 function retrieveEmoSupport(message, support_type){
-    let loaderId = support_type+'-loader'
-    let loader = createLoader('supportWindow',loaderId)
     const supportDiv = document.getElementById('supportWindow');
+
+    const headerId = `${support_type}-header`;
+    const contentId = `${support_type}-content`;
+    let loaderId = support_type+'-loader'
+    let loader = createLoader(loaderId)
+
+    let header = document.getElementById(headerId);
+    let contentContainer = document.getElementById(contentId);
+
+    // If the header doesn't exist, create it and the content container
+    if (!header) {
+        header = document.createElement('div');
+        header.id = headerId;
+        header.classList.add('card-header');
+
+        const headerTitle = document.createElement('div');
+        headerTitle.classList.add('card-header-title');
+        headerTitle.textContent = support_type.toUpperCase();
+
+        header.appendChild(headerTitle);
+        header.appendChild(loader);
+        supportDiv.appendChild(header);
+
+        contentContainer = document.createElement('div');
+        contentContainer.id = contentId;
+        contentContainer.classList.add('card-content');
+        supportDiv.appendChild(contentContainer);
+    }
+
+
 
     fetch('/get-emo-support', {
             method: 'POST',
@@ -106,9 +164,43 @@ function retrieveEmoSupport(message, support_type){
         })
         .then(response => response.json())
         .then(data => {
-            var emoMessage = createSupportPane(data.message, "emo", support_type)
-            supportDiv.appendChild(emoMessage);
-            supportDiv.scrollTop = supportDiv.scrollHeight;
+            var emoMessage = createSupportPane(data.message, "emo")
+            contentContainer.appendChild(emoMessage);
+            // supportDiv.appendChild(emoMessage);
+            // supportDiv.scrollTop = supportDiv.scrollHeight;
+            document.getElementById(loaderId).remove();
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+        });
+}
+
+function retrieveTroubleSupport(message){
+    const troubleDiv = document.getElementById('troubleWindow');
+
+    const header = document.createElement('div');
+    header.classList.add('card-header');
+    const headerTitle = document.createElement('div');
+    headerTitle.classList.add('card-header-title');
+    headerTitle.textContent = "Trouble Shooting".toUpperCase();
+    let loaderId = 'trouble-loader'
+    let loader = createLoader(loaderId)
+    header.appendChild(headerTitle);
+    header.appendChild(loader);
+    troubleDiv.appendChild(header);
+
+    fetch('/get-trouble-support', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({client_reply: message}),
+        })
+        .then(response => response.json())
+        .then(data => {
+            var troubleMessage = createSupportPane(data.message, "trouble")
+            troubleDiv.appendChild(troubleMessage);
+            //troubleDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
         })
         .catch((error) => {
@@ -128,6 +220,10 @@ function processClientResponse(data){
     const infoDiv = document.getElementById('co-pilot');
     infoDiv.innerHTML = '';
     retrieveInfoSupport(data.message);
+
+    const troubleDiv = document.getElementById('troubleWindow');
+    troubleDiv.innerHTML = '';
+    retrieveTroubleSupport(data.message);
 
 
     const supportDiv = document.getElementById('supportWindow');

@@ -11,6 +11,7 @@ from langchain_core.prompts import ChatPromptTemplate, MessagesPlaceholder
 from langchain_core.output_parsers import StrOutputParser
 from langchain_core.runnables import RunnablePassthrough
 
+import re
 from dotenv import load_dotenv
 load_dotenv("project.env")
 
@@ -48,9 +49,49 @@ def agent_coworker_info():
     client = mLangChain()
     prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
                 Help the representative address a customer's complaints about {product}. \
-                The representative's next message should aim to do ONLY ONE of the following:\
+                The representative's next message should be non-verbose 2 - 3 cues that aim to do ONLY ONE of the following (Each Cues should be Max 10 Words):\
                 1) Request the customer to perform ONE immediate next step for troubleshooting. OR \
                 2) Provide a solution to resolve the customer's need. \
+                
+                Customer message: {complaint}
+                Representative response: 
+            """
+    template = ChatPromptTemplate.from_messages(
+        [
+            ("system", prompt),
+            ("user", "{product}: {complaint}"),
+        ]
+    )
+    chain = template | client.client_completion
+
+    chain = (RunnablePassthrough.assign(
+        context=get_historical_info_context_chain()
+    )
+             | template
+             | llmchat
+             )
+    
+    def extract_cues(chain_output):
+        cues_text = chain_output.content
+        # Assuming each cue is separated by a newline in the chain_output.
+        cues = cues_text.split('\n')
+        # Filter out any empty strings or whitespace-only strings
+        cues = [cue.strip() for cue in cues if cue.strip()]
+        # Return the first 2 - 3 cues
+        processed_cues = [re.sub(r'^\d+\.\s*', '', cue) for cue in cues]
+        return processed_cues[:3]
+    
+    chain = chain | extract_cues
+
+    return chain
+
+
+def agent_coworker_trouble():
+    client = mLangChain()
+    prompt = """Your role is to help a service representative by providing TROUBLESHOOTING SUPPORT. \
+                Help the representative address a customer's complaints about {product}. \
+                The representative's next message should aim to provide step by step guideline for troubleshooting.\
+                Every steps should be less than 10 words and Maximum 7 steps!\
                 
                 Customer message: {complaint}
                 Representative response: 
