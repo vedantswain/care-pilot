@@ -29,6 +29,14 @@ llmchat = lcai.AzureChatOpenAI(
     openai_api_version="2024-02-15-preview",
     model_name="gpt-4",
 )
+llminfo = lcai.AzureChatOpenAI(
+    openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+    azure_deployment="NUHAI-GPT4",
+    openai_api_version="2024-02-15-preview",
+    model_name="gpt-4",
+    temperature=0.1
+)
 
 def get_historical_info_context_chain():
     contextualize_q_system_prompt = """Given a chat history and the latest user input \
@@ -48,17 +56,25 @@ def get_historical_info_context_chain():
 def agent_coworker_info():
     client = mLangChain()
     prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
-                Help the representative address a customer's complaints about {product}. \
-                The representative's next message should be non-verbose 2 - 3 cues that aim to do ONLY ONE of the following (Each Cues should be Max 10 Words):\
-                1) Request the customer to perform ONE immediate next step for troubleshooting. OR \
-                2) Provide a solution to resolve the customer's need. \
+                The representative is chatting online with a customer complaining about {product}.  \
+                
+                Given the chat history,
+                provide 2-3 hints to help the representative's response.\
+                The hints should direct the representative to do ONLY ONE of the following:\
+                
+                1) Inquire more details about the problem. OR \
+                2) Request the customer to troubleshoot. OR \
+                3) Provide a solution to resolve the customer's need. \
+                
+                Each cue should be a single phrase of less than 10 words.\
                 
                 Customer message: {complaint}
-                Representative response: 
+                Hints: 
             """
     template = ChatPromptTemplate.from_messages(
         [
             ("system", prompt),
+            MessagesPlaceholder(variable_name="chat_history"),
             ("user", "{product}: {complaint}"),
         ]
     )
@@ -68,7 +84,7 @@ def agent_coworker_info():
         context=get_historical_info_context_chain()
     )
              | template
-             | llmchat
+             | llminfo
              )
     
     def extract_cues(chain_output):
@@ -88,17 +104,21 @@ def agent_coworker_info():
 
 def agent_coworker_trouble():
     client = mLangChain()
-    prompt = """Your role is to help a service representative by providing TROUBLESHOOTING SUPPORT. \
-                Help the representative address a customer's complaints about {product}. \
-                The representative's next message should aim to provide step by step guideline for troubleshooting.\
-                Every steps should be less than 10 words and Maximum 7 steps!\
+    prompt = """Your role is to help a service representative by providing PROCEDURAL SUPPORT. \
+                The representative is chatting online with a customer complaining about {product}. \
+                Given the chat history,
+                list 3-7 steps to guide the representative in resolving the customer complaint.\
+
+                Do NOT include steps that have already been tried.\
+                Every step should be less than 10 words.\
                 
                 Customer message: {complaint}
-                Representative response: 
+                Troubleshooting Steps: 
             """
     template = ChatPromptTemplate.from_messages(
         [
             ("system", prompt),
+            MessagesPlaceholder(variable_name="chat_history"),
             ("user", "{product}: {complaint}"),
         ]
     )
@@ -108,7 +128,7 @@ def agent_coworker_trouble():
         context=get_historical_info_context_chain()
     )
              | template
-             | llmchat
+             | client.client_completion
              )
 
     return chain
@@ -159,7 +179,7 @@ def agent_coworker_emo_reframe():
         context=get_historical_info_context_chain()
     )
              | template
-             | llmchat
+             | client.client_completion
              )
 
     return chain
@@ -246,18 +266,34 @@ class mAgentCustomer:
         contextualize_q_chain = contextualize_q_prompt | llmchat | StrOutputParser()
         return contextualize_q_chain
 
-    def get_info_prompt(self):
+    def get_uncivil_chain(self):
         qa_info_prompt = """
             Your role is to act like a CUSTOMER seeking support. \
             The user is a support representative. \
             Respond to the question as if you were the customer. \
-            If the user is asking for a specific detail, respond with a believable answer.
+            Do NOT reveal your role.\
+            
+            If the user is asking for a specific detail, respond with a believable answer.\
+            If customer has agreed with response then respond with "FINISH:999"
+            After 7-10 turns, respond with messages to close the conversation.\
+            After 12 turns, do NOT respond further, only respond with "FINISH:999".\
+            
+            Phrase your responses like an UNCIVIL customer:\
+            - Talk in a rude, impolite, and disrespectuful tone of voice.\
+            - Do NOT use good manners. Do NOT use courtesy.\
+            - Act with disregard to others.\
+            
+            
+            Representative: {question}
+            Customer:
         """
         qa_info = ChatPromptTemplate.from_messages(
             [
                 ("system", qa_info_prompt),
                 MessagesPlaceholder(variable_name="chat_history"),
-                ("human", "{question}"),
+                ("user", '''
+                    Representative asked: {question}
+                '''),
             ]
         )
         rag_chain_info = (
@@ -268,46 +304,12 @@ class mAgentCustomer:
                 | llmchat
         )
         return rag_chain_info
-    def get_uncivil_prompt(self):
-        qa_uncivil_prompt = """
-            Given a history of messages, where the AI is a customer and the user is a representative, rephrase the response to the representative's message.\
-            
-            Rephrase the customer response to sound UNCIVIL. \
-            Your rephrase must retain the information of th original response.\
-            Do NOT reply to the question ONLY rephrase. \
-            
-            This is what UNCIVIL customers do:\
-            - Address others in an unprofessional, disrespectful way-for example, talking down, using degrading remarks or tone of voice.\
-            - Pay little or no attention to others’ opinions.\
-            - Use intimidating or threatening verbal communication—yelling, repeated emotional outbursts, threats, berating or harsh tone of voice, repeatedly interrupting.\
-            - Blaming others for things out of their control.\
-            - Accusing others of incompetence or dismissing their expertise.\
-        """
-        qa_uncivil = ChatPromptTemplate.from_messages(
-            [
-                ("system", qa_uncivil_prompt),
-                MessagesPlaceholder(variable_name="chat_history"),
-                ("user", '''
-                    Representative asked: {question}
-                    Customer responded: {input}
-                '''),
-            ]
-        )
-        chain_uncivil = (RunnablePassthrough.assign(
-                            context=self.history_chain
-                        )
-                         | qa_uncivil
-                         | llmchat
-                         )
-        return chain_uncivil
 
     def invoke(self, user_input):
-        info_msg = self.info_chain.invoke({"chat_history": user_input['chat_history'], "question": user_input['input']})
-        ai_msg = self.uncivil_chain.invoke({"chat_history": user_input['chat_history'], "question": user_input['input'], "input": info_msg.content})
+        ai_msg = self.uncivil_chain.invoke({"chat_history": user_input['chat_history'], "question": user_input['input']})
 
         return ai_msg.content
 
     def __init__(self):
             self.history_chain = self.get_historical_context_chain()
-            self.info_chain = self.get_info_prompt()
-            self.uncivil_chain = self.get_uncivil_prompt()
+            self.uncivil_chain = self.get_uncivil_chain()

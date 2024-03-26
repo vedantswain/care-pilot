@@ -91,7 +91,7 @@ def getEmoSupport():
 
     if support_type=="reframe_client":
         response_cw_emo = agent_coworker_emo_reframe().invoke({'complaint':reply, "chat_history": chat_history})
-        response = response_cw_emo.content
+        response = response_cw_emo
     if support_type=="reflect":
         response_cw_emo = agent_coworker_emo().invoke({'complaint':reply})
         response = response_cw_emo
@@ -125,7 +125,7 @@ def getTroubleSupport():
     chat_history = messages_from_dict(retrieve_from_session)
 
     response_cw_info = agent_coworker_trouble().invoke({'product': session['product'],'complaint':reply, "chat_history": chat_history})
-    response = response_cw_info.content
+    response = response_cw_info
 
     return jsonify({
         "message": response
