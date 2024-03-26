@@ -4,15 +4,15 @@ from openai import AzureOpenAI
 client = AzureOpenAI(
   azure_endpoint = os.getenv("AZURE_OPENAI_ENDPOINT"),
   api_key=os.getenv("AZURE_OPENAI_KEY"),
-  api_version="2023-10-01-preview",  # This API version or later is required to access fine-tuning for turbo/babbage-002/davinci-002
+  api_version="2024-02-15-preview",  # This API version or later is required to access fine-tuning for turbo/babbage-002/davinci-002
   # azure_deployment="CSR"
 )
 
 '''
 Output after uploading
 '''
-training_file_id = "file-396de6278d154df8a83fb7420917a414"
-validation_file_id =  "file-d50a9ffaaf3b465fa80afda315e9bb0c"
+training_file_id = "file-4a6f0799eb2444bbaf055f06b6cda140"
+validation_file_id =  "file-6e5abe29822447c78f01038c9bf20993"
 
 response = client.fine_tuning.jobs.create(
     training_file=training_file_id,
@@ -28,3 +28,4 @@ job_id = response.id
 print("Job ID:", response.id)
 print("Status:", response.id)
 print(response.model_dump_json(indent=2))
+#%%
