@@ -152,24 +152,22 @@ def agent_coworker_emo():
     chain = template | client.client_completion
     return chain
 
-def agent_coworker_emo_reframe():
+def agent_coworker_emo_perspective():
     client = mLangChain()
 
-    prompt = """Reframe the latest customer message to help empathize with them.\                
-                Here are some examples of reframing:
+    prompt = """Your role is to provide the customer's perspective of the conversation.
+                Summarize this for the representative.\
+                Describe how the customer might feel.\
+                Describe how the customer might view the problem.\
                 
-                Complaint: Why on earth do you need my zipcode? Fine, it's 10001, but hurry up and fix this mess. 
-                Reframe: The customer is frustrated with the network disruptions and needs an urgent resolution.
+                Limit your response to 2 sentences.
                 
-                Complaint: Yeah, finally, it's about time you asked for that. It's #784593. Now hurry up and figure out what mess you've made with my order! 
-                Reframe: The customer has been waiting on their order for a long time and is feeling frustrated. They are communicating while they are very hungry.
-                
-                Complaint: {complaint}
-                Reframe:
+                Customer perspective:
             """
     template = ChatPromptTemplate.from_messages(
         [
             ("system", prompt),
+            MessagesPlaceholder(variable_name="chat_history"),
             ("user", "{complaint}"),
         ]
     )
@@ -313,3 +311,4 @@ class mAgentCustomer:
     def __init__(self):
             self.history_chain = self.get_historical_context_chain()
             self.uncivil_chain = self.get_uncivil_chain()
+#%%

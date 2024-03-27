@@ -24,7 +24,7 @@ function createSupportPane(messageText, msgClass){
 
     const body = document.createElement('div');
     body.classList.add('card-content');
-    innerContent = document.createElement('pre');
+    innerContent = document.createElement('div');
     markedmsgText = marked.parse(messageText);
     innerContent.innerHTML = markedmsgText;
     body.appendChild(innerContent);

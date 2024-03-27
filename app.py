@@ -90,7 +90,7 @@ def getEmoSupport():
     chat_history = messages_from_dict(retrieve_from_session)
 
     if support_type=="reframe_client":
-        response_cw_emo = agent_coworker_emo_reframe().invoke({'complaint':reply, "chat_history": chat_history})
+        response_cw_emo = agent_coworker_emo_perspective().invoke({'complaint':reply, "chat_history": chat_history})
         response = response_cw_emo
     if support_type=="reflect":
         response_cw_emo = agent_coworker_emo().invoke({'complaint':reply})
