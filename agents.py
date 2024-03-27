@@ -67,6 +67,7 @@ def agent_coworker_info():
                 3) Provide a solution to resolve the customer's need. \
                 
                 Each cue should be a single phrase of less than 10 words.\
+                Do NOT number the cues.\
                 
                 Customer message: {complaint}
                 Hints: 
