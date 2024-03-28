@@ -109,6 +109,8 @@ def agent_coworker_trouble():
                 The representative is chatting online with a customer complaining about {product}. \
                 Given the chat history,
                 list 3-7 steps to guide the representative in resolving the customer complaint.\
+                Review the similar PROCEDURAL SUPPORT history if exist, then assess the current situation in depth and provide detailed steps for resolution\
+                if not exist, offer an alternative solution that can solve current solution as detail as possible\
 
                 Do NOT include steps that have already been tried.\
                 Every step should be less than 10 words.\
@@ -162,6 +164,7 @@ def agent_coworker_emo_perspective():
                 Describe how the customer might view the problem.\
                 
                 Limit your response to 2 sentences.
+                Write sentence using 2nd person pronouns as subject
                 
                 Customer perspective:
             """
