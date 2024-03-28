@@ -86,7 +86,7 @@ function retrieveInfoSupport(message){
     header.classList.add('card-header');
     const headerTitle = document.createElement('div');
     headerTitle.classList.add('card-header-title');
-    headerTitle.textContent = "Suggested Response".toUpperCase();
+    headerTitle.textContent = "Ways to Continue the Conversation".toUpperCase();
     let loader = createLoader()
     header.appendChild(headerTitle);
     header.appendChild(loader);
@@ -169,6 +169,22 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
+            if (support_type == "Put Yourself in the Client's Shoes") {
+                const span = document.createElement('span');
+                span.classList.add('icon', 'is-small');
+                const icon = document.createElement('i');
+                icon.classList.add('fas', 'fa-people-arrows');
+                span.appendChild(icon);
+                header.appendChild(span);
+            }
+            else if (support_type == "Be Mindful of Your Emotions") {
+                const span = document.createElement('span');
+                span.classList.add('icon', 'is-small');
+                const icon = document.createElement('i');
+                icon.classList.add('fas', 'fa-spa');
+                span.appendChild(icon);
+                header.appendChild(span);
+            }
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -182,7 +198,7 @@ function retrieveTroubleSupport(message){
     header.classList.add('card-header');
     const headerTitle = document.createElement('div');
     headerTitle.classList.add('card-header-title');
-    headerTitle.textContent = "Trouble Shooting".toUpperCase();
+    headerTitle.textContent = "Ways to Help Your Customers".toUpperCase();
     let loaderId = 'trouble-loader'
     let loader = createLoader(loaderId)
     header.appendChild(headerTitle);
@@ -202,6 +218,12 @@ function retrieveTroubleSupport(message){
             troubleDiv.appendChild(troubleMessage);
             //troubleDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
+            const span = document.createElement('span');
+            span.classList.add('icon', 'is-small');
+            const icon = document.createElement('i');
+            icon.classList.add('fas', 'fa-circle-info');
+            span.appendChild(icon);
+            header.appendChild(span);
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -228,8 +250,8 @@ function processClientResponse(data){
 
     const supportDiv = document.getElementById('supportWindow');
     supportDiv.innerHTML = '';
-    retrieveEmoSupport(data.message,'reframe_client');
-    retrieveEmoSupport(data.message,'reflect');
+    retrieveEmoSupport(data.message,"Put Yourself in the Client's Shoes");
+    retrieveEmoSupport(data.message,'Be Mindful of Your Emotions');
 }
 
 function sendMessage() {
