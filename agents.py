@@ -251,6 +251,125 @@ def agent_sender_fewshot_twitter():
     chain = template | client.client_completion
     return chain
 
+class mAgentER:
+    def __init__(self):
+        self.situation_chain = self.agent_coworker_emo_situation()
+        self.thought_chain = self.agent_coworker_emo_thought()
+        self.reframe_chain = self.agent_coworker_emo_reframe()
+
+    def invoke(self, user_input):
+        situation = self.situation_chain.invoke({'complaint':user_input['chat_history'], 'chat_history':user_input['chat_history']})
+        thought = self.thought_chain.invoke({'complaint':user_input['chat_history'], 'situation':situation, 'chat_history':user_input['chat_history']})
+        reframe = self.reframe_chain.invoke({'thought':thought, 'situation':situation})
+        return reframe
+
+    def agent_coworker_emo_situation(self):
+        client = mLangChain()
+
+        prompt = """The chat history describes a representative chatting online with a complaining customer. \
+                    The latest input is the last message from the customer. \
+                    which can be understood without the chat history.\
+                    Describe the situation with respect to the customer's behavior towards the representative.\
+                    Include the specifics of the complaint while describing the situation.\
+                    
+                    Do NOT respond to the input, just summarize the situation.\
+                    Do NOT speculate.\
+                """
+        template = ChatPromptTemplate.from_messages(
+            [
+                ("system", prompt),
+                MessagesPlaceholder(variable_name="chat_history"),
+                ("user", "{complaint}"),
+            ]
+        )
+        chain = template | client.client_completion
+
+        return chain
+
+    def agent_coworker_emo_thought(self):
+        client = mLangChain()
+
+        prompt = """You are roleplaying as the representative talking to a complaining customer.\
+                    Refer to the chat history between you and the customer and the latest {complaint} from the customer.\
+                    What is the representative thinking about the situation?\
+                    Be concise. Only 2 sentences.\
+                    
+                    Situation: An mturk requester rejected my task and I wasn't sure why because I work very hard on my tasks. Being new it affected my approval rating more negatively.\
+                    Thought: I'm not smart enough to succeed at mturk\
+                    
+                    Situation: I asked my daughter a question, and she responded in a snotty way.\
+                    Thought: She doesn't love me like she used to.\
+                    
+                    Situation: I got upset at my boss for not putting me in a temporary promotion to act as supervisor of our team.\
+                    Thought: I wasn't valued as much as the other person.\
+                    
+                    Situation: I had been working on a project at work for a very long time, but a higher up manager contacted my boss and asked about it, insinuating I wasn't delivering it fast enough.\
+                    Thought: I'm working on this as fast as I possibly can.\
+                    
+                    Situation: I tried on my wedding dress in front of my family. My mother was excited and told me I was beautiful, but other members of my family made comments about my weight. I was told to not eat and exercise so I could be beautiful.\
+                    Thought: I'm a fat ugly troll.\
+                    
+                    Situation: I was reprimanded at work for standing up to a coworker who was bullying another co-worker.\
+                    Thought: It was unfair that I was the one to get in trouble for defending a weaker person.\
+                    
+                    Situation: {situation}\
+                    Thought:
+                """
+        template = ChatPromptTemplate.from_messages(
+            [
+                ("system", prompt),
+                MessagesPlaceholder(variable_name="chat_history"),
+                ("user", "{situation}: {complaint}"),
+            ]
+        )
+        chain = template | client.client_completion
+
+        return chain
+
+    def agent_coworker_emo_reframe(self):
+        client = mLangChain()
+
+        prompt = """You are a representative chatting online with a complaining customer.\
+                    Reframe your thoughts in the given situation.
+                    
+                    Situation: An mturk requester rejected my task and I wasn't sure why because I work very hard on my tasks. Being new it affected my approval rating more negatively.\
+                    Thought: I'm not smart enough to succeed at mturk\
+                    Reframe: It seems like there was some miscommunication. It doesn't mean that I do not have the skills to do well with mturk. I should reach out to see if I can get more clarity on why my task was rejected.\
+                    
+                    Situation: I asked my daughter a question, and she responded in a snotty way.\
+                    Thought: She doesn't love me like she used to.\
+                    Reframe: Kids say snappy things to their parents all the time. It doesn't mean I'm a bad parent or that she doesn't love me.\
+                    
+                    Situation: I got upset at my boss for not putting me in a temporary promotion to act as supervisor of our team.\
+                    Thought: I wasn't valued as much as the other person.\
+                    Reframe: I should ask my boss why I was not selected for the promotion. Maybe the reason will be something other than my work ethic. Maybe my boss will reassure that I am still valuable to the company.\
+                    
+                    Situation: I had been working on a project at work for a very long time, but a higher up manager contacted my boss and asked about it, insinuating I wasn't delivering it fast enough.\
+                    Thought: I'm working on this as fast as I possibly can.\
+                    Reframe: I am stressed by trying to compare how fast I am working on this to how fast I think other people complete their assignments. I know I am being efficient with my time and producing good work. I need to focus on that to get this task done.\
+                    
+                    Situation: I tried on my wedding dress in front of my family. My mother was excited and told me I was beautiful, but other members of my family made comments about my weight. I was told to not eat and exercise so I could be beautiful.\
+                    Thought: I'm a fat ugly troll.\
+                    Reframe: The commend about my weight hurt and have me feeling self conscious. I'm glad my mother thinks I'm beautiful and know that my weight does not dictate my worth.\
+                    
+                    Situation: I was reprimanded at work for standing up to a coworker who was bullying another co-worker.\
+                    Thought: It was unfair that I was the one to get in trouble for defending a weaker person.\
+                    Reframe: I can own some responsibility for this conflict that occurred at work.\
+                    
+                    Situation: {situation}\
+                    Thought: {thought}\
+                    Reframe:\
+                """
+        template = ChatPromptTemplate.from_messages(
+            [
+                ("system", prompt),
+                ("user", "{situation}: {thought}"),
+            ]
+        )
+        chain = template | client.client_completion
+
+        return chain
+
 
 class mAgentCustomer:
     def get_historical_context_chain(self):

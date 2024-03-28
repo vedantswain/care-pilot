@@ -37,6 +37,7 @@ chat_history = [
 
 sender_initial = agent_sender_fewshot_twitter()
 sender_agent = mAgentCustomer()
+emo_agent = mAgentER()
 
 
 @app.route('/')
@@ -93,7 +94,7 @@ def getEmoSupport():
         response_cw_emo = agent_coworker_emo_perspective().invoke({'complaint':reply, "chat_history": chat_history})
         response = response_cw_emo
     if support_type=="Be Mindful of Your Emotions":
-        response_cw_emo = agent_coworker_emo().invoke({'complaint':reply})
+        response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
         response = response_cw_emo
 
     return jsonify({
