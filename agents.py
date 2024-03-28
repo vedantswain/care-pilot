@@ -194,11 +194,11 @@ def agent_sender_fewshot_twitter():
                 
                 Product: Mobile Network               
                 Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
-                Complaint: @O2 I received this a few weeks ago, since then I've been getting 2/3 calls a day from a telemarketer. Is someone using your name?\
+                Complaint: O2 I received this a few weeks ago, since then I've been getting 2/3 calls a day from a telemarketer. Is someone using your name?\
                 
                 Product: Air Travel
                 Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
-                Complaint: First flight for long time with @British_Airways. Now over one 1h delay for the short jump FRA-LCY and NO one here to provide status updates\
+                Complaint: First flight for long time with British Airways. Now over one 1h delay for the short jump FRA-LCY and NO one here to provide status updates\
                 
                 Product: Mobile Device
                 Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
@@ -206,11 +206,11 @@ def agent_sender_fewshot_twitter():
                 
                 Product: Mobile Device
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
-                Complaint:  After the 11.0.2 my phone just sucks most of the apps are broken, wifi disconnects frequently #apple #ios1102 #painfulupdate! \
+                Complaint:  After the 11.0.2 my phone just sucks most of the apps are broken, wifi disconnects frequently apple. Painfulupdate! \
                 
                 Product: Mobile Device
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
-                Complaint:  @AppleSupport #ios11update - is still killing my battery within 12 hours - phone is 10 months old - it's a disgrace - used to get 2 days \
+                Complaint:  Apple Support ios11 update - is still killing my battery within 12 hours - phone is 10 months old - it's a disgrace - used to get 2 days \
                 
                 Product: Air Travel
                 Feeling: You are NOT grateful. You are ranting. You are expressive.\
@@ -226,7 +226,7 @@ def agent_sender_fewshot_twitter():
                 
                 Product: Mobile Device                                                     
                 Feeling: You are grateful. You are NOT ranting. You are NOT expressive.\
-                Complaint: hi #apple, I‚ have a concern about the latest ios is too slow on #iphone6 and i am not happy with it. Any solution please? \
+                Complaint: hi #apple, I‚ have a concern about the latest ios is too slow on iphone6 and i am not happy with it. Any solution please? \
 
                 Product: Mobile App
                 Feeling: You are grateful. You are NOT ranting. You are expressive.\
@@ -234,7 +234,7 @@ def agent_sender_fewshot_twitter():
                 
                 Product: Convenience Store                
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
-                Complaint: Got id'd @Tesco for buying one Adnams Broadside. Is being blind part of the job-spec? I am 35 and 99 kilos. \
+                Complaint: Got id'd Tesco for buying one Adnams Broadside. Is being blind part of the job-spec? I am 35 and 99 kilos. \
                 
                 Product: {product}
                 Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expressive}.\
