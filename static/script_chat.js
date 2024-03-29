@@ -259,6 +259,7 @@ function sendMessage() {
     var message = input.value;
     input.value = '';
     input.disabled = true;
+    console.log(message)
 
     if(message.trim() === '') return;
 
@@ -277,8 +278,14 @@ function sendMessage() {
     })
     .then(response => response.json())
     .then(data => {
-        processClientResponse(data);
-        input.disabled = false;
+        if(data.message === "FINISH:999") {
+            alert("CONVERSATION RESOLVED")
+            typing.style.display = 'none';
+            input.disabled = true;
+        } else {
+            processClientResponse(data);
+            input.disabled = false;
+        }
     })
     .catch((error) => {
         console.error('Error:', error);

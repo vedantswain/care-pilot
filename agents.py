@@ -396,8 +396,8 @@ class mAgentCustomer:
             
             If the user is asking for a specific detail, respond with a believable answer.\
             If customer has agreed with response then respond with "FINISH:999"
-            After 7-10 turns, respond with messages to close the conversation.\
-            After 12 turns, do NOT respond further, only respond with "FINISH:999".\
+            After 10-16 turns, respond with messages to close the conversation.\
+            After 18 turns, do NOT respond further, only respond with "FINISH:999".\
             
             Phrase your responses like an UNCIVIL customer:\
             - Talk in a rude, impolite, and disrespectuful tone of voice.\
