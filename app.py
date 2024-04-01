@@ -77,7 +77,6 @@ def getReply():
         chat_history.extend([HumanMessage(content=prompt), AIMessage(content=response)])
         session["chat_history"] = messages_to_dict(chat_history)
 
-    print(response)
     return jsonify({
         "message": response
     })
