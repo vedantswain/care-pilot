@@ -22,9 +22,11 @@ function updateQueueDisplay() {
         userElement.innerHTML = `
             <div class="media">
                 <div class="media-left">
-                    <figure class="image is-48x48 is-32x32-mobile">
-                        <img src="https://via.placeholder.com/150" alt="Image" class="is-rounded">
-                    </figure>
+                    <p>
+                        <span class="icon is-large">
+                            <i class="fas fa-2x fa-circle-user"></i>
+                        </span>
+                    </p>
                 </div>
                 <div class="media-content is-hidden-mobile">
                     <div class="content">
@@ -173,56 +175,33 @@ function retrieveInfoSupport(message){
 function retrieveEmoSupport(message, support_type){
     const supportDiv = document.getElementById('supportWindow');
 
+    const cardId = `${support_type}-card`;
     const headerId = `${support_type}-header`;
-    const contentId = `${support_type}-content`;
-    const footerId = `${support_type}-footer`;
+    // const footerId = `${support_type}-footer`;
     let loaderId = support_type+'-loader'
     let loader = createLoader(loaderId)
 
+    let card = document.getElementById(cardId);
     let header = document.getElementById(headerId);
-    let contentContainer = document.getElementById(contentId);
-    let footer = document.getElementById(footerId);
+    // let footer = document.getElementById(footerId);
 
-    // If the header doesn't exist, create it and the content container
-    if (!header) {
-        header = document.createElement('div');
-        header.id = headerId;
-        header.classList.add('card-header');
+    card = document.createElement('div');
+    card.id = cardId;
+    card.classList.add('card');
 
-        const headerTitle = document.createElement('div');
-        headerTitle.classList.add('card-header-title');
-        headerTitle.textContent = support_type.toUpperCase();
+    header = document.createElement('div');
+    header.id = headerId;
+    header.classList.add('card-header');
 
-        header.appendChild(headerTitle);
-        header.appendChild(loader);
-        supportDiv.appendChild(header);
+    const headerTitle = document.createElement('div');
+    headerTitle.classList.add('card-header-title');
+    headerTitle.textContent = support_type.toUpperCase();
 
-        contentContainer = document.createElement('div');
-        contentContainer.id = contentId;
-        contentContainer.classList.add('card-content');
-        supportDiv.appendChild(contentContainer);
-
-        footer = document.createElement('div');
-        footer.id = footerId;
-        footer.classList.add('card-footer');
-        
-        const label = document.createElement('label');
-        label.setAttribute('for', 'customRange3');
-        label.classList.add('form-label');
-        label.textContent = 'Rate Response';
-        footer.appendChild(label);
-
-        const input = document.createElement('input');
-        input.setAttribute('type', 'range');
-        input.classList.add('form-range');
-        input.setAttribute('min', '1');
-        input.setAttribute('max', '5');
-        input.setAttribute('step', '1');
-        input.setAttribute('id', 'customRange3');
-        input.style.marginLeft = '5%';
-        footer.appendChild(input);
-        supportDiv.appendChild(footer);
-    }
+    header.appendChild(headerTitle);
+    header.appendChild(loader);
+    
+    card.appendChild(header);
+    supportDiv.appendChild(card);
 
 
 
@@ -236,7 +215,7 @@ function retrieveEmoSupport(message, support_type){
         .then(response => response.json())
         .then(data => {
             var emoMessage = createSupportPane(data.message, "emo")
-            contentContainer.appendChild(emoMessage);
+            card.appendChild(emoMessage);
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
@@ -250,6 +229,28 @@ function retrieveEmoSupport(message, support_type){
                 span.appendChild(icon);
                 p.appendChild(span);
                 header.appendChild(p);
+
+                const footer = document.createElement('p');
+                footer.classList.add('card-footer');
+                footer.style.background = 'white';
+                footer.style.marginBottom = '5%';
+                
+                const label = document.createElement('label');
+                label.setAttribute('for', 'customRange3');
+                label.classList.add('form-label');
+                label.textContent = 'Rate Response';
+                footer.appendChild(label);
+
+                const input = document.createElement('input');
+                input.setAttribute('type', 'range');
+                input.classList.add('form-range');
+                input.setAttribute('min', '1');
+                input.setAttribute('max', '5');
+                input.setAttribute('step', '1');
+                input.setAttribute('id', 'customRange3');
+                input.style.marginLeft = '5%';
+                footer.appendChild(input);
+                card.appendChild(footer);
             }
             else if (support_type == "Put Yourself in the Client's Shoes") {
                 const p = document.createElement('p');
@@ -261,6 +262,28 @@ function retrieveEmoSupport(message, support_type){
                 span.appendChild(icon);
                 p.appendChild(span);
                 header.appendChild(p);
+
+                const footer = document.createElement('p');
+                footer.classList.add('card-footer');
+                footer.style.background = 'white';
+                footer.style.marginBottom = '5%';
+                
+                const label = document.createElement('label');
+                label.setAttribute('for', 'customRange3');
+                label.classList.add('form-label');
+                label.textContent = 'Rate Response';
+                footer.appendChild(label);
+
+                const input = document.createElement('input');
+                input.setAttribute('type', 'range');
+                input.classList.add('form-range');
+                input.setAttribute('min', '1');
+                input.setAttribute('max', '5');
+                input.setAttribute('step', '1');
+                input.setAttribute('id', 'customRange3');
+                input.style.marginLeft = '5%';
+                footer.appendChild(input);
+                card.appendChild(footer);
             }
             else if (support_type == "Be Mindful of Your Emotions") {
                 const p = document.createElement('p');
@@ -272,6 +295,28 @@ function retrieveEmoSupport(message, support_type){
                 span.appendChild(icon);
                 p.appendChild(span);
                 header.appendChild(p);
+
+                const footer = document.createElement('p');
+                footer.classList.add('card-footer');
+                footer.style.background = 'white';
+                footer.style.marginBottom = '5%';
+                
+                const label = document.createElement('label');
+                label.setAttribute('for', 'customRange3');
+                label.classList.add('form-label');
+                label.textContent = 'Rate Response';
+                footer.appendChild(label);
+
+                const input = document.createElement('input');
+                input.setAttribute('type', 'range');
+                input.classList.add('form-range');
+                input.setAttribute('min', '1');
+                input.setAttribute('max', '5');
+                input.setAttribute('step', '1');
+                input.setAttribute('id', 'customRange3');
+                input.style.marginLeft = '5%';
+                footer.appendChild(input);
+                card.appendChild(footer);
             }
         })
         .catch((error) => {
