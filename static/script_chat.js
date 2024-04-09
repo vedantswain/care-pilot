@@ -1,3 +1,51 @@
+let userQueue = [
+    { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0 },
+    { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1 },
+    { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1 },
+    { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0}
+];
+
+function updateQueueBackend() {
+    userQueue.shift();
+    updateQueueDisplay();
+}
+
+function updateQueueDisplay() {
+    const queueContainer = document.querySelector('.list');
+    queueContainer.innerHTML = '';
+
+    // Re-add users from the updated queue to the HTML
+    userQueue.forEach(user => {
+        const userElement = document.createElement('a');
+        userElement.className = 'list-item box';
+        userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}`;
+        userElement.innerHTML = `
+            <div class="media">
+                <div class="media-left">
+                    <figure class="image is-48x48 is-32x32-mobile">
+                        <img src="https://via.placeholder.com/150" alt="Image" class="is-rounded">
+                    </figure>
+                </div>
+                <div class="media-content is-hidden-mobile">
+                    <div class="content">
+                        <p>
+                            <strong>${user.name}</strong>
+                            <br><small class="has-text-weight-semibold">${user.product}</small>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        `;
+        queueContainer.appendChild(userElement);
+    });
+}
+
+function endChatSession() {
+    updateQueueBackend();
+    updateQueueDisplay();
+}
+
+
 function createMessageElement(messageText, msgClass, messageHeader='') {
   const article = document.createElement('article');
 
@@ -127,11 +175,13 @@ function retrieveEmoSupport(message, support_type){
 
     const headerId = `${support_type}-header`;
     const contentId = `${support_type}-content`;
+    const footerId = `${support_type}-footer`;
     let loaderId = support_type+'-loader'
     let loader = createLoader(loaderId)
 
     let header = document.getElementById(headerId);
     let contentContainer = document.getElementById(contentId);
+    let footer = document.getElementById(footerId);
 
     // If the header doesn't exist, create it and the content container
     if (!header) {
@@ -151,6 +201,27 @@ function retrieveEmoSupport(message, support_type){
         contentContainer.id = contentId;
         contentContainer.classList.add('card-content');
         supportDiv.appendChild(contentContainer);
+
+        footer = document.createElement('div');
+        footer.id = footerId;
+        footer.classList.add('card-footer');
+        
+        const label = document.createElement('label');
+        label.setAttribute('for', 'customRange3');
+        label.classList.add('form-label');
+        label.textContent = 'Rate Response';
+        footer.appendChild(label);
+
+        const input = document.createElement('input');
+        input.setAttribute('type', 'range');
+        input.classList.add('form-range');
+        input.setAttribute('min', '1');
+        input.setAttribute('max', '5');
+        input.setAttribute('step', '1');
+        input.setAttribute('id', 'customRange3');
+        input.style.marginLeft = '5%';
+        footer.appendChild(input);
+        supportDiv.appendChild(footer);
     }
 
 
@@ -169,21 +240,38 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
-            if (support_type == "Put Yourself in the Client's Shoes") {
+            if (support_type == "You might be thinking") {
+                const p = document.createElement('p');
+                p.classList.add('card-header-icon');
+                const span = document.createElement('span');
+                span.classList.add('icon', 'is-small');
+                const icon = document.createElement('i');
+                icon.classList.add('fa-solid', 'fa-lightbulb');
+                span.appendChild(icon);
+                p.appendChild(span);
+                header.appendChild(p);
+            }
+            else if (support_type == "Put Yourself in the Client's Shoes") {
+                const p = document.createElement('p');
+                p.classList.add('card-header-icon');
                 const span = document.createElement('span');
                 span.classList.add('icon', 'is-small');
                 const icon = document.createElement('i');
                 icon.classList.add('fas', 'fa-people-arrows');
                 span.appendChild(icon);
-                header.appendChild(span);
+                p.appendChild(span);
+                header.appendChild(p);
             }
             else if (support_type == "Be Mindful of Your Emotions") {
+                const p = document.createElement('p');
+                p.classList.add('card-header-icon');
                 const span = document.createElement('span');
                 span.classList.add('icon', 'is-small');
                 const icon = document.createElement('i');
                 icon.classList.add('fas', 'fa-spa');
                 span.appendChild(icon);
-                header.appendChild(span);
+                p.appendChild(span);
+                header.appendChild(p);
             }
         })
         .catch((error) => {
@@ -218,12 +306,15 @@ function retrieveTroubleSupport(message){
             troubleDiv.appendChild(troubleMessage);
             //troubleDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
+            const p = document.createElement('p');
+            p.classList.add('card-header-icon');
             const span = document.createElement('span');
             span.classList.add('icon', 'is-small');
             const icon = document.createElement('i');
             icon.classList.add('fas', 'fa-circle-info');
             span.appendChild(icon);
-            header.appendChild(span);
+            p.appendChild(span);
+            header.appendChild(p);
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -250,6 +341,7 @@ function processClientResponse(data){
 
     const supportDiv = document.getElementById('supportWindow');
     supportDiv.innerHTML = '';
+    retrieveEmoSupport(data.message,"You might be thinking");
     retrieveEmoSupport(data.message,"Put Yourself in the Client's Shoes");
     retrieveEmoSupport(data.message,'Be Mindful of Your Emotions');
 }
@@ -279,7 +371,8 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         if(data.message === "FINISH:999") {
-            alert("CONVERSATION RESOLVED")
+            alert("CONVERSATION RESOLVED");
+            endChatSession();
             typing.style.display = 'none';
             input.disabled = true;
         } else {
@@ -295,6 +388,7 @@ function sendMessage() {
 
 // Define a function to execute after the page loads
 function fetchFirstMsg() {
+    updateQueueDisplay()
     const urlParams = new URLSearchParams(window.location.search);
     const chatDiv = document.getElementById('chatWindow');
 
