@@ -70,10 +70,10 @@ function createMessageElement(messageText, msgClass, messageHeader='') {
 
 function createSupportPane(messageText, msgClass){
     const article = document.createElement('div');
-    article.classList.add('card');
+    article.classList.add('card-content');
 
     const body = document.createElement('div');
-    body.classList.add('card-content');
+    body.classList.add('content');
     innerContent = document.createElement('div');
     markedmsgText = marked.parse(messageText);
     innerContent.innerHTML = markedmsgText;
@@ -188,12 +188,13 @@ function retrieveEmoSupport(message, support_type){
     card = document.createElement('div');
     card.id = cardId;
     card.classList.add('card');
+    card.style.marginBottom = "5%";
 
-    header = document.createElement('div');
+    header = document.createElement('header');
     header.id = headerId;
     header.classList.add('card-header');
 
-    const headerTitle = document.createElement('div');
+    const headerTitle = document.createElement('p');
     headerTitle.classList.add('card-header-title');
     headerTitle.textContent = support_type.toUpperCase();
 
@@ -230,16 +231,17 @@ function retrieveEmoSupport(message, support_type){
                 p.appendChild(span);
                 header.appendChild(p);
 
-                const footer = document.createElement('p');
+                const footer = document.createElement('div');
                 footer.classList.add('card-footer');
-                footer.style.background = 'white';
-                footer.style.marginBottom = '5%';
+
+                const footerItem = document.createElement('div');
+                footerItem.classList.add('card-footer-item');
                 
                 const label = document.createElement('label');
                 label.setAttribute('for', 'customRange3');
                 label.classList.add('form-label');
                 label.textContent = 'Rate Response';
-                footer.appendChild(label);
+                footerItem.appendChild(label);
 
                 const input = document.createElement('input');
                 input.setAttribute('type', 'range');
@@ -249,7 +251,8 @@ function retrieveEmoSupport(message, support_type){
                 input.setAttribute('step', '1');
                 input.setAttribute('id', 'customRange3');
                 input.style.marginLeft = '5%';
-                footer.appendChild(input);
+                footerItem.appendChild(input);
+                footer.appendChild(footerItem)
                 card.appendChild(footer);
             }
             else if (support_type == "Put Yourself in the Client's Shoes") {
@@ -265,14 +268,15 @@ function retrieveEmoSupport(message, support_type){
 
                 const footer = document.createElement('p');
                 footer.classList.add('card-footer');
-                footer.style.background = 'white';
-                footer.style.marginBottom = '5%';
+                
+                const footerItem = document.createElement('div');
+                footerItem.classList.add('card-footer-item');
                 
                 const label = document.createElement('label');
                 label.setAttribute('for', 'customRange3');
                 label.classList.add('form-label');
                 label.textContent = 'Rate Response';
-                footer.appendChild(label);
+                footerItem.appendChild(label);
 
                 const input = document.createElement('input');
                 input.setAttribute('type', 'range');
@@ -282,7 +286,8 @@ function retrieveEmoSupport(message, support_type){
                 input.setAttribute('step', '1');
                 input.setAttribute('id', 'customRange3');
                 input.style.marginLeft = '5%';
-                footer.appendChild(input);
+                footerItem.appendChild(input);
+                footer.appendChild(footerItem)
                 card.appendChild(footer);
             }
             else if (support_type == "Be Mindful of Your Emotions") {
@@ -298,14 +303,15 @@ function retrieveEmoSupport(message, support_type){
 
                 const footer = document.createElement('p');
                 footer.classList.add('card-footer');
-                footer.style.background = 'white';
-                footer.style.marginBottom = '5%';
+
+                const footerItem = document.createElement('div');
+                footerItem.classList.add('card-footer-item');
                 
                 const label = document.createElement('label');
                 label.setAttribute('for', 'customRange3');
                 label.classList.add('form-label');
                 label.textContent = 'Rate Response';
-                footer.appendChild(label);
+                footerItem.appendChild(label);
 
                 const input = document.createElement('input');
                 input.setAttribute('type', 'range');
@@ -315,7 +321,8 @@ function retrieveEmoSupport(message, support_type){
                 input.setAttribute('step', '1');
                 input.setAttribute('id', 'customRange3');
                 input.style.marginLeft = '5%';
-                footer.appendChild(input);
+                footerItem.appendChild(input);
+                footer.appendChild(footerItem);
                 card.appendChild(footer);
             }
         })
