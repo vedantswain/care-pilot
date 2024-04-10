@@ -107,6 +107,7 @@ def agent_coworker_trouble():
     client = mLangChain()
     prompt = """Your role is to help a service representative by providing PROCEDURAL SUPPORT. \
                 The representative is chatting online with a customer complaining about {product}. \
+                
                 Given the chat history,
                 list 3-7 steps to guide the representative in resolving the customer complaint.\
                 Review the similar PROCEDURAL SUPPORT history if exist, then assess the current situation in depth and provide detailed steps for resolution\
