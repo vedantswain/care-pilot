@@ -38,6 +38,9 @@ chat_history = [
 sender_initial = agent_sender_fewshot_twitter()
 sender_agent = mAgentCustomer()
 emo_agent = mAgentER()
+ep_agent = mAgentEP()
+info_agent = mAgentInfo()
+trouble_agent = mAgentTrouble()
 
 
 @app.route('/')
@@ -90,13 +93,16 @@ def getEmoSupport():
     retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
     chat_history = messages_from_dict(retrieve_from_session)
 
+    if support_type=="You might be thinking":
+        response_cw_emo = emo_agent.invokeThought({'complaint':reply, "chat_history": chat_history})
+        response = response_cw_emo
     if support_type=="Put Yourself in the Client's Shoes":
-        response_cw_emo = agent_coworker_emo_perspective().invoke({'complaint':reply, "chat_history": chat_history})
+        response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
         response = response_cw_emo
     if support_type=="Be Mindful of Your Emotions":
         response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
         response = response_cw_emo
-
+        
     return jsonify({
         "message": response
     })
@@ -110,7 +116,7 @@ def getInfoSupport():
     retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
     chat_history = messages_from_dict(retrieve_from_session)
 
-    response_cw_info = agent_coworker_info().invoke({'product': session['product'],'complaint':reply, "chat_history": chat_history})
+    response_cw_info = info_agent.invoke({'product': session['product'],'complaint':reply, "chat_history": chat_history})
     # response = response_cw_info.content
 
     return jsonify({
@@ -125,8 +131,8 @@ def getTroubleSupport():
     retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
     chat_history = messages_from_dict(retrieve_from_session)
 
-    response_cw_info = agent_coworker_trouble().invoke({'product': session['product'],'complaint':reply, "chat_history": chat_history})
-    response = response_cw_info
+    response_cw_info = trouble_agent.invoke({'product': session['product'],'complaint':reply, "chat_history": chat_history})
+    response = "Troubleshooting Guide:\n" + response_cw_info
 
     return jsonify({
         "message": response
