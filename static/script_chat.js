@@ -166,7 +166,9 @@ function retrieveInfoSupport(message){
     header.appendChild(loader);
     infoDiv.appendChild(header);
 
-    fetch('/get-info-support', {
+    const sessionId = window.location.pathname.split('/')[1];
+
+    fetch(`/${sessionId}/get-info-support`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -228,9 +230,10 @@ function retrieveEmoSupport(message, support_type){
     card.appendChild(header);
     supportDiv.appendChild(card);
 
+    const sessionId = window.location.pathname.split('/')[1];
 
 
-    fetch('/get-emo-support', {
+    fetch(`/${sessionId}/get-emo-support`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -368,8 +371,9 @@ function retrieveTroubleSupport(message){
     header.appendChild(headerTitle);
     header.appendChild(loader);
     troubleDiv.appendChild(header);
+    const sessionId = window.location.pathname.split('/')[1];
 
-    fetch('/get-trouble-support', {
+    fetch(`/${sessionId}/get-trouble-support`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -436,8 +440,9 @@ function sendMessage() {
     chatDiv.appendChild(userMessage);
     chatDiv.scrollTop = chatDiv.scrollHeight;
     typing.style.display = 'block';
+    const sessionId = window.location.pathname.split('/')[1];
 
-    fetch('/get-reply', {
+    fetch(`/${sessionId}/get-reply`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -505,9 +510,10 @@ function fetchFirstMsg() {
     updateQueueDisplay()
     const urlParams = new URLSearchParams(window.location.search);
     const chatDiv = document.getElementById('chatWindow');
+    const sessionId = window.location.pathname.split('/')[1];
 
     // Make a GET request using fetch
-    fetch(`/get-reply?${urlParams}`)
+    fetch(`/${sessionId}/get-reply?${urlParams}`)
     .then(response => {
         // Check if the request was successful
         if (!response.ok) {
