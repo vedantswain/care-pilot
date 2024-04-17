@@ -1,6 +1,7 @@
-from flask import Flask, request, jsonify, render_template, session
+from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 import os, json
 import certifi
+from pymongo import MongoClient
 from flask_pymongo import PyMongo
 from langchain.schema import messages_from_dict, messages_to_dict
 
@@ -15,6 +16,8 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
 from dotenv import load_dotenv
+from uuid import uuid4
+import datetime
 load_dotenv("project.env")
 
 DB_NAME = "test"
@@ -29,6 +32,10 @@ app.secret_key = 'your_secret_key'  # Required for session to work
 
 # db = client[DB_NAME]
 # print(client.list_databases())
+client = MongoClient('localhost', 27017)
+
+db = client.flask_db
+chat_history_collection = db.chat_history_collection
 
 sender_agent = None
 chat_history = [
@@ -45,13 +52,17 @@ trouble_agent = mAgentTrouble()
 
 @app.route('/')
 def hello():
-    return render_template('index_chat.html')
+    session_id = str(uuid4())
+    session[session_id] = {"product": None, "chat_history": []}
+    return redirect(url_for('index', session_id=session_id))
 
-@app.route('/get-reply', methods=['GET','POST'])
-def getReply():
+@app.route('/<session_id>/')
+def index(session_id):
+    return render_template('index_chat.html', session_id=session_id)
 
+@app.route('/<session_id>/get-reply', methods=['GET','POST'])
+def getReply(session_id):
     if request.method == 'GET':
-        # Handle GET request
         val_product = request.args.get('product')
         val_grateful = request.args.get('grateful')
         val_ranting = request.args.get('ranting')
@@ -65,78 +76,113 @@ def getReply():
         }
 
         response = sender_initial.invoke(user_input)
-        session["product"] = val_product
-        session["chat_history"] = messages_to_dict([AIMessage(content=response)])
+        
+        session[session_id]["product"] = val_product
+        session[session_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
+
+        turn_number = len(session[session_id]["chat_history"])
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+
+        chat_history_collection.insert_one({
+            "session_id": session_id,
+            "turn_number": turn_number,
+            "sender": "representative",
+            "message": response.strip(),
+            "timestamp": timestamp
+        })
+
 
     elif request.method == 'POST':
         prompt = request.json.get("prompt")
 
-        retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
+        retrieve_from_session = json.loads(json.dumps(session[session_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
         result = sender_agent.invoke({"input": prompt, "chat_history": chat_history})
         response = result
 
         chat_history.extend([HumanMessage(content=prompt), AIMessage(content=response)])
-        session["chat_history"] = messages_to_dict(chat_history)
+        session[session_id]["chat_history"] = messages_to_dict(chat_history)
 
-    return jsonify({
-        "message": response
-    })
+        turn_number = len(chat_history)
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-
-@app.route('/get-emo-support', methods=['POST'])
-def getEmoSupport():
-    reply = request.json.get("client_reply")
-    support_type = request.json.get("type")
-
-    retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
-    chat_history = messages_from_dict(retrieve_from_session)
-
-    if support_type=="You might be thinking":
-        response_cw_emo = emo_agent.invokeThought({'complaint':reply, "chat_history": chat_history})
-        response = response_cw_emo
-    if support_type=="Put Yourself in the Client's Shoes":
-        response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
-        response = response_cw_emo
-    if support_type=="Be Mindful of Your Emotions":
-        response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
-        response = response_cw_emo
+        chat_history_collection.insert_one({
+            "session_id": session_id,
+            "turn_number": turn_number - 1,
+            "sender": "client",
+            "message": prompt.strip(),
+            "timestamp": timestamp
+        })
         
-    return jsonify({
-        "message": response
-    })
-
-
-@app.route('/get-info-support', methods=['POST'])
-def getInfoSupport():
-    reply = request.json.get("client_reply")
-    # support_type = request.json.get("type")
-
-    retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
-    chat_history = messages_from_dict(retrieve_from_session)
-
-    response_cw_info = info_agent.invoke({'product': session['product'],'complaint':reply, "chat_history": chat_history})
-    # response = response_cw_info.content
-
-    return jsonify({
-        "message": response_cw_info
-    })
-
-@app.route('/get-trouble-support', methods=['POST'])
-def getTroubleSupport():
-    reply = request.json.get("client_reply")
-    # support_type = request.json.get("type")
-
-    retrieve_from_session = json.loads(json.dumps(session["chat_history"]))
-    chat_history = messages_from_dict(retrieve_from_session)
-
-    response_cw_info = trouble_agent.invoke({'product': session['product'],'complaint':reply, "chat_history": chat_history})
-    response = "Troubleshooting Guide:\n" + response_cw_info
+        chat_history_collection.insert_one({
+            "session_id": session_id,
+            "turn_number": turn_number,
+            "sender": "representative",
+            "message": response.strip(),
+            "timestamp": timestamp
+        })
 
     return jsonify({
         "message": response
     })
+
+
+@app.route('/<session_id>/get-emo-support', methods=['POST'])
+def getEmoSupport(session_id):
+    if session_id in session:
+        reply = request.json.get("client_reply")
+        support_type = request.json.get("type")
+
+        retrieve_from_session = json.loads(json.dumps(session[session_id]["chat_history"]))
+        chat_history = messages_from_dict(retrieve_from_session)
+
+        if support_type=="You might be thinking":
+            response_cw_emo = emo_agent.invokeThought({'complaint':reply, "chat_history": chat_history})
+            response = response_cw_emo
+        if support_type=="Put Yourself in the Client's Shoes":
+            response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
+            response = response_cw_emo
+        if support_type=="Be Mindful of Your Emotions":
+            response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
+            response = response_cw_emo
+            
+        return jsonify({
+            "message": response
+        })
+
+
+@app.route('/<session_id>/get-info-support', methods=['POST'])
+def getInfoSupport(session_id):
+    if session_id in session:
+        reply = request.json.get("client_reply")
+        # support_type = request.json.get("type")
+
+        retrieve_from_session = json.loads(json.dumps(session[session_id]["chat_history"]))
+        chat_history = messages_from_dict(retrieve_from_session)
+
+        response_cw_info = info_agent.invoke({'product': session[session_id]["product"],'complaint':reply, "chat_history": chat_history})
+        # response = response_cw_info.content
+
+        return jsonify({
+            "message": response_cw_info
+        })
+
+@app.route('/<session_id>/get-trouble-support', methods=['POST'])
+def getTroubleSupport(session_id):
+    if session_id in session:
+        reply = request.json.get("client_reply")
+        # support_type = request.json.get("type")
+
+        retrieve_from_session = json.loads(json.dumps(session[session_id]["chat_history"]))
+        chat_history = messages_from_dict(retrieve_from_session)
+
+        response_cw_trouble = trouble_agent.invoke({'product': session[session_id]["product"],'complaint':reply, "chat_history": chat_history})
+        response = "Troubleshooting Guide:\n" + response_cw_trouble
+
+        return jsonify({
+            "message": response
+        })
 
 
 
