@@ -1,12 +1,28 @@
-let userQueue = [
+let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
     { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0 },
     { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1 },
     { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1 },
     { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0}
 ];
 
+function resetQueueToInitialState() {
+    let initialState = [
+        { id: 1, name: "User1", product: "Pizza", grateful: 0, ranting: 0, expression: 0 },
+        { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1 },
+        { id: 3, name: "User3", product: "Book", grateful: 1, ranting: 1, expression: 1 },
+        { id: 4, name: "User4", product: "Cup", grateful: 0, ranting: 1, expression: 0 }
+    ];
+
+    userQueue = initialState;
+
+    localStorage.setItem('userQueue', JSON.stringify(initialState));
+
+    updateQueueDisplay();
+}
+
 function updateQueueBackend() {
     userQueue.shift();
+    localStorage.setItem('userQueue', JSON.stringify(userQueue));
     updateQueueDisplay();
 }
 
@@ -14,9 +30,8 @@ function updateQueueDisplay() {
     const queueContainer = document.querySelector('.list');
     queueContainer.innerHTML = '';
 
-    // Re-add users from the updated queue to the HTML
     userQueue.forEach(user => {
-        const userElement = document.createElement('a');
+        const userElement = document.createElement('div');
         userElement.className = 'list-item box';
         userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}`;
         userElement.innerHTML = `
@@ -44,7 +59,16 @@ function updateQueueDisplay() {
 
 function endChatSession() {
     updateQueueBackend();
-    updateQueueDisplay();
+
+    if (userQueue.length > 0) {
+        const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}`;
+        window.location.href = nextUserLink;
+    } else {
+        console.log("The queue is now empty.");
+        resetQueueToInitialState();
+        const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}`;
+        window.location.href = nextUserLink;
+    }
 }
 
 
@@ -142,7 +166,9 @@ function retrieveInfoSupport(message){
     header.appendChild(loader);
     infoDiv.appendChild(header);
 
-    fetch('/get-info-support', {
+    const sessionId = window.location.pathname.split('/')[1];
+
+    fetch(`/${sessionId}/get-info-support`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -204,9 +230,10 @@ function retrieveEmoSupport(message, support_type){
     card.appendChild(header);
     supportDiv.appendChild(card);
 
+    const sessionId = window.location.pathname.split('/')[1];
 
 
-    fetch('/get-emo-support', {
+    fetch(`/${sessionId}/get-emo-support`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -344,8 +371,9 @@ function retrieveTroubleSupport(message){
     header.appendChild(headerTitle);
     header.appendChild(loader);
     troubleDiv.appendChild(header);
+    const sessionId = window.location.pathname.split('/')[1];
 
-    fetch('/get-trouble-support', {
+    fetch(`/${sessionId}/get-trouble-support`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -412,8 +440,9 @@ function sendMessage() {
     chatDiv.appendChild(userMessage);
     chatDiv.scrollTop = chatDiv.scrollHeight;
     typing.style.display = 'block';
+    const sessionId = window.location.pathname.split('/')[1];
 
-    fetch('/get-reply', {
+    fetch(`/${sessionId}/get-reply`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -423,8 +452,46 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         if(data.message === "FINISH:999") {
-            alert("CONVERSATION RESOLVED");
-            endChatSession();
+            const modal = document.createElement('div');
+            modal.id = 'finishModal';
+            modal.style.position = 'fixed';
+            modal.style.display = 'flex';
+            modal.style.width = '100%';
+            modal.style.height = '100%';
+            modal.style.alignContent = 'center';
+            modal.style.alignItems = 'center';
+            modal.style.backgroundColor = 'rgba(0,0,0,0.4)';
+            modal.classList.add('modal');
+
+            const modalContent = document.createElement('div');
+            modalContent.classList.add('modal-content');
+            modalContent.style.backgroundColor = 'white'; 
+            modalContent.style.padding = '20px';
+            modalContent.style.borderRadius = '5px';
+            modalContent.style.width = 'fit-content';
+            modalContent.style.flexDirection = 'column';
+            modalContent.style.justifyItems = 'center';
+
+            const value = document.createElement('p');
+            value.innerHTML = "CONVERSATION RESOLVED";
+            modalContent.appendChild(value);
+            
+            const nextButton = document.createElement('button');
+            nextButton.innerHTML = "Next";
+            nextButton.classList.add('next-button');
+            modalContent.appendChild(nextButton);
+
+
+            modal.appendChild(modalContent);
+            document.body.appendChild(modal);
+
+            nextButton.onclick = function() {
+                endChatSession();
+                modal.style.display = "none";
+                document.body.removeChild(modal); 
+            };
+
+            modal.style.display = "block";
             typing.style.display = 'none';
             input.disabled = true;
         } else {
@@ -443,9 +510,10 @@ function fetchFirstMsg() {
     updateQueueDisplay()
     const urlParams = new URLSearchParams(window.location.search);
     const chatDiv = document.getElementById('chatWindow');
+    const sessionId = window.location.pathname.split('/')[1];
 
     // Make a GET request using fetch
-    fetch(`/get-reply?${urlParams}`)
+    fetch(`/${sessionId}/get-reply?${urlParams}`)
     .then(response => {
         // Check if the request was successful
         if (!response.ok) {
