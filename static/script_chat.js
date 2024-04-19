@@ -273,12 +273,12 @@ function retrieveEmoSupport(message, support_type){
                 footerItem.appendChild(label);
 
                 const input = document.createElement('input');
+                input.id = `${support_type}-feedback`;
                 input.setAttribute('type', 'range');
                 input.classList.add('form-range');
                 input.setAttribute('min', '1');
                 input.setAttribute('max', '5');
                 input.setAttribute('step', '1');
-                input.setAttribute('id', 'customRange3');
                 input.style.marginLeft = '5%';
                 footerItem.appendChild(input);
                 footer.appendChild(footerItem)
@@ -308,12 +308,12 @@ function retrieveEmoSupport(message, support_type){
                 footerItem.appendChild(label);
 
                 const input = document.createElement('input');
+                input.id = `${support_type}-feedback`;
                 input.setAttribute('type', 'range');
                 input.classList.add('form-range');
                 input.setAttribute('min', '1');
                 input.setAttribute('max', '5');
                 input.setAttribute('step', '1');
-                input.setAttribute('id', 'customRange3');
                 input.style.marginLeft = '5%';
                 footerItem.appendChild(input);
                 footer.appendChild(footerItem)
@@ -343,12 +343,12 @@ function retrieveEmoSupport(message, support_type){
                 footerItem.appendChild(label);
 
                 const input = document.createElement('input');
+                input.id = `${support_type}-feedback`;
                 input.setAttribute('type', 'range');
                 input.classList.add('form-range');
                 input.setAttribute('min', '1');
                 input.setAttribute('max', '5');
                 input.setAttribute('step', '1');
-                input.setAttribute('id', 'customRange3');
                 input.style.marginLeft = '5%';
                 footerItem.appendChild(input);
                 footer.appendChild(footerItem);
@@ -358,6 +358,25 @@ function retrieveEmoSupport(message, support_type){
         .catch((error) => {
             console.error('Error:', error);
         });
+}
+
+function retrieveEmoFeedback(support_type) {
+    const sessionId = window.location.pathname.split('/')[1];
+    const clientId = sessionStorage.getItem('client_id');
+
+    var input = document.getElementById(`${support_type}-feedback`);
+    var rate = input.value;
+    fetch(`/${sessionId}/get-emo-feedback`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({rate: rate, type: support_type, client_id: clientId}),
+    })
+    .then(response => response.json())
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
 
 function retrieveTroubleSupport(message){
@@ -502,6 +521,9 @@ function sendMessage() {
             typing.style.display = 'none';
             input.disabled = true;
         } else {
+            retrieveEmoFeedback("You might be thinking");
+            retrieveEmoFeedback("Put Yourself in the Client's Shoes");
+            retrieveEmoFeedback('Be Mindful of Your Emotions');
             processClientResponse(data);
             input.disabled = false;
         }

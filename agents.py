@@ -411,7 +411,7 @@ def agent_sender_fewshot_twitter():
                 Complaint: Got id'd Tesco for buying one Adnams Broadside. Is being blind part of the job-spec? I am 35 and 99 kilos. \
                 
                 Product: {product}
-                Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expressive}.\
+                Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expression}.\
                 Complaint:
             """
     template = ChatPromptTemplate.from_messages(

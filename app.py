@@ -44,6 +44,8 @@ client = MongoClient('localhost', 27017)
 
 db = client.flask_db
 chat_history_collection = db.chat_history_collection
+chat_client_info = db.chat_client_info
+chat_emo_feedback = db.chat_emo_feedback
 
 sender_agent = None
 chat_history = [
@@ -60,6 +62,10 @@ trouble_agent = mAgentTrouble()
 
 @app.route('/')
 def hello():
+    return render_template('landing.html')
+
+@app.route('/chat')
+def start_chat():
     session_id = str(uuid4())
     session[session_id] = {}
     return redirect(url_for('index', session_id=session_id))
@@ -75,30 +81,40 @@ def getReply(session_id):
         val_product = request.args.get('product')
         val_grateful = request.args.get('grateful')
         val_ranting = request.args.get('ranting')
-        val_expressive = request.args.get('expressive')
+        val_expression = request.args.get('expression')
 
         user_input = {
             "product": val_product,
             "is_grateful": 'grateful' if val_grateful==0 else 'NOT grateful',
             "is_ranting": 'ranting' if val_ranting==0 else 'NOT ranting',
-            "is_expressive": 'expressive' if val_expressive==0 else 'NOT expressive'
+            "is_expression": 'expression' if val_expression==0 else 'NOT expression'
         }
 
         response = sender_initial.invoke(user_input)
         
         client_id = str(uuid4())
-        session[session_id] = {client_id: {"product": val_product, "chat_history": []}}
+        session[session_id][client_id] = {"product": val_product, "chat_history": []}
         session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
-        print("here get", session[session_id][client_id])
         
 
         turn_number = len(session[session_id][client_id]["chat_history"])
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
+        chat_client_info.insert_one({
+            "session_id": session_id,
+            "client_id": client_id,
+            "product": val_product,
+            "grateful": val_grateful,
+            "ranting": val_ranting,
+            "expression": val_expression
+        })
+
         chat_history_collection.insert_one({
             "session_id": session_id,
+            "client_id": client_id,
             "turn_number": turn_number,
             "sender": "representative",
+            "receiver": "client",
             "message": response.strip(),
             "timestamp": timestamp
         })
@@ -107,9 +123,6 @@ def getReply(session_id):
     elif request.method == 'POST':
         prompt = request.json.get("prompt")
         client_id = request.json.get("client_id")
-
-        print("here getp", client_id)
-        print("here getp", session[session_id][client_id]["product"])
 
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
@@ -125,16 +138,20 @@ def getReply(session_id):
 
         chat_history_collection.insert_one({
             "session_id": session_id,
+            "client_id": client_id,
             "turn_number": turn_number - 1,
             "sender": "client",
+            "receiver": "representative",
             "message": prompt.strip(),
             "timestamp": timestamp
         })
         
         chat_history_collection.insert_one({
             "session_id": session_id,
+            "client_id": client_id,
             "turn_number": turn_number,
             "sender": "representative",
+            "receiver": "client",
             "message": response.strip(),
             "timestamp": timestamp
         })
@@ -144,14 +161,41 @@ def getReply(session_id):
         "message": response
     })
 
+@app.route('/<session_id>/get-emo-feedback', methods=['POST'])
+def getEmoFeedback(session_id):
+    if session_id in session:
+        client_id = request.json.get("client_id")
+        rate = request.json.get("rate")
+        support_type = request.json.get("type")
+
+        turn_number = len(chat_history) + 1
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+        print("update", session_id, client_id, turn_number, support_type)
+
+        query = {
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": support_type
+        }
+        update = {
+            "$set": {
+                "user_feedback": rate,
+                "timestamp_feedback": timestamp,
+            }
+        }
+
+        res = chat_emo_feedback.update_one(query, update)
+        if res == 0:
+            return jsonify({"message": "No existing record found to update"}), 404
+        return jsonify({"message": "Feedback received"}), 200    
+    return jsonify({"message": "Invalid session or session expired"}), 400
+
 
 @app.route('/<session_id>/get-emo-support', methods=['POST'])
 def getEmoSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
-
-        print("here emo", client_id)
-        print("here emo", session[session_id][client_id]["product"])
         
         reply = request.json.get("client_reply")
         support_type = request.json.get("type")
@@ -159,28 +203,53 @@ def getEmoSupport(session_id):
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
+        turn_number = len(chat_history)
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+
         if support_type=="You might be thinking":
             response_cw_emo = emo_agent.invokeThought({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
+            chat_emo_feedback.insert_one({
+                "session_id": session_id,
+                "client_id": client_id,
+                "turn_number": turn_number,
+                "support_type": "You might be thinking",
+                "support_content": response.strip(),
+                "timestamp_arrival": timestamp
+            })
         if support_type=="Put Yourself in the Client's Shoes":
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
+            chat_emo_feedback.insert_one({
+                "session_id": session_id,
+                "client_id": client_id,
+                "turn_number": turn_number,
+                "support_type": "Put Yourself in the Client's Shoes",
+                "support_content": response.strip(),
+                "timestamp_arrival": timestamp
+            })
         if support_type=="Be Mindful of Your Emotions":
             response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
+            chat_emo_feedback.insert_one({
+                "session_id": session_id,
+                "client_id": client_id,
+                "turn_number": turn_number,
+                "support_type": "Be Mindful of Your Emotions",
+                "support_content": response.strip(),
+                "timestamp_arrival": timestamp
+            })
             
         return jsonify({
             "message": response
         })
 
 
+
 @app.route('/<session_id>/get-info-support', methods=['POST'])
 def getInfoSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
-
-        print("here info", client_id)
-        print("here info", session[session_id][client_id]["product"])
 
         reply = request.json.get("client_reply")
         # support_type = request.json.get("type")
@@ -199,8 +268,6 @@ def getInfoSupport(session_id):
 def getTroubleSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
-        print("here trouble", client_id)
-        print("here trouble", session[session_id][client_id]["product"])
         reply = request.json.get("client_reply")
         # support_type = request.json.get("type")
 
