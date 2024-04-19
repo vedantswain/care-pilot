@@ -18,6 +18,8 @@ from langchain_core.runnables import RunnablePassthrough
 from dotenv import load_dotenv
 from uuid import uuid4
 import datetime
+import redis
+from flask_session import Session
 load_dotenv("project.env")
 
 DB_NAME = "test"
@@ -29,6 +31,12 @@ app.secret_key = 'your_secret_key'  # Required for session to work
 # app.config["MONGO_URI"] = os.getenv("AZURE_COSMOS_MONGO_CONNSTRING")
 # mongo = PyMongo(app, tlsCAFile=certifi.where())
 # client = mongo.cx
+app.config['SESSION_TYPE'] = 'redis'
+app.config['SESSION_PERMANENT'] = False
+app.config['SESSION_USE_SIGNER'] = True
+app.config['SESSION_REDIS'] = redis.from_url('redis://localhost:6379')
+
+Session(app)
 
 # db = client[DB_NAME]
 # print(client.list_databases())
@@ -53,12 +61,13 @@ trouble_agent = mAgentTrouble()
 @app.route('/')
 def hello():
     session_id = str(uuid4())
-    session[session_id] = {"product": None, "chat_history": []}
+    session[session_id] = {}
     return redirect(url_for('index', session_id=session_id))
 
 @app.route('/<session_id>/')
 def index(session_id):
     return render_template('index_chat.html', session_id=session_id)
+
 
 @app.route('/<session_id>/get-reply', methods=['GET','POST'])
 def getReply(session_id):
@@ -77,10 +86,13 @@ def getReply(session_id):
 
         response = sender_initial.invoke(user_input)
         
-        session[session_id]["product"] = val_product
-        session[session_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
+        client_id = str(uuid4())
+        session[session_id] = {client_id: {"product": val_product, "chat_history": []}}
+        session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
+        print("here get", session[session_id][client_id])
+        
 
-        turn_number = len(session[session_id]["chat_history"])
+        turn_number = len(session[session_id][client_id]["chat_history"])
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
         chat_history_collection.insert_one({
@@ -94,15 +106,19 @@ def getReply(session_id):
 
     elif request.method == 'POST':
         prompt = request.json.get("prompt")
+        client_id = request.json.get("client_id")
 
-        retrieve_from_session = json.loads(json.dumps(session[session_id]["chat_history"]))
+        print("here getp", client_id)
+        print("here getp", session[session_id][client_id]["product"])
+
+        retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
         result = sender_agent.invoke({"input": prompt, "chat_history": chat_history})
         response = result
 
         chat_history.extend([HumanMessage(content=prompt), AIMessage(content=response)])
-        session[session_id]["chat_history"] = messages_to_dict(chat_history)
+        session[session_id][client_id]["chat_history"] = messages_to_dict(chat_history)
 
         turn_number = len(chat_history)
         timestamp = datetime.datetime.now(datetime.timezone.utc)
@@ -124,6 +140,7 @@ def getReply(session_id):
         })
 
     return jsonify({
+        "client": client_id,
         "message": response
     })
 
@@ -131,10 +148,15 @@ def getReply(session_id):
 @app.route('/<session_id>/get-emo-support', methods=['POST'])
 def getEmoSupport(session_id):
     if session_id in session:
+        client_id = request.json.get("client_id")
+
+        print("here emo", client_id)
+        print("here emo", session[session_id][client_id]["product"])
+        
         reply = request.json.get("client_reply")
         support_type = request.json.get("type")
 
-        retrieve_from_session = json.loads(json.dumps(session[session_id]["chat_history"]))
+        retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
         if support_type=="You might be thinking":
@@ -155,13 +177,18 @@ def getEmoSupport(session_id):
 @app.route('/<session_id>/get-info-support', methods=['POST'])
 def getInfoSupport(session_id):
     if session_id in session:
+        client_id = request.json.get("client_id")
+
+        print("here info", client_id)
+        print("here info", session[session_id][client_id]["product"])
+
         reply = request.json.get("client_reply")
         # support_type = request.json.get("type")
 
-        retrieve_from_session = json.loads(json.dumps(session[session_id]["chat_history"]))
+        retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        response_cw_info = info_agent.invoke({'product': session[session_id]["product"],'complaint':reply, "chat_history": chat_history})
+        response_cw_info = info_agent.invoke({'product': session[session_id][client_id]["product"],'complaint':reply, "chat_history": chat_history})
         # response = response_cw_info.content
 
         return jsonify({
@@ -171,13 +198,16 @@ def getInfoSupport(session_id):
 @app.route('/<session_id>/get-trouble-support', methods=['POST'])
 def getTroubleSupport(session_id):
     if session_id in session:
+        client_id = request.json.get("client_id")
+        print("here trouble", client_id)
+        print("here trouble", session[session_id][client_id]["product"])
         reply = request.json.get("client_reply")
         # support_type = request.json.get("type")
 
-        retrieve_from_session = json.loads(json.dumps(session[session_id]["chat_history"]))
+        retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        response_cw_trouble = trouble_agent.invoke({'product': session[session_id]["product"],'complaint':reply, "chat_history": chat_history})
+        response_cw_trouble = trouble_agent.invoke({'product': session[session_id][client_id]["product"],'complaint':reply, "chat_history": chat_history})
         response = "Troubleshooting Guide:\n" + response_cw_trouble
 
         return jsonify({

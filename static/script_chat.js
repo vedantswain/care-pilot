@@ -167,13 +167,14 @@ function retrieveInfoSupport(message){
     infoDiv.appendChild(header);
 
     const sessionId = window.location.pathname.split('/')[1];
+    const clientId = sessionStorage.getItem('client_id');
 
     fetch(`/${sessionId}/get-info-support`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({client_reply: message}),
+            body: JSON.stringify({client_reply: message, client_id: clientId}),
         })
         .then(response => response.json())
         .then(data => {
@@ -231,6 +232,7 @@ function retrieveEmoSupport(message, support_type){
     supportDiv.appendChild(card);
 
     const sessionId = window.location.pathname.split('/')[1];
+    const clientId = sessionStorage.getItem('client_id');
 
 
     fetch(`/${sessionId}/get-emo-support`, {
@@ -238,7 +240,7 @@ function retrieveEmoSupport(message, support_type){
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({client_reply: message, type: support_type}),
+            body: JSON.stringify({client_reply: message, type: support_type, client_id: clientId}),
         })
         .then(response => response.json())
         .then(data => {
@@ -372,13 +374,14 @@ function retrieveTroubleSupport(message){
     header.appendChild(loader);
     troubleDiv.appendChild(header);
     const sessionId = window.location.pathname.split('/')[1];
+    const clientId = sessionStorage.getItem('client_id');
 
     fetch(`/${sessionId}/get-trouble-support`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify({client_reply: message}),
+            body: JSON.stringify({client_reply: message, client_id: clientId}),
         })
         .then(response => response.json())
         .then(data => {
@@ -440,14 +443,18 @@ function sendMessage() {
     chatDiv.appendChild(userMessage);
     chatDiv.scrollTop = chatDiv.scrollHeight;
     typing.style.display = 'block';
+
+    // const urlParams = new URLSearchParams(window.location.search);
+    // const product = urlParams.get('product');
     const sessionId = window.location.pathname.split('/')[1];
+    const clientId = sessionStorage.getItem('client_id');
 
     fetch(`/${sessionId}/get-reply`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({prompt: message}),
+        body: JSON.stringify({prompt: message, client_id: clientId}),
     })
     .then(response => response.json())
     .then(data => {
@@ -508,8 +515,15 @@ function sendMessage() {
 // Define a function to execute after the page loads
 function fetchFirstMsg() {
     updateQueueDisplay()
+    // let firstUser = userQueue[0];
+    // const urlParams = new URLSearchParams({
+    //     product: firstUser.product,
+    //     grateful: firstUser.grateful,
+    //     ranting: firstUser.ranting,
+    //     expression: firstUser.expression
+    // }).toString()
+    // window.location.href = `./?${urlParams}`;
     const urlParams = new URLSearchParams(window.location.search);
-    const chatDiv = document.getElementById('chatWindow');
     const sessionId = window.location.pathname.split('/')[1];
 
     // Make a GET request using fetch
@@ -523,7 +537,7 @@ function fetchFirstMsg() {
         return response.json();
     })
     .then(data => {
-        // Process the data returned from the server
+        sessionStorage.setItem("client_id", data.client);
         processClientResponse(data);
     })
     .catch(error => {
