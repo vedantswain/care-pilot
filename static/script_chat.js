@@ -1,3 +1,7 @@
+const TYPE_EMO_PERSPECTIVE = "You might be thinking";
+const TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes";
+const TYPE_EMO_MINDFUL = "Be Mindful of Your Emotions";
+
 let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
     { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0 },
     { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1 },
@@ -249,7 +253,7 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
-            if (support_type == "You might be thinking") {
+            if (support_type == TYPE_EMO_PERSPECTIVE) {
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -284,7 +288,7 @@ function retrieveEmoSupport(message, support_type){
                 footer.appendChild(footerItem)
                 card.appendChild(footer);
             }
-            else if (support_type == "Put Yourself in the Client's Shoes") {
+            else if (support_type == TYPE_EMO_SHOES) {
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -319,7 +323,7 @@ function retrieveEmoSupport(message, support_type){
                 footer.appendChild(footerItem)
                 card.appendChild(footer);
             }
-            else if (support_type == "Be Mindful of Your Emotions") {
+            else if (support_type == TYPE_EMO_MINDFUL) {
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -443,9 +447,9 @@ function processClientResponse(data){
 
     const supportDiv = document.getElementById('supportWindow');
     supportDiv.innerHTML = '';
-    retrieveEmoSupport(data.message,"You might be thinking");
-    retrieveEmoSupport(data.message,"Put Yourself in the Client's Shoes");
-    retrieveEmoSupport(data.message,'Be Mindful of Your Emotions');
+    retrieveEmoSupport(data.message,TYPE_EMO_PERSPECTIVE);
+    retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
+    retrieveEmoSupport(data.message,TYPE_EMO_MINDFUL);
 }
 
 function sendMessage() {
@@ -521,9 +525,9 @@ function sendMessage() {
             typing.style.display = 'none';
             input.disabled = true;
         } else {
-            retrieveEmoFeedback("You might be thinking");
-            retrieveEmoFeedback("Put Yourself in the Client's Shoes");
-            retrieveEmoFeedback('Be Mindful of Your Emotions');
+            retrieveEmoFeedback(TYPE_EMO_PERSPECTIVE);
+            retrieveEmoFeedback(TYPE_EMO_SHOES);
+            retrieveEmoFeedback(TYPE_EMO_MINDFUL);
             processClientResponse(data);
             input.disabled = false;
         }

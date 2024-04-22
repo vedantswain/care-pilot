@@ -51,6 +51,9 @@ sender_agent = None
 chat_history = [
 ]
 
+TYPE_EMO_PERSPECTIVE = "You might be thinking"
+TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
+TYPE_EMO_MINDFUL = "Be Mindful of Your Emotions"
 
 sender_initial = agent_sender_fewshot_twitter()
 sender_agent = mAgentCustomer()
@@ -133,7 +136,7 @@ def getReply(session_id):
         chat_history.extend([HumanMessage(content=prompt), AIMessage(content=response)])
         session[session_id][client_id]["chat_history"] = messages_to_dict(chat_history)
 
-        turn_number = len(chat_history)
+        turn_number = len(chat_history) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
         chat_history_collection.insert_one({
@@ -168,9 +171,8 @@ def getEmoFeedback(session_id):
         rate = request.json.get("rate")
         support_type = request.json.get("type")
 
-        turn_number = len(chat_history) + 1
+        turn_number = len(session[session_id][client_id]["chat_history"]) // 2
         timestamp = datetime.datetime.now(datetime.timezone.utc)
-        print("update", session_id, client_id, turn_number, support_type)
 
         query = {
             "session_id": session_id,
@@ -203,10 +205,10 @@ def getEmoSupport(session_id):
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        turn_number = len(chat_history)
+        turn_number = len(chat_history) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-        if support_type=="You might be thinking":
+        if support_type==TYPE_EMO_PERSPECTIVE:
             response_cw_emo = emo_agent.invokeThought({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
             chat_emo_feedback.insert_one({
@@ -217,7 +219,7 @@ def getEmoSupport(session_id):
                 "support_content": response.strip(),
                 "timestamp_arrival": timestamp
             })
-        if support_type=="Put Yourself in the Client's Shoes":
+        if support_type==TYPE_EMO_SHOES:
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
             chat_emo_feedback.insert_one({
@@ -228,7 +230,7 @@ def getEmoSupport(session_id):
                 "support_content": response.strip(),
                 "timestamp_arrival": timestamp
             })
-        if support_type=="Be Mindful of Your Emotions":
+        if support_type==TYPE_EMO_MINDFUL:
             response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
             chat_emo_feedback.insert_one({
