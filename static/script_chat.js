@@ -1,3 +1,7 @@
+const TYPE_EMO_PERSPECTIVE = "You might be thinking";
+const TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes";
+const TYPE_EMO_MINDFUL = "Be Mindful of Your Emotions";
+
 let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
     { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0 },
     { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1 },
@@ -249,7 +253,7 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
-            if (support_type == "You might be thinking") {
+            if (support_type == TYPE_EMO_PERSPECTIVE) {
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -273,18 +277,18 @@ function retrieveEmoSupport(message, support_type){
                 footerItem.appendChild(label);
 
                 const input = document.createElement('input');
+                input.id = `${support_type}-feedback`;
                 input.setAttribute('type', 'range');
                 input.classList.add('form-range');
                 input.setAttribute('min', '1');
                 input.setAttribute('max', '5');
                 input.setAttribute('step', '1');
-                input.setAttribute('id', 'customRange3');
                 input.style.marginLeft = '5%';
                 footerItem.appendChild(input);
                 footer.appendChild(footerItem)
                 card.appendChild(footer);
             }
-            else if (support_type == "Put Yourself in the Client's Shoes") {
+            else if (support_type == TYPE_EMO_SHOES) {
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -308,18 +312,18 @@ function retrieveEmoSupport(message, support_type){
                 footerItem.appendChild(label);
 
                 const input = document.createElement('input');
+                input.id = `${support_type}-feedback`;
                 input.setAttribute('type', 'range');
                 input.classList.add('form-range');
                 input.setAttribute('min', '1');
                 input.setAttribute('max', '5');
                 input.setAttribute('step', '1');
-                input.setAttribute('id', 'customRange3');
                 input.style.marginLeft = '5%';
                 footerItem.appendChild(input);
                 footer.appendChild(footerItem)
                 card.appendChild(footer);
             }
-            else if (support_type == "Be Mindful of Your Emotions") {
+            else if (support_type == TYPE_EMO_MINDFUL) {
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -343,12 +347,12 @@ function retrieveEmoSupport(message, support_type){
                 footerItem.appendChild(label);
 
                 const input = document.createElement('input');
+                input.id = `${support_type}-feedback`;
                 input.setAttribute('type', 'range');
                 input.classList.add('form-range');
                 input.setAttribute('min', '1');
                 input.setAttribute('max', '5');
                 input.setAttribute('step', '1');
-                input.setAttribute('id', 'customRange3');
                 input.style.marginLeft = '5%';
                 footerItem.appendChild(input);
                 footer.appendChild(footerItem);
@@ -358,6 +362,25 @@ function retrieveEmoSupport(message, support_type){
         .catch((error) => {
             console.error('Error:', error);
         });
+}
+
+function retrieveEmoFeedback(support_type) {
+    const sessionId = window.location.pathname.split('/')[1];
+    const clientId = sessionStorage.getItem('client_id');
+
+    var input = document.getElementById(`${support_type}-feedback`);
+    var rate = input.value;
+    fetch(`/${sessionId}/get-emo-feedback`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({rate: rate, type: support_type, client_id: clientId}),
+    })
+    .then(response => response.json())
+    .catch((error) => {
+        console.error('Error:', error);
+    });
 }
 
 function retrieveTroubleSupport(message){
@@ -424,9 +447,9 @@ function processClientResponse(data){
 
     const supportDiv = document.getElementById('supportWindow');
     supportDiv.innerHTML = '';
-    retrieveEmoSupport(data.message,"You might be thinking");
-    retrieveEmoSupport(data.message,"Put Yourself in the Client's Shoes");
-    retrieveEmoSupport(data.message,'Be Mindful of Your Emotions');
+    retrieveEmoSupport(data.message,TYPE_EMO_PERSPECTIVE);
+    retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
+    retrieveEmoSupport(data.message,TYPE_EMO_MINDFUL);
 }
 
 function sendMessage() {
@@ -502,6 +525,9 @@ function sendMessage() {
             typing.style.display = 'none';
             input.disabled = true;
         } else {
+            retrieveEmoFeedback(TYPE_EMO_PERSPECTIVE);
+            retrieveEmoFeedback(TYPE_EMO_SHOES);
+            retrieveEmoFeedback(TYPE_EMO_MINDFUL);
             processClientResponse(data);
             input.disabled = false;
         }
