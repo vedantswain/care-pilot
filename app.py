@@ -87,7 +87,7 @@ def getReply(session_id):
         response = sender_initial.invoke(user_input)
         
         client_id = str(uuid4())
-        session[session_id] = {client_id: {"product": val_product, "chat_history": []}}
+        session[session_id][client_id] = {"product": val_product, "chat_history": []}
         session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
         print("here get", session[session_id][client_id])
         
@@ -108,8 +108,7 @@ def getReply(session_id):
         prompt = request.json.get("prompt")
         client_id = request.json.get("client_id")
 
-        print("here getp", client_id)
-        print("here getp", session[session_id][client_id]["product"])
+        user_session = session[session_id]
 
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
