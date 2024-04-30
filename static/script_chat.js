@@ -3,18 +3,18 @@ const TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes";
 const TYPE_EMO_MINDFUL = "Be Mindful of Your Emotions";
 
 let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
-    { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0 },
-    { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1 },
-    { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1 },
-    { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0}
+    { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 0 , info: 0, emo: 0},
+    { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1, civil: 1 , info: 1, emo: 0},
+    { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1, civil: 0 , info: 0, emo: 1},
+    { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0, civil: 1 , info: 1, emo: 1}
 ];
 
 function resetQueueToInitialState() {
     let initialState = [
-        { id: 1, name: "User1", product: "Pizza", grateful: 0, ranting: 0, expression: 0 },
-        { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1 },
-        { id: 3, name: "User3", product: "Book", grateful: 1, ranting: 1, expression: 1 },
-        { id: 4, name: "User4", product: "Cup", grateful: 0, ranting: 1, expression: 0 }
+        { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 0 , info: 0, emo: 0},
+        { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1, civil: 1 , info: 1, emo: 0},
+        { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1, civil: 0 , info: 0, emo: 1},
+        { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0, civil: 1 , info: 1, emo: 1}
     ];
 
     userQueue = initialState;
@@ -37,7 +37,7 @@ function updateQueueDisplay() {
     userQueue.forEach(user => {
         const userElement = document.createElement('div');
         userElement.className = 'list-item box';
-        userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}`;
+        userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
         userElement.innerHTML = `
             <div class="media">
                 <div class="media-left">
@@ -65,12 +65,12 @@ function endChatSession() {
     updateQueueBackend();
 
     if (userQueue.length > 0) {
-        const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}`;
+        const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}&civil=${userQueue[0].civil}&info=${userQueue[0].info}&emo=${userQueue[0].emo}`;
         window.location.href = nextUserLink;
     } else {
         console.log("The queue is now empty.");
         resetQueueToInitialState();
-        const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}`;
+        const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}&civil=${userQueue[0].civil}&info=${userQueue[0].info}&emo=${userQueue[0].emo}`;
         window.location.href = nextUserLink;
     }
 }
@@ -435,21 +435,24 @@ function processClientResponse(data){
     chatDiv.scrollTop = chatDiv.scrollHeight;
     typing.style.display = 'none';
 
+    if (data.show_info == '0') {
+        const infoDiv = document.getElementById('co-pilot');
+        infoDiv.innerHTML = '';
+        retrieveInfoSupport(data.message);
+    }
 
-    const infoDiv = document.getElementById('co-pilot');
-    infoDiv.innerHTML = '';
-    retrieveInfoSupport(data.message);
+    if (data.show_emo == '0') {
+        const supportDiv = document.getElementById('supportWindow');
+        supportDiv.innerHTML = '';
+        retrieveEmoSupport(data.message,TYPE_EMO_PERSPECTIVE);
+        retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
+        retrieveEmoSupport(data.message,TYPE_EMO_MINDFUL);
+    }
+
 
     const troubleDiv = document.getElementById('troubleWindow');
     troubleDiv.innerHTML = '';
     retrieveTroubleSupport(data.message);
-
-
-    const supportDiv = document.getElementById('supportWindow');
-    supportDiv.innerHTML = '';
-    retrieveEmoSupport(data.message,TYPE_EMO_PERSPECTIVE);
-    retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
-    retrieveEmoSupport(data.message,TYPE_EMO_MINDFUL);
 }
 
 function sendMessage() {
@@ -471,13 +474,15 @@ function sendMessage() {
     // const product = urlParams.get('product');
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
+    const showInfo = sessionStorage.getItem('show_info');
+    const showEmo = sessionStorage.getItem('show_emo');
 
     fetch(`/${sessionId}/get-reply`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({prompt: message, client_id: clientId}),
+        body: JSON.stringify({prompt: message, client_id: clientId, show_info: showInfo, show_emo: showEmo}),
     })
     .then(response => response.json())
     .then(data => {
@@ -525,9 +530,11 @@ function sendMessage() {
             typing.style.display = 'none';
             input.disabled = true;
         } else {
-            retrieveEmoFeedback(TYPE_EMO_PERSPECTIVE);
-            retrieveEmoFeedback(TYPE_EMO_SHOES);
-            retrieveEmoFeedback(TYPE_EMO_MINDFUL);
+            if (showEmo == '0') {
+                retrieveEmoFeedback(TYPE_EMO_PERSPECTIVE);
+                retrieveEmoFeedback(TYPE_EMO_SHOES);
+                retrieveEmoFeedback(TYPE_EMO_MINDFUL);
+            }
             processClientResponse(data);
             input.disabled = false;
         }
@@ -564,6 +571,8 @@ function fetchFirstMsg() {
     })
     .then(data => {
         sessionStorage.setItem("client_id", data.client);
+        sessionStorage.setItem("show_info", data.show_info);
+        sessionStorage.setItem("show_emo", data.show_emo);
         processClientResponse(data);
     })
     .catch(error => {

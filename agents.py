@@ -564,7 +564,46 @@ class mAgentCustomer:
         )
         contextualize_q_chain = contextualize_q_prompt | llmchat | StrOutputParser()
         return contextualize_q_chain
-
+    
+    def get_civil_chain(self):
+        qa_info_prompt = """
+            Your role is to act like a CUSTOMER seeking support. \
+            The user is a support representative. \
+            Respond to the question as if you were the customer. \
+            Do NOT reveal your role.\
+            
+            If the user is asking for a specific detail, respond with a believable answer.\
+            If customer has agreed with response then respond with "FINISH:999"
+            After 10 - 12 turns, respond with messages to close the conversation.\
+            After 12 turns, do NOT respond further, only respond with "FINISH:999".\
+            
+            Phrase your responses like an CIVIL customer:\
+            - Talk in a gentle, polite, and respectuful tone of voice.\
+            - Do use good manners. Do use courtesy.\
+            - Act with regard to others.\
+            
+            
+            Representative: {question}
+            Customer:
+        """
+        qa_info = ChatPromptTemplate.from_messages(
+            [
+                ("system", qa_info_prompt),
+                MessagesPlaceholder(variable_name="chat_history"),
+                ("user", '''
+                    Representative asked: {question}
+                '''),
+            ]
+        )
+        rag_chain_info = (
+                RunnablePassthrough.assign(
+                    context=self.history_chain
+                )
+                | qa_info
+                | llmchat
+        )
+        return rag_chain_info
+    
     def get_uncivil_chain(self):
         qa_info_prompt = """
             Your role is to act like a CUSTOMER seeking support. \
@@ -605,11 +644,15 @@ class mAgentCustomer:
         return rag_chain_info
 
     def invoke(self, user_input):
-        ai_msg = self.uncivil_chain.invoke({"chat_history": user_input['chat_history'], "question": user_input['input']})
+        if user_input['civil'] == '0':
+            ai_msg = self.civil_chain.invoke({"chat_history": user_input['chat_history'], "question": user_input['input'], "civil": user_input['civil']})
+        else:
+            ai_msg = self.uncivil_chain.invoke({"chat_history": user_input['chat_history'], "question": user_input['input'], "civil": user_input['civil']})
 
         return ai_msg.content
 
     def __init__(self):
             self.history_chain = self.get_historical_context_chain()
+            self.civil_chain = self.get_civil_chain()
             self.uncivil_chain = self.get_uncivil_chain()
 #%%

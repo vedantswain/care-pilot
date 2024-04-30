@@ -85,6 +85,9 @@ def getReply(session_id):
         val_grateful = request.args.get('grateful')
         val_ranting = request.args.get('ranting')
         val_expression = request.args.get('expression')
+        val_civil = request.args.get('civil')
+        show_info = request.args.get('info')
+        show_emo = request.args.get('emo')
 
         user_input = {
             "product": val_product,
@@ -96,7 +99,7 @@ def getReply(session_id):
         response = sender_initial.invoke(user_input)
         
         client_id = str(uuid4())
-        session[session_id][client_id] = {"product": val_product, "chat_history": []}
+        session[session_id][client_id] = {"product": val_product, "civil": val_civil, "chat_history": []}
         session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
         
 
@@ -109,7 +112,8 @@ def getReply(session_id):
             "product": val_product,
             "grateful": val_grateful,
             "ranting": val_ranting,
-            "expression": val_expression
+            "expression": val_expression,
+            "civil": val_civil
         })
 
         chat_history_collection.insert_one({
@@ -126,11 +130,13 @@ def getReply(session_id):
     elif request.method == 'POST':
         prompt = request.json.get("prompt")
         client_id = request.json.get("client_id")
+        show_info = request.json.get("show_info")
+        show_emo = request.json.get("show_emo")
 
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        result = sender_agent.invoke({"input": prompt, "chat_history": chat_history})
+        result = sender_agent.invoke({"input": prompt, "chat_history": chat_history, "civil": session[session_id][client_id]["civil"]})
         response = result
 
         chat_history.extend([HumanMessage(content=prompt), AIMessage(content=response)])
@@ -161,7 +167,9 @@ def getReply(session_id):
 
     return jsonify({
         "client": client_id,
-        "message": response
+        "message": response,
+        "show_info": show_info,
+        "show_emo": show_emo,
     })
 
 @app.route('/<session_id>/get-emo-feedback', methods=['POST'])
