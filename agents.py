@@ -644,7 +644,7 @@ class mAgentCustomer:
         return rag_chain_info
 
     def invoke(self, user_input):
-        if user_input['civil'] == '0':
+        if user_input['civil'] == '1':
             ai_msg = self.civil_chain.invoke({"chat_history": user_input['chat_history'], "question": user_input['input'], "civil": user_input['civil']})
         else:
             ai_msg = self.uncivil_chain.invoke({"chat_history": user_input['chat_history'], "question": user_input['input'], "civil": user_input['civil']})

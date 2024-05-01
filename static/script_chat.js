@@ -435,24 +435,23 @@ function processClientResponse(data){
     chatDiv.scrollTop = chatDiv.scrollHeight;
     typing.style.display = 'none';
 
-    if (data.show_info == '0') {
+    if (data.show_info == '1') {
         const infoDiv = document.getElementById('co-pilot');
         infoDiv.innerHTML = '';
         retrieveInfoSupport(data.message);
+
+        const troubleDiv = document.getElementById('troubleWindow');
+        troubleDiv.innerHTML = '';
+        retrieveTroubleSupport(data.message);
     }
 
-    if (data.show_emo == '0') {
+    if (data.show_emo == '1') {
         const supportDiv = document.getElementById('supportWindow');
         supportDiv.innerHTML = '';
         retrieveEmoSupport(data.message,TYPE_EMO_PERSPECTIVE);
         retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
         retrieveEmoSupport(data.message,TYPE_EMO_MINDFUL);
     }
-
-
-    const troubleDiv = document.getElementById('troubleWindow');
-    troubleDiv.innerHTML = '';
-    retrieveTroubleSupport(data.message);
 }
 
 function sendMessage() {
@@ -530,7 +529,7 @@ function sendMessage() {
             typing.style.display = 'none';
             input.disabled = true;
         } else {
-            if (showEmo == '0') {
+            if (showEmo == '1') {
                 retrieveEmoFeedback(TYPE_EMO_PERSPECTIVE);
                 retrieveEmoFeedback(TYPE_EMO_SHOES);
                 retrieveEmoFeedback(TYPE_EMO_MINDFUL);
