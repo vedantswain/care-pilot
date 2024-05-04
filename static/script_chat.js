@@ -2,42 +2,42 @@ const TYPE_EMO_PERSPECTIVE = "You might be thinking";
 const TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes";
 const TYPE_EMO_MINDFUL = "Be Mindful of Your Emotions";
 
-let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
-    { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 0 , info: 0, emo: 0},
-    { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1, civil: 1 , info: 1, emo: 0},
-    { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1, civil: 0 , info: 0, emo: 1},
-    { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0, civil: 1 , info: 1, emo: 1}
-];
+// let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
+//     { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 1, info: 1, emo: 1},
+//     { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1, civil: 1, info: 1, emo: 0},
+//     { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1, civil: 0, info: 0, emo: 1},
+//     { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0, civil: 0, info: 0, emo: 0}
+// ];
 
-function resetQueueToInitialState() {
-    let initialState = [
-        { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 0 , info: 0, emo: 0},
-        { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1, civil: 1 , info: 1, emo: 0},
-        { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1, civil: 0 , info: 0, emo: 1},
-        { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0, civil: 1 , info: 1, emo: 1}
-    ];
+// function resetQueueToInitialState() {
+//     let initialState = [
+//         { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 1 , info: 1, emo: 1},
+//         { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1, civil: 1 , info: 1, emo: 0},
+//         { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1, civil: 0 , info: 0, emo: 1},
+//         { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0, civil: 1 , info: 1, emo: 1}
+//     ];
 
-    userQueue = initialState;
+//     userQueue = initialState;
 
-    localStorage.setItem('userQueue', JSON.stringify(initialState));
+//     localStorage.setItem('userQueue', JSON.stringify(initialState));
 
-    updateQueueDisplay();
-}
+//     updateQueueDisplay();
+// }
 
-function updateQueueBackend() {
-    userQueue.shift();
-    localStorage.setItem('userQueue', JSON.stringify(userQueue));
-    updateQueueDisplay();
-}
+// function updateQueueBackend() {
+//     userQueue.shift();
+//     localStorage.setItem('userQueue', JSON.stringify(userQueue));
+//     updateQueueDisplay();
+// }
 
-function updateQueueDisplay() {
+function updateQueueDisplay(data) {
     const queueContainer = document.querySelector('.list');
     queueContainer.innerHTML = '';
 
-    userQueue.forEach(user => {
+    data.userQueue.forEach(user => {
         const userElement = document.createElement('div');
         userElement.className = 'list-item box';
-        userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
+        // userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
         userElement.innerHTML = `
             <div class="media">
                 <div class="media-left">
@@ -61,19 +61,19 @@ function updateQueueDisplay() {
     });
 }
 
-function endChatSession() {
-    updateQueueBackend();
+// function endChatSession() {
+ 
 
-    if (userQueue.length > 0) {
-        const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}&civil=${userQueue[0].civil}&info=${userQueue[0].info}&emo=${userQueue[0].emo}`;
-        window.location.href = nextUserLink;
-    } else {
-        console.log("The queue is now empty.");
-        resetQueueToInitialState();
-        const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}&civil=${userQueue[0].civil}&info=${userQueue[0].info}&emo=${userQueue[0].emo}`;
-        window.location.href = nextUserLink;
-    }
-}
+//     if (userQueue.length > 0) {
+        // const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}&civil=${userQueue[0].civil}&info=${userQueue[0].info}&emo=${userQueue[0].emo}`;
+        // window.location.href = nextUserLink;
+//     } else {
+//         console.log("The queue is now empty.");
+//         resetQueueToInitialState();
+//         const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}&civil=${userQueue[0].civil}&info=${userQueue[0].info}&emo=${userQueue[0].emo}`;
+//         window.location.href = nextUserLink;
+//     }
+// }
 
 
 function createMessageElement(messageText, msgClass, messageHeader='') {
@@ -427,6 +427,19 @@ function retrieveTroubleSupport(message){
         });
 }
 
+function updateUserQueue() {
+    const sessionId = window.location.pathname.split('/')[1];
+
+    fetch(`/${sessionId}/update-userQueue`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.url) {
+            window.location.href = data.url;
+        }
+    })
+    .catch(error => console.error('Error updating user queue:', error));
+}
+
 function processClientResponse(data){
     const chatDiv = document.getElementById('chatWindow');
     const typing = document.getElementById('typing');
@@ -520,7 +533,8 @@ function sendMessage() {
             document.body.appendChild(modal);
 
             nextButton.onclick = function() {
-                endChatSession();
+                //update pop userQueue  from flask backend
+                updateUserQueue()
                 modal.style.display = "none";
                 document.body.removeChild(modal); 
             };
@@ -546,15 +560,6 @@ function sendMessage() {
 
 // Define a function to execute after the page loads
 function fetchFirstMsg() {
-    updateQueueDisplay()
-    // let firstUser = userQueue[0];
-    // const urlParams = new URLSearchParams({
-    //     product: firstUser.product,
-    //     grateful: firstUser.grateful,
-    //     ranting: firstUser.ranting,
-    //     expression: firstUser.expression
-    // }).toString()
-    // window.location.href = `./?${urlParams}`;
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = window.location.pathname.split('/')[1];
 
@@ -572,6 +577,7 @@ function fetchFirstMsg() {
         sessionStorage.setItem("client_id", data.client);
         sessionStorage.setItem("show_info", data.show_info);
         sessionStorage.setItem("show_emo", data.show_emo);
+        updateQueueDisplay(data);
         processClientResponse(data);
     })
     .catch(error => {
