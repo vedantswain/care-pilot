@@ -1,0 +1,6 @@
+tap "homebrew/core"
+
+brew "mongodb-community"
+brew "redis"
+
+cask "mongodb-compass"
