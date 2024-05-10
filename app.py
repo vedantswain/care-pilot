@@ -1,6 +1,7 @@
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 import os, json
 import certifi
+import random
 from pymongo import MongoClient
 from flask_pymongo import PyMongo
 from langchain.schema import messages_from_dict, messages_to_dict
@@ -50,6 +51,13 @@ chat_emo_feedback = db.chat_emo_feedback
 sender_agent = None
 chat_history = [
 ]
+initQueue = [
+    { "id": 1, "name": "User1", "product": "Pizza" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
+    { "id": 2, "name": "User2", "product": "Speaker", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
+    { "id": 3, "name": "User3", "product": "Book",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
+    { "id": 4, "name": "User4", "product": "Cup" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0}
+]
+userQueue = initQueue.copy()
 
 TYPE_EMO_PERSPECTIVE = "You might be thinking"
 TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
@@ -69,9 +77,15 @@ def hello():
 
 @app.route('/chat')
 def start_chat():
+    global userQueue
+    if not userQueue:
+        userQueue = initQueue
+    random.shuffle(userQueue)
+    user = userQueue.pop(0) 
     session_id = str(uuid4())
     session[session_id] = {}
-    return redirect(url_for('index', session_id=session_id))
+    userParam = f"?product={user['product']}&grateful={user['grateful']}&ranting={user['ranting']}&expression={user['expression']}&civil={user['civil']}&info={user['info']}&emo={user['emo']}"
+    return redirect(url_for('index', session_id=session_id) + userParam)
 
 @app.route('/<session_id>/')
 def index(session_id):
@@ -80,11 +94,15 @@ def index(session_id):
 
 @app.route('/<session_id>/get-reply', methods=['GET','POST'])
 def getReply(session_id):
+    global userQueue
     if request.method == 'GET':
         val_product = request.args.get('product')
         val_grateful = request.args.get('grateful')
         val_ranting = request.args.get('ranting')
         val_expression = request.args.get('expression')
+        val_civil = request.args.get('civil')
+        show_info = request.args.get('info')
+        show_emo = request.args.get('emo')
 
         user_input = {
             "product": val_product,
@@ -96,7 +114,7 @@ def getReply(session_id):
         response = sender_initial.invoke(user_input)
         
         client_id = str(uuid4())
-        session[session_id][client_id] = {"product": val_product, "chat_history": []}
+        session[session_id][client_id] = {"product": val_product, "civil": val_civil, "chat_history": []}
         session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
         
 
@@ -109,7 +127,8 @@ def getReply(session_id):
             "product": val_product,
             "grateful": val_grateful,
             "ranting": val_ranting,
-            "expression": val_expression
+            "expression": val_expression,
+            "civil": val_civil
         })
 
         chat_history_collection.insert_one({
@@ -126,11 +145,13 @@ def getReply(session_id):
     elif request.method == 'POST':
         prompt = request.json.get("prompt")
         client_id = request.json.get("client_id")
+        show_info = request.json.get("show_info")
+        show_emo = request.json.get("show_emo")
 
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        result = sender_agent.invoke({"input": prompt, "chat_history": chat_history})
+        result = sender_agent.invoke({"input": prompt, "chat_history": chat_history, "civil": session[session_id][client_id]["civil"]})
         response = result
 
         chat_history.extend([HumanMessage(content=prompt), AIMessage(content=response)])
@@ -161,8 +182,23 @@ def getReply(session_id):
 
     return jsonify({
         "client": client_id,
-        "message": response
+        "message": response,
+        "show_info": show_info,
+        "show_emo": show_emo,
+        "userQueue": userQueue
+
     })
+
+@app.route('/<session_id>/update-userQueue')
+def update_user_queue(session_id):
+    global userQueue
+    if not userQueue:
+        userQueue = initQueue.copy()
+    user = userQueue.pop(0) 
+    userParam = f"?product={user['product']}&grateful={user['grateful']}&ranting={user['ranting']}&expression={user['expression']}&civil={user['civil']}&info={user['info']}&emo={user['emo']}"
+    new_url = url_for('index', session_id=session_id) + userParam
+
+    return jsonify({"url": new_url})
 
 @app.route('/<session_id>/get-emo-feedback', methods=['POST'])
 def getEmoFeedback(session_id):
