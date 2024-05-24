@@ -1,5 +1,7 @@
 import os
 
+#import pandas as pd
+
 from langchain.schema import messages_from_dict, messages_to_dict
 
 import langchain_openai as lcai
@@ -14,6 +16,14 @@ from langchain_core.runnables import RunnablePassthrough
 import re
 from dotenv import load_dotenv
 load_dotenv("project.env")
+
+
+#JOYYYYYYYY Load the service quality reviews dataset
+#dataset_path = '/Users/max/Desktop/GitHub/pro-pilot/Service_Quality_reviews.csv'
+#reviews_df = pd.read_csv(dataset_path)
+#service_quality_df = reviews_df[reviews_df['Category'] == 'Service Quality']
+#complaints = service_quality_df['Text'].tolist()
+
 
 embeddings = lcai.AzureOpenAIEmbeddings(
     openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
@@ -43,6 +53,10 @@ def get_historical_info_context_chain():
         which might reference context in the chat history, formulate a standalone statement \
         which can be understood without the chat history. Do NOT respond to the statement, \
         just reformulate it if needed and otherwise return it as is."""
+
+        # ### However, not always start with a rhetorical question that copied from representative's response ###
+        # ### Be more creative and sounds like human-being. 
+   
     contextualize_q_prompt = ChatPromptTemplate.from_messages(
         [
             ("system", contextualize_q_system_prompt),
@@ -102,6 +116,7 @@ def get_historical_info_context_chain():
 
 #     return chain
 
+# middle///
 class mAgentInfo:
     def __init__(self):
         self.info_chain = self.agent_coworker_info()
@@ -116,6 +131,9 @@ class mAgentInfo:
             which might reference context in the chat history, formulate a standalone statement \
             which can be understood without the chat history. Do NOT respond to the statement, \
             just reformulate it if needed and otherwise return it as is."""
+        
+            ### However, not always start with a rhetorical question that copied from representative's response ###
+            ### Be more creative and sounds like human-being.
         contextualize_q_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", contextualize_q_system_prompt),
@@ -126,11 +144,12 @@ class mAgentInfo:
         contextualize_q_chain = contextualize_q_prompt | llmchat | StrOutputParser()
         return contextualize_q_chain
     
+# Mid panel - cues
     def agent_coworker_info(self):
         client = mLangChain()
         prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
                     The representative is chatting online with a customer complaining about {product}.  \
-                    
+                                     
                     Given the chat history,
                     provide 2-3 hints to help the representative's response.\
                     The hints should direct the representative to do ONLY ONE of the following:\
@@ -145,6 +164,10 @@ class mAgentInfo:
                     Customer message: {complaint}
                     Hints: 
                 """
+        # #           INFORMATIONAL SUPPORT point to the solution to the FIVE categories of complaints: 
+        #             <Service Quality>, <Product Issue> < Pricing and Charges> <Policy> <Resolution> 
+        #             The representative is chatting online with a grummpy customer complaining about {product}.  \
+                    
         template = ChatPromptTemplate.from_messages(
             [
                 ("system", prompt),
@@ -210,6 +233,7 @@ class mAgentInfo:
 
 #     return chain
 
+# Left Info Panel
 class mAgentTrouble:
     def __init__(self):
         self.trouble_chain = self.agent_coworker_trouble()
@@ -229,11 +253,17 @@ class mAgentTrouble:
                     if not exist, offer an alternative solution that can solve current solution as detail as possible\
 
                     Do NOT include steps that have already been tried.\
-                    Every step should be less than 10 words.\
-                    
+                    Every step should be less than 10 words.\     
+
                     Customer message: {complaint}
                     Troubleshooting Steps: 
                 """
+                    #     ###format every step based on the following form: 
+                    # Step 1: \
+                    # \
+                    # step2:\
+                    # \
+                    # ... ###
         template = ChatPromptTemplate.from_messages(
             [
                 ("system", prompt),
@@ -252,6 +282,7 @@ class mAgentTrouble:
 
         return chain
 
+# Right Emo Panel-representative's thought
 def agent_coworker_emo():
     client = mLangChain()
     prompt = """Your role is to help a service representative by providing EMOTIONAL SUPPORT. \
@@ -301,6 +332,7 @@ def agent_coworker_emo():
 
 #     return chain
 
+# PERSPECTIVE / toughts  + reframing
 class mAgentEP:
     def __init__(self):
         self.ep_chain = self.agent_coworker_emo_perspective()
@@ -312,9 +344,11 @@ class mAgentEP:
 
         return final_res
     
+# shoes
     def agent_coworker_emo_perspective(self):
         client = mLangChain()
 
+# 
         prompt = """Your role is to provide the customer's perspective of the conversation.
                     Summarize this for the representative.\
                     Describe how the customer might feel.\
@@ -342,6 +376,7 @@ class mAgentEP:
 
         return chain
     
+    ### this something wrong here!!!!! it always rephrase the prompts
     def paraphraseResponse(self):
         client = mLangChain()
 
@@ -414,6 +449,17 @@ def agent_sender_fewshot_twitter():
                 Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expression}.\
                 Complaint:
             """
+                ###your complaints ONLY have FIVE categories below:
+                # 1.Service Quality: Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.
+                # 2.Product Issues: Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.
+                # 3.Pricing and Charges: Financial discrepancies encountered before, during, or after the service, including overcharging, undisclosed fees, or refund problems.
+                # 4.Policy: The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other categories but should have a policy in place.
+                # 5.Resolution: The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and response has been received, where the customer still remains dissatisfied with the resolution.\
+
+                # Ensure diversity in examples to avoid repetition. Use varied scenarios for different contexts instead of repeating the same example, like the air conditioner for hotels.\
+                # Implement a mechanism to track used examples and prevent their reuse. Introduce new examples to maintain diversity.\
+                # Check for and filter out irrelevant or junk responses like 'I can't assist with this task.' Ensure that initial complaints are relevant and meaningful.\###
+   
     template = ChatPromptTemplate.from_messages(
         [
             ("system", prompt),
@@ -421,9 +467,37 @@ def agent_sender_fewshot_twitter():
     )
     chain = template | client.client_completion
     return chain
+    
+# def limitation_sender_zeroshot():
+#     client = mLangChain()
+#     prompt = """
+#                 Your role is to set up limitations for the customer service representative.\
+#                 You are messaging a service representative via the support chat.\
+
+#                 The representatives could be positioned as interns or assistant representatives with restricted powers.\
+#                 Here are the specific limitations:
+    
+#                 1. Representatives cannot offer coupons or discounts over the price of product.
+#                 2. Compensation provided cannot exceed $100.
+#                 3. Representatives are not authorized to provide immediate services or upgrades without permission from manager.
+#                 4. Any compensation or service adjustments above $100 need to be approved by a supervisor.
+#                 5. Representatives should follow a standard protocol for escalating issues that cannot be resolved within these limitations.
+#                 6. Representatives must document all customer interactions and resolutions offered.
+
+#                 Generate a detailed guideline based on these limitations.
+
+#             """
+#     template = ChatPromptTemplate.from_messages(
+#         [
+#             ("system", prompt),
+#         ]
+#     )
+#     chain = template | client.client_completion
+#     return chain
 
 class mAgentER:
     def __init__(self):
+
         self.situation_chain = self.agent_coworker_emo_situation()
         self.thought_chain = self.agent_coworker_emo_thought()
         self.reframe_chain = self.agent_coworker_emo_reframe()
@@ -443,6 +517,8 @@ class mAgentER:
 
     def agent_coworker_emo_situation(self):
         client = mLangChain()
+
+# the latest input is the last message from the [user = representative]?
 
         prompt = """The chat history describes a representative chatting online with a complaining customer. \
                     The latest input is the last message from the customer. \
@@ -586,6 +662,7 @@ class mAgentCustomer:
             Representative: {question}
             Customer:
         """
+        # DO NOT close the conversation when user pose questions and your conversation less than 12 turns.\
         qa_info = ChatPromptTemplate.from_messages(
             [
                 ("system", qa_info_prompt),
@@ -621,10 +698,74 @@ class mAgentCustomer:
             - Do NOT use good manners. Do NOT use courtesy.\
             - Act with disregard to others.\
             
-            
+
             Representative: {question}
             Customer:
         """
+
+            #         Your MUST act like a grumpy CUSTOMER seeking support. \
+            # Your audience is a support representative. \
+            # Respond to your audience as if you were the customer. \
+            # Do NOT reveal your role.\
+            # Ensure every turn is one to three sentences, and DO NOT make it too long to read.\
+            
+            # If the user is asking for a specific detail, respond with a believable answer.\
+            # If customer has agreed with response then respond with "FINISH:999"
+            # After 10 - 12 turns, respond with messages to close the conversation.\
+            # After 12 turns, do NOT respond further, only respond with "FINISH:999".\
+            # DO NOT close the conversation when user pose questions.\
+            # DO NOT close the conversation when it is less than 12 turns.\
+
+            
+            # Phrase your responses like an UNCIVIL customer:\
+            # - Use a rude, impolite, and disrespectful tone.
+            # - DO NOT show good manners or courtesy.
+            # - DO NOT use a polite or nice tone.
+            # - Show disregard for others.
+            
+            # <Your complaints can ONLY fall into one of the following FIVE categories:
+            # 1. Service Quality: Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.
+            # 2. Product Issues: Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.
+            # 3. Pricing and Charges: Financial discrepancies encountered before, during, or after the service, including overcharging, undisclosed fees, or refund problems.
+            # 4. Policy: The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other categories but should have a policy in place.
+            # 5. Resolution: The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and a response has been received, where the customer still remains dissatisfied with the resolution.>
+
+            # Ensure diversity in examples to avoid repetition. 
+            # Use diverse examples to prevent repetition. Track used examples to avoid reuse and introduce new scenarios for variety.\
+            # Avoid repeating the same example, like the air conditioner for hotels.\
+            # Filter out irrelevant or junk responses. Ensure initial complaints are relevant and meaningful.
+            
+            # Your TASK is to escalate complaints to challenge the representative. As the conversation progresses, increase the intensity of the complaints.
+            
+            # ###Example Complaint for Training###
+
+            # ```Premium economy don’t waste your money on an overnight flight! 
+            # Going out is acceptable but the night flight we had was a disgrace! 
+            # The food (I use this term lightly) wasn’t fit for dogs on our flight, 
+            # it was salmon we think as it didn’t taste of anything, 
+            # a meat of some kind but was too tough to stick a fork into let alone eat it. 
+            # The veg tasted burnt, bread roll was ok. (Not really a saving grace). 
+            # One cup of tea or coffee at breakfast and don’t bother asking what was in the box left on our table!
+            # I didn’t bother trying it. The look on other people’s faces was good enough for me to know don’t bother! 
+            # Which in comparison to the outbound flight (London to Orlando) was worlds apart, 
+            # greeted with a drink which was the first of many, dinner was nice, the steak edible, 
+            # veg cooked just right and dessert was nice with plenty of drinks! 
+            # Inflight entertainment was good even though there was supposed to be WiFi but couldn’t log on so saved some money there. 
+            # I really thought this was going to be the best way to travel. 
+            # Oh a broken seat for one of our party was a bit disappointing, 
+            # homeward bound and the inflight entertainment seem rather lacklustre which leads me to think it was an older plane. 
+            # But that really shouldn’t happen. What is not told when booking, homeward flight on the top of your ticket if you have TSA PRE you don’t have to join the massive queue, 
+            # look for pre entered TSA line that’s the one that’s empty cause they tell no one about it.```
+        
+            # ### generate complanits like the example above, and step by step
+
+            # 1. Summarize the main issues you are facing, acting as the grumpy CUSTOMER.
+            # 2. Breaking Down the Issues to ensure the conversation lasts 10-12 turns.
+            # 3. Generating Responses to CHALLENGE the representative based on their responses. ###
+        
+            # Representative: {question}
+            # Customer:
+        
         qa_info = ChatPromptTemplate.from_messages(
             [
                 ("system", qa_info_prompt),

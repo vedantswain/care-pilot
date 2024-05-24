@@ -63,12 +63,19 @@ TYPE_EMO_PERSPECTIVE = "You might be thinking"
 TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
 TYPE_EMO_MINDFUL = "Be Mindful of Your Emotions"
 
+
 sender_initial = agent_sender_fewshot_twitter()
 sender_agent = mAgentCustomer()
+# perspective / thoughts
+
+# reframing
 emo_agent = mAgentER()
+# shoes
 ep_agent = mAgentEP()
 info_agent = mAgentInfo()
 trouble_agent = mAgentTrouble()
+
+#limitation_agent = limitation_sender_zeroshot()
 
 
 @app.route('/')
