@@ -1,6 +1,6 @@
-const TYPE_EMO_PERSPECTIVE = "You might be thinking";
+const TYPE_EMO_THOUGHT = "You might be thinking";
 const TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes";
-const TYPE_EMO_MINDFUL = "Be Mindful of Your Emotions";
+const TYPE_EMO_REFRAME = "Be Mindful of Your Emotions";
 
 // let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
 //     { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 1, info: 1, emo: 1},
@@ -253,7 +253,7 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
-            if (support_type == TYPE_EMO_PERSPECTIVE) {
+            if (support_type == TYPE_EMO_THOUGHT) {
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -323,7 +323,7 @@ function retrieveEmoSupport(message, support_type){
                 footer.appendChild(footerItem)
                 card.appendChild(footer);
             }
-            else if (support_type == TYPE_EMO_MINDFUL) {
+            else if (support_type == TYPE_EMO_REFRAME) {
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -461,9 +461,9 @@ function processClientResponse(data){
     if (data.show_emo == '1') {
         const supportDiv = document.getElementById('supportWindow');
         supportDiv.innerHTML = '';
-        retrieveEmoSupport(data.message,TYPE_EMO_PERSPECTIVE);
+        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
         retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
-        retrieveEmoSupport(data.message,TYPE_EMO_MINDFUL);
+        retrieveEmoSupport(data.message,TYPE_EMO_REFRAME);
     }
 }
 
@@ -544,9 +544,9 @@ function sendMessage() {
             input.disabled = true;
         } else {
             if (showEmo == '1') {
-                retrieveEmoFeedback(TYPE_EMO_PERSPECTIVE);
+                retrieveEmoFeedback(TYPE_EMO_THOUGHT);
                 retrieveEmoFeedback(TYPE_EMO_SHOES);
-                retrieveEmoFeedback(TYPE_EMO_MINDFUL);
+                retrieveEmoFeedback(TYPE_EMO_REFRAME);
             }
             processClientResponse(data);
             input.disabled = false;
