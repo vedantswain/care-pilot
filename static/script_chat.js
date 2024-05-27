@@ -1,6 +1,6 @@
-const TYPE_EMO_PERSPECTIVE = "You might be thinking";
+const TYPE_EMO_THOUGHT = "You might be thinking";
 const TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes";
-const TYPE_EMO_MINDFUL = "Be Mindful of Your Emotions";
+const TYPE_EMO_REFRAME = "Be Mindful of Your Emotions";
 
 // let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
 //     { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 1, info: 1, emo: 1},
@@ -253,112 +253,163 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
-            if (support_type == TYPE_EMO_PERSPECTIVE) {
-                const p = document.createElement('p');
-                p.classList.add('card-header-icon');
-                const span = document.createElement('span');
-                span.classList.add('icon', 'is-small');
-                const icon = document.createElement('i');
-                icon.classList.add('fa-solid', 'fa-lightbulb');
-                span.appendChild(icon);
-                p.appendChild(span);
-                header.appendChild(p);
+            
+            // if (support_type == TYPE_EMO_THOUGHT) {
+            //     const p = document.createElement('p');
+            //     p.classList.add('card-header-icon');
+            //     const span = document.createElement('span');
+            //     span.classList.add('icon', 'is-small');
+            //     const icon = document.createElement('i');
+            //     icon.classList.add('fa-solid', 'fa-lightbulb');
+            //     span.appendChild(icon);
+            //     p.appendChild(span);
+            //     header.appendChild(p);
 
-                const footer = document.createElement('div');
-                footer.classList.add('card-footer');
+            //     const footer = document.createElement('div');
+            //     footer.classList.add('card-footer');
 
-                const footerItem = document.createElement('div');
-                footerItem.classList.add('card-footer-item');
+            //     const footerItem = document.createElement('div');
+            //     footerItem.classList.add('card-footer-item');
                 
-                const label = document.createElement('label');
-                label.setAttribute('for', 'customRange3');
-                label.classList.add('form-label');
-                label.textContent = 'Rate Response';
-                footerItem.appendChild(label);
+            //     const label = document.createElement('label');
+            //     label.setAttribute('for', 'customRange3');
+            //     label.classList.add('form-label');
+            //     label.textContent = 'Rate Response';
+            //     footerItem.appendChild(label);
 
-                const input = document.createElement('input');
-                input.id = `${support_type}-feedback`;
-                input.setAttribute('type', 'range');
-                input.classList.add('form-range');
-                input.setAttribute('min', '1');
-                input.setAttribute('max', '5');
-                input.setAttribute('step', '1');
-                input.style.marginLeft = '5%';
-                footerItem.appendChild(input);
-                footer.appendChild(footerItem)
-                card.appendChild(footer);
+            //     const input = document.createElement('input');
+            //     input.id = `${support_type}-feedback`;
+            //     input.setAttribute('type', 'range');
+            //     input.classList.add('form-range');
+            //     input.setAttribute('min', '1');
+            //     input.setAttribute('max', '5');
+            //     input.setAttribute('step', '1');
+            //     input.style.marginLeft = '5%';
+            //     footerItem.appendChild(input);
+            //     footer.appendChild(footerItem)
+            //     card.appendChild(footer);
+            // }
+            // else if (support_type == TYPE_EMO_SHOES) {
+            //     const p = document.createElement('p');
+            //     p.classList.add('card-header-icon');
+            //     const span = document.createElement('span');
+            //     span.classList.add('icon', 'is-small');
+            //     const icon = document.createElement('i');
+            //     icon.classList.add('fas', 'fa-people-arrows');
+            //     span.appendChild(icon);
+            //     p.appendChild(span);
+            //     header.appendChild(p);
+
+            //     const footer = document.createElement('p');
+            //     footer.classList.add('card-footer');
+                
+            //     const footerItem = document.createElement('div');
+            //     footerItem.classList.add('card-footer-item');
+                
+            //     const label = document.createElement('label');
+            //     label.setAttribute('for', 'customRange3');
+            //     label.classList.add('form-label');
+            //     label.textContent = 'Rate Response';
+            //     footerItem.appendChild(label);
+
+            //     const input = document.createElement('input');
+            //     input.id = `${support_type}-feedback`;
+            //     input.setAttribute('type', 'range');
+            //     input.classList.add('form-range');
+            //     input.setAttribute('min', '1');
+            //     input.setAttribute('max', '5');
+            //     input.setAttribute('step', '1');
+            //     input.style.marginLeft = '5%';
+            //     footerItem.appendChild(input);
+            //     footer.appendChild(footerItem)
+            //     card.appendChild(footer);
+            // }
+            // else if (support_type == TYPE_EMO_REFRAME) {
+            //     const p = document.createElement('p');
+            //     p.classList.add('card-header-icon');
+            //     const span = document.createElement('span');
+            //     span.classList.add('icon', 'is-small');
+            //     const icon = document.createElement('i');
+            //     icon.classList.add('fas', 'fa-spa');
+            //     span.appendChild(icon);
+            //     p.appendChild(span);
+            //     header.appendChild(p);
+
+            //     const footer = document.createElement('p');
+            //     footer.classList.add('card-footer');
+
+            //     const footerItem = document.createElement('div');
+            //     footerItem.classList.add('card-footer-item');
+                
+            //     const label = document.createElement('label');
+            //     label.setAttribute('for', 'customRange3');
+            //     label.classList.add('form-label');
+            //     label.textContent = 'Rate Response';
+            //     footerItem.appendChild(label);
+
+            //     const input = document.createElement('input');
+            //     input.id = `${support_type}-feedback`;
+            //     input.setAttribute('type', 'range');
+            //     input.classList.add('form-range');
+            //     input.setAttribute('min', '1');
+            //     input.setAttribute('max', '5');
+            //     input.setAttribute('step', '1');
+            //     input.style.marginLeft = '5%';
+            //     footerItem.appendChild(input);
+            //     footer.appendChild(footerItem);
+            //     card.appendChild(footer);
+            // }
+
+            if (support_type === TYPE_EMO_REFRAME) {
+                const thoughtPane = createSupportPane(data.message.thought, "emo");
+                const reframePane = createSupportPane(data.message.reframe, "emo");
+                card.appendChild(thoughtPane);
+                card.appendChild(reframePane);
             }
-            else if (support_type == TYPE_EMO_SHOES) {
-                const p = document.createElement('p');
-                p.classList.add('card-header-icon');
-                const span = document.createElement('span');
-                span.classList.add('icon', 'is-small');
-                const icon = document.createElement('i');
+    
+            if (support_type === TYPE_EMO_SHOES) {
+                const shoesPane = createSupportPane(data.message, "emo");
+                card.appendChild(shoesPane);
+            }
+
+            const p = document.createElement('p');
+            p.classList.add('card-header-icon');
+            const span = document.createElement('span');
+            span.classList.add('icon', 'is-small');
+            const icon = document.createElement('i');
+
+            if (support_type == TYPE_EMO_SHOES) {
                 icon.classList.add('fas', 'fa-people-arrows');
-                span.appendChild(icon);
-                p.appendChild(span);
-                header.appendChild(p);
-
-                const footer = document.createElement('p');
-                footer.classList.add('card-footer');
-                
-                const footerItem = document.createElement('div');
-                footerItem.classList.add('card-footer-item');
-                
-                const label = document.createElement('label');
-                label.setAttribute('for', 'customRange3');
-                label.classList.add('form-label');
-                label.textContent = 'Rate Response';
-                footerItem.appendChild(label);
-
-                const input = document.createElement('input');
-                input.id = `${support_type}-feedback`;
-                input.setAttribute('type', 'range');
-                input.classList.add('form-range');
-                input.setAttribute('min', '1');
-                input.setAttribute('max', '5');
-                input.setAttribute('step', '1');
-                input.style.marginLeft = '5%';
-                footerItem.appendChild(input);
-                footer.appendChild(footerItem)
-                card.appendChild(footer);
             }
-            else if (support_type == TYPE_EMO_MINDFUL) {
-                const p = document.createElement('p');
-                p.classList.add('card-header-icon');
-                const span = document.createElement('span');
-                span.classList.add('icon', 'is-small');
-                const icon = document.createElement('i');
-                icon.classList.add('fas', 'fa-spa');
-                span.appendChild(icon);
-                p.appendChild(span);
-                header.appendChild(p);
+            span.appendChild(icon);
+            p.appendChild(span);
+            header.appendChild(p);
 
-                const footer = document.createElement('p');
-                footer.classList.add('card-footer');
+            const footer = document.createElement('p');
+            footer.classList.add('card-footer');
 
-                const footerItem = document.createElement('div');
-                footerItem.classList.add('card-footer-item');
-                
-                const label = document.createElement('label');
-                label.setAttribute('for', 'customRange3');
-                label.classList.add('form-label');
-                label.textContent = 'Rate Response';
-                footerItem.appendChild(label);
+            const footerItem = document.createElement('div');
+            footerItem.classList.add('card-footer-item');
 
-                const input = document.createElement('input');
-                input.id = `${support_type}-feedback`;
-                input.setAttribute('type', 'range');
-                input.classList.add('form-range');
-                input.setAttribute('min', '1');
-                input.setAttribute('max', '5');
-                input.setAttribute('step', '1');
-                input.style.marginLeft = '5%';
-                footerItem.appendChild(input);
-                footer.appendChild(footerItem);
-                card.appendChild(footer);
-            }
+            const label = document.createElement('label');
+            label.setAttribute('for', 'customRange3');
+            label.classList.add('form-label');
+            label.textContent = 'Rate Response';
+            footerItem.appendChild(label);
+
+            const input = document.createElement('input');
+            input.id = `${support_type}-feedback`;
+            input.setAttribute('type', 'range');
+            input.classList.add('form-range');
+            input.setAttribute('min', '1');
+            input.setAttribute('max', '5');
+            input.setAttribute('step', '1');
+            input.style.marginLeft = '5%';
+            footerItem.appendChild(input);
+            footer.appendChild(footerItem);
+            card.appendChild(footer);
         })
+        
         .catch((error) => {
             console.error('Error:', error);
         });
@@ -461,9 +512,9 @@ function processClientResponse(data){
     if (data.show_emo == '1') {
         const supportDiv = document.getElementById('supportWindow');
         supportDiv.innerHTML = '';
-        retrieveEmoSupport(data.message,TYPE_EMO_PERSPECTIVE);
+        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
         retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
-        retrieveEmoSupport(data.message,TYPE_EMO_MINDFUL);
+        retrieveEmoSupport(data.message,TYPE_EMO_REFRAME);
     }
 }
 
@@ -544,9 +595,9 @@ function sendMessage() {
             input.disabled = true;
         } else {
             if (showEmo == '1') {
-                retrieveEmoFeedback(TYPE_EMO_PERSPECTIVE);
+                retrieveEmoFeedback(TYPE_EMO_THOUGHT);
                 retrieveEmoFeedback(TYPE_EMO_SHOES);
-                retrieveEmoFeedback(TYPE_EMO_MINDFUL);
+                retrieveEmoFeedback(TYPE_EMO_REFRAME);
             }
             processClientResponse(data);
             input.disabled = false;

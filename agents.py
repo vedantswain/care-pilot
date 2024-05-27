@@ -495,6 +495,7 @@ def agent_sender_fewshot_twitter():
 #     chain = template | client.client_completion
 #     return chain
 
+
 class mAgentER:
     def __init__(self):
 
@@ -503,17 +504,16 @@ class mAgentER:
         self.reframe_chain = self.agent_coworker_emo_reframe()
 
     def invoke(self, user_input):
+        
         situation = self.situation_chain.invoke({'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
         thought = self.thought_chain.invoke({'complaint':user_input['complaint'], 'situation':situation, 'chat_history':user_input['chat_history']})
         reframe = self.reframe_chain.invoke({'thought':thought, 'situation':situation})
 
-        return reframe.strip()
-    
-    def invokeThought(self, user_input):
-        situation = self.situation_chain.invoke({'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
-        thought = self.thought_chain.invoke({'complaint':user_input['complaint'], 'situation':situation, 'chat_history':user_input['chat_history']})
-        
-        return thought.strip()
+        return {
+            'situation': situation.strip(),
+            'thought': thought.strip(),
+            'reframe': reframe.strip(),
+        }
 
     def agent_coworker_emo_situation(self):
         client = mLangChain()

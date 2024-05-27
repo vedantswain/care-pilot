@@ -59,9 +59,9 @@ initQueue = [
 ]
 userQueue = initQueue.copy()
 
-TYPE_EMO_PERSPECTIVE = "You might be thinking"
+TYPE_EMO_THOUGHT = "You might be thinking"
 TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
-TYPE_EMO_MINDFUL = "Be Mindful of Your Emotions"
+TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"
 
 
 sender_initial = agent_sender_fewshot_twitter()
@@ -111,14 +111,14 @@ def getReply(session_id):
         show_info = request.args.get('info')
         show_emo = request.args.get('emo')
 
-        user_input = {
+        complaint_parameters = {
             "product": val_product,
             "is_grateful": 'grateful' if val_grateful==0 else 'NOT grateful',
             "is_ranting": 'ranting' if val_ranting==0 else 'NOT ranting',
             "is_expression": 'expression' if val_expression==0 else 'NOT expression'
         }
 
-        response = sender_initial.invoke(user_input)
+        response = sender_initial.invoke(complaint_parameters)
         
         client_id = str(uuid4())
         session[session_id][client_id] = {"product": val_product, "civil": val_civil, "chat_history": []}
@@ -233,7 +233,7 @@ def getEmoFeedback(session_id):
         res = chat_emo_feedback.update_one(query, update)
         if res == 0:
             return jsonify({"message": "No existing record found to update"}), 404
-        return jsonify({"message": "Feedback received"}), 200    
+        return jsonify({"message": "Feedback received"}), 200
     return jsonify({"message": "Invalid session or session expired"}), 400
 
 
@@ -241,7 +241,6 @@ def getEmoFeedback(session_id):
 def getEmoSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
-        
         reply = request.json.get("client_reply")
         support_type = request.json.get("type")
 
@@ -251,18 +250,36 @@ def getEmoSupport(session_id):
         turn_number = len(chat_history) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-        if support_type==TYPE_EMO_PERSPECTIVE:
-            response_cw_emo = emo_agent.invokeThought({'complaint':reply, "chat_history": chat_history})
+        if support_type==TYPE_EMO_REFRAME:
+            response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
+            thought = response_cw_emo['thought']
+            reframe = response_cw_emo['reframe']
+        # Thought
             chat_emo_feedback.insert_one({
                 "session_id": session_id,
                 "client_id": client_id,
                 "turn_number": turn_number,
                 "support_type": "You might be thinking",
-                "support_content": response.strip(),
+                "support_content": thought.strip(),
+                "timestamp_arrival":timestamp
+            })
+        # Reframe
+            chat_emo_feedback.insert_one({
+                "session_id": session_id,
+                "client_id": client_id,
+                "turn_number": turn_number,
+                "support_type": "Be Mindful of Your Emotions",
+                "support_content": reframe.strip(),
                 "timestamp_arrival": timestamp
             })
-        if support_type==TYPE_EMO_SHOES:
+
+            return jsonify({
+                'thought':thought, 
+                'reframe': reframe
+            })
+        
+        elif support_type==TYPE_EMO_SHOES:
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
             chat_emo_feedback.insert_one({
@@ -273,23 +290,11 @@ def getEmoSupport(session_id):
                 "support_content": response.strip(),
                 "timestamp_arrival": timestamp
             })
-        if support_type==TYPE_EMO_MINDFUL:
-            response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
-            response = response_cw_emo
-            chat_emo_feedback.insert_one({
-                "session_id": session_id,
-                "client_id": client_id,
-                "turn_number": turn_number,
-                "support_type": "Be Mindful of Your Emotions",
-                "support_content": response.strip(),
-                "timestamp_arrival": timestamp
+            return jsonify({
+                "message": response
             })
-            
-        return jsonify({
-            "message": response
-        })
 
-
+    return jsonify({"error": "Invalid session_id"}), 400
 
 @app.route('/<session_id>/get-info-support', methods=['POST'])
 def getInfoSupport(session_id):
