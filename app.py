@@ -275,10 +275,11 @@ def getEmoSupport(session_id):
             })
 
             return jsonify({
-                'thought':thought, 
-                'reframe': reframe
+                "message": {
+                    'thought':thought,
+                    'reframe': reframe
+                }
             })
-        
         elif support_type==TYPE_EMO_SHOES:
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
@@ -293,6 +294,8 @@ def getEmoSupport(session_id):
             return jsonify({
                 "message": response
             })
+        else:
+            return jsonify({"error": "Invalid support_type"}), 400
 
     return jsonify({"error": "Invalid session_id"}), 400
 

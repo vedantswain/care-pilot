@@ -248,8 +248,8 @@ function retrieveEmoSupport(message, support_type){
         })
         .then(response => response.json())
         .then(data => {
-            var emoMessage = createSupportPane(data.message, "emo")
-            card.appendChild(emoMessage);
+//            var emoMessage = createSupportPane(data.message, "emo")
+//            card.appendChild(emoMessage);
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
@@ -293,8 +293,8 @@ function retrieveEmoSupport(message, support_type){
                 card.appendChild(footer);
             }
             else if (support_type == TYPE_EMO_REFRAME) {
-                const thoughtPane = createSupportPane(data.thought, "emo");
-                const reframePane = createSupportPane(data.reframe, "emo");
+                const thoughtPane = createSupportPane(data.message.thought, "emo");
+                const reframePane = createSupportPane(data.message.reframe, "emo");
                 card.appendChild(thoughtPane);
                 card.appendChild(reframePane);
                 
@@ -435,7 +435,7 @@ function processClientResponse(data){
     if (data.show_emo == '1') {
         const supportDiv = document.getElementById('supportWindow');
         supportDiv.innerHTML = '';
-        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
+//        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
         retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
         retrieveEmoSupport(data.message,TYPE_EMO_REFRAME);
     }
