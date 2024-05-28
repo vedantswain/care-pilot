@@ -518,7 +518,7 @@ function sendMessage() {
             input.disabled = true;
         } else {
             if (showEmo == '1') {
-                retrieveEmoFeedback(TYPE_EMO_THOUGHT);
+                // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
                 retrieveEmoFeedback(TYPE_EMO_SHOES);
                 retrieveEmoFeedback(TYPE_EMO_REFRAME);
             }
