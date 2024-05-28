@@ -253,42 +253,11 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
-            if (support_type == TYPE_EMO_THOUGHT) {
-                const p = document.createElement('p');
-                p.classList.add('card-header-icon');
-                const span = document.createElement('span');
-                span.classList.add('icon', 'is-small');
-                const icon = document.createElement('i');
-                icon.classList.add('fa-solid', 'fa-lightbulb');
-                span.appendChild(icon);
-                p.appendChild(span);
-                header.appendChild(p);
-
-                const footer = document.createElement('div');
-                footer.classList.add('card-footer');
-
-                const footerItem = document.createElement('div');
-                footerItem.classList.add('card-footer-item');
+            //delete if (support_type == TYPE_EMO_THOUGHT) {
+            if (support_type == TYPE_EMO_SHOES) {
+                const shoesPane = createSupportPane(data.message, "emo");
+                card.appendChild(shoesPane);
                 
-                const label = document.createElement('label');
-                label.setAttribute('for', 'customRange3');
-                label.classList.add('form-label');
-                label.textContent = 'Rate Response';
-                footerItem.appendChild(label);
-
-                const input = document.createElement('input');
-                input.id = `${support_type}-feedback`;
-                input.setAttribute('type', 'range');
-                input.classList.add('form-range');
-                input.setAttribute('min', '1');
-                input.setAttribute('max', '5');
-                input.setAttribute('step', '1');
-                input.style.marginLeft = '5%';
-                footerItem.appendChild(input);
-                footer.appendChild(footerItem)
-                card.appendChild(footer);
-            }
-            else if (support_type == TYPE_EMO_SHOES) {
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -324,6 +293,11 @@ function retrieveEmoSupport(message, support_type){
                 card.appendChild(footer);
             }
             else if (support_type == TYPE_EMO_REFRAME) {
+                const thoughtPane = createSupportPane(data.thought, "emo");
+                const reframePane = createSupportPane(data.reframe, "emo");
+                card.appendChild(thoughtPane);
+                card.appendChild(reframePane);
+                
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
