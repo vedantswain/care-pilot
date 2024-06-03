@@ -86,7 +86,7 @@ def hello():
 def start_chat():
     global userQueue
     if not userQueue:
-        userQueue = initQueue
+        userQueue = initQueue.copy()
     random.shuffle(userQueue)
     user = userQueue.pop(0) 
     session_id = str(uuid4())
