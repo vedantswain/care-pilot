@@ -52,10 +52,10 @@ sender_agent = None
 chat_history = [
 ]
 initQueue = [
-    { "id": 1, "name": "User1", "product": "Pizza" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
-    { "id": 2, "name": "User2", "product": "Speaker", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
-    { "id": 3, "name": "User3", "product": "Book",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
-    { "id": 4, "name": "User4", "product": "Cup" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0}
+    { "id": 1, "name": "Amy", "product": "Airline" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
+    { "id": 2, "name": "Lucy", "product": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
+    { "id": 3, "name": "Ivy", "product": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
+    { "id": 4, "name": "Chris", "product": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0}
 ]
 userQueue = initQueue.copy()
 
@@ -90,7 +90,7 @@ def start_chat():
     random.shuffle(userQueue)
     user = userQueue.pop(0) 
     session_id = str(uuid4())
-    session[session_id] = {}
+    session[session_id] = user 
     userParam = f"?product={user['product']}&grateful={user['grateful']}&ranting={user['ranting']}&expression={user['expression']}&civil={user['civil']}&info={user['info']}&emo={user['emo']}"
     return redirect(url_for('index', session_id=session_id) + userParam)
 
