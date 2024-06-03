@@ -88,7 +88,7 @@ def start_chat():
     if len(userQueue)==0:
         userQueue = initQueue.copy()
     random.shuffle(userQueue)
-    user = userQueue.pop(0) 
+    user = userQueue[0]
     session_id = str(uuid4())
     session[session_id] = user
     userParam = f"?product={user['product']}&grateful={user['grateful']}&ranting={user['ranting']}&expression={user['expression']}&civil={user['civil']}&info={user['info']}&emo={user['emo']}"
