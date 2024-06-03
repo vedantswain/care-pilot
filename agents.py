@@ -253,10 +253,13 @@ class mAgentTrouble:
                     INFORMATIONAL SUPPORT point to the solution to the FIVE categories of complaints: 
                     <Service Quality>, <Product Issue> < Pricing and Charges> <Policy> <Resolution>                 
                     ###format every step based on the following form: 
-                    # Step 1: \n
-                    # step2:\n
-                    # 
-                    # ... ###
+                    Step 1: \n
+                    step 2: \n
+                    step 3: \n
+                    step 4: \n
+                    step 5: \n
+                    
+                    ... ###
                     
                     Customer message: {complaint}
                     Troubleshooting Steps: 
@@ -546,6 +549,9 @@ class mAgentER:
         client = mLangChain()
 
         prompt = """You are a representative chatting online with a complaining customer.\
+        
+                    <DO NOT respond until the user input the message.\>
+                    
                     Reframe your thoughts in the given situation.
                     
                     Situation: An mturk requester rejected my task and I wasn't sure why because I work very hard on my tasks. Being new it affected my approval rating more negatively.\
