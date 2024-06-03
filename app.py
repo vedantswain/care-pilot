@@ -85,7 +85,7 @@ def hello():
 @app.route('/chat')
 def start_chat():
     global userQueue
-    if not userQueue:
+    if len(userQueue)==0:
         userQueue = initQueue.copy()
     random.shuffle(userQueue)
     user = userQueue.pop(0) 
@@ -204,7 +204,7 @@ def getReply(session_id):
 @app.route('/<session_id>/update-userQueue')
 def update_user_queue(session_id):
     global userQueue
-    if not userQueue:
+    if len(userQueue) == 0:
         userQueue = initQueue.copy()
     user = userQueue.pop(0) 
     userParam = f"?product={user['product']}&grateful={user['grateful']}&ranting={user['ranting']}&expression={user['expression']}&civil={user['civil']}&info={user['info']}&emo={user['emo']}"
