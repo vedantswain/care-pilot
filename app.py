@@ -90,7 +90,7 @@ def start_chat():
     random.shuffle(userQueue)
     user = userQueue.pop(0) 
     session_id = str(uuid4())
-    session[session_id] = {} 
+    session[session_id] = user
     userParam = f"?product={user['product']}&grateful={user['grateful']}&ranting={user['ranting']}&expression={user['expression']}&civil={user['civil']}&info={user['info']}&emo={user['emo']}"
     return redirect(url_for('index', session_id=session_id) + userParam)
 
