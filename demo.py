@@ -12,8 +12,6 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.runnables import RunnablePassthrough
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.tools.retriever import create_retriever_tool
-
-
 from utils import mOpenAI, mLangChain
 
 
