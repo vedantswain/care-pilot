@@ -85,22 +85,22 @@ def hello():
 @app.route('/chat')
 def start_chat():
     global userQueue
-    if len(userQueue)==0:
-        userQueue = initQueue.copy()
+    if not userQueue:
+        userQueue = initQueue
     random.shuffle(userQueue)
-    user = userQueue[0]
+    user = userQueue.pop(0)
     session_id = str(uuid4())
-    session[session_id] = user
+    session[session_id] = {}
     userParam = f"?product={user['product']}&grateful={user['grateful']}&ranting={user['ranting']}&expression={user['expression']}&civil={user['civil']}&info={user['info']}&emo={user['emo']}"
     return redirect(url_for('index', session_id=session_id) + userParam)
 
 @app.route('/<session_id>/')
 def index(session_id):
     if session_id in session:
-        user_name = session[session_id]['name']
+        client_name = session[session_id]['name']
     else:
-        user_name = 'Guest'
-    return render_template('index_chat.html', session_id=session_id, user_name=user_name)
+        client_name = 'Guest'
+    return render_template('index_chat.html', session_id=session_id, client_name=client_name)
 
 
 
@@ -204,7 +204,7 @@ def getReply(session_id):
 @app.route('/<session_id>/update-userQueue')
 def update_user_queue(session_id):
     global userQueue
-    if len(userQueue) == 0:
+    if not userQueue:
         userQueue = initQueue.copy()
     user = userQueue.pop(0) 
     userParam = f"?product={user['product']}&grateful={user['grateful']}&ranting={user['ranting']}&expression={user['expression']}&civil={user['civil']}&info={user['info']}&emo={user['emo']}"
