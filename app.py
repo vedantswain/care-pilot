@@ -28,7 +28,7 @@ DB_NAME = "test"
 print(os.getenv("AZURE_OPENAI_ENDPOINT"))
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
-app.secret_key = 'your_secret_key'  # Required for session to work
+app.secret_key = 'your_secret_key1'  # Required for session to work
 # app.config["MONGO_URI"] = os.getenv("AZURE_COSMOS_MONGO_CONNSTRING")
 # mongo = PyMongo(app, tlsCAFile=certifi.where())
 # client = mongo.cx
@@ -52,12 +52,12 @@ sender_agent = None
 chat_history = [
 ]
 initQueue = [
-    { "id": 1, "name": "Aron", "product": "Airline" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
+    { "id": 1, "name": "Lucy", "product": "Airline" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
     { "id": 2, "name": "Esther", "product": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
     { "id": 3, "name": "Peter", "product": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
     { "id": 4, "name": "Joseph", "product": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0}
 ]
-userQueue = initQueue.copy()
+clientQueue = initQueue.copy()
 
 TYPE_EMO_THOUGHT = "You might be thinking"
 TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
@@ -84,29 +84,35 @@ def hello():
 
 @app.route('/chat')
 def start_chat():
-    global userQueue
-    if not userQueue:
-        userQueue = initQueue
-    random.shuffle(userQueue)
-    user = userQueue.pop(0)
-    session_id = str(uuid4())
+    global clientQueue
+    if not clientQueue:
+        clientQueue = initQueue
+    random.shuffle(clientQueue)
+    client = clientQueue.pop(0)
+    session_id = str(uuid4())   ### unique to each user/participant/representative
+    # 
+    current_client = client['name']
     session[session_id] = {}
-    userParam = f"?product={user['product']}&grateful={user['grateful']}&ranting={user['ranting']}&expression={user['expression']}&civil={user['civil']}&info={user['info']}&emo={user['emo']}"
-    return redirect(url_for('index', session_id=session_id) + userParam)
+    session[session_id]['current_client'] = current_client
+    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    # 
+    return redirect(url_for('index', session_id=session_id, current_client=current_client) + clientParam)
+
 
 @app.route('/<session_id>/')
 def index(session_id):
     if session_id in session:
-        client_name = session[session_id]['name']
+        current_client = session[session_id]['current_client']
     else:
-        client_name = 'Guest'
-    return render_template('index_chat.html', session_id=session_id, client_name=client_name)
+        current_client = 'Guest'
+
+    return render_template('index_chat.html', session_id=session_id, current_client=current_client)
 
 
 
 @app.route('/<session_id>/get-reply', methods=['GET','POST'])
 def getReply(session_id):
-    global userQueue
+    global clientQueue
     if request.method == 'GET':
         val_product = request.args.get('product')
         val_grateful = request.args.get('grateful')
@@ -126,7 +132,8 @@ def getReply(session_id):
         response = sender_initial.invoke(complaint_parameters)
         
         client_id = str(uuid4())
-        session[session_id][client_id] = {"product": val_product, "civil": val_civil, "chat_history": []}
+        current_client = session[session_id]['current_client']
+        session[session_id][client_id] = {"current_client": current_client, "product": val_product, "civil": val_civil, "chat_history": []}
         session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
         
 
@@ -197,18 +204,18 @@ def getReply(session_id):
         "message": response,
         "show_info": show_info,
         "show_emo": show_emo,
-        "userQueue": userQueue
+        "clientQueue": clientQueue
 
     })
 
-@app.route('/<session_id>/update-userQueue')
-def update_user_queue(session_id):
-    global userQueue
-    if not userQueue:
-        userQueue = initQueue.copy()
-    user = userQueue.pop(0) 
-    userParam = f"?product={user['product']}&grateful={user['grateful']}&ranting={user['ranting']}&expression={user['expression']}&civil={user['civil']}&info={user['info']}&emo={user['emo']}"
-    new_url = url_for('index', session_id=session_id) + userParam
+@app.route('/<session_id>/update-clientQueue')
+def update_client_queue(session_id):
+    global clientQueue
+    if not clientQueue:
+        clientQueue = initQueue.copy()
+    client = clientQueue.pop(0) 
+    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    new_url = url_for('index', session_id=session_id) + clientParam
 
     return jsonify({"url": new_url})
 
@@ -230,7 +237,7 @@ def getEmoFeedback(session_id):
         }
         update = {
             "$set": {
-                "user_feedback": rate,
+                "client_feedback": rate,
                 "timestamp_feedback": timestamp,
             }
         }

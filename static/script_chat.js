@@ -34,11 +34,11 @@ function updateQueueDisplay(data) {
     const queueContainer = document.querySelector('.list');
     queueContainer.innerHTML = '';
 
-    data.userQueue.forEach(user => {
-        const userElement = document.createElement('div');
-        userElement.className = 'list-item box';
+    data.clientQueue.forEach(client => {
+        const clientElement = document.createElement('div');
+        clientElement.className = 'list-item box';
         // userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
-        userElement.innerHTML = `
+        clientElement.innerHTML = `
             <div class="media">
                 <div class="media-left">
                     <p>
@@ -50,14 +50,14 @@ function updateQueueDisplay(data) {
                 <div class="media-content is-hidden-mobile">
                     <div class="content">
                         <p>
-                            <strong>${user.name}</strong>
-                            <br><small class="has-text-weight-semibold">${user.product}</small>
+                            <strong>${client.name}</strong>
+                            <br><small class="has-text-weight-semibold">${client.product}</small>
                         </p>
                     </div>
                 </div>
             </div>
         `;
-        queueContainer.appendChild(userElement);
+        queueContainer.appendChild(clientElement);
     });
 }
 
