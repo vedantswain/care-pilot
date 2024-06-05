@@ -96,7 +96,7 @@ def start_chat():
     session[session_id]['current_client'] = current_client
     clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     # 
-    return redirect(url_for('index', session_id=session_id, current_client=current_client) + clientParam)
+    return redirect(url_for('index', session_id=session_id) + clientParam)
 
 
 @app.route('/<session_id>/')
@@ -130,7 +130,7 @@ def getReply(session_id):
         }
 
         response = sender_initial.invoke(complaint_parameters)
-        
+
         client_id = str(uuid4())
         current_client = session[session_id]['current_client']
         session[session_id][client_id] = {"current_client": current_client, "product": val_product, "civil": val_civil, "chat_history": []}

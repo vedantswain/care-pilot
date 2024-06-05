@@ -38,28 +38,28 @@ llminfo = lcai.AzureChatOpenAI(
     temperature=0.1
 )
 
-def get_historical_info_context_chain():
-    contextualize_q_system_prompt = """Given a chat history and the latest user input \
-        which might reference context in the chat history, formulate a standalone statement \
-        which can be understood without the chat history. Do NOT respond to the statement, \
-        just reformulate it if needed and otherwise return it as is.\
-        
-        Think it step by step:
-        First, read through the chat history carefully to understand the context.\    
-        Then, read the latest user input and identify any references to the previous context.\
-        Next, rephrase the user input into a clear, standalone statement that captures the intent and can be understood independently without the chat history.\ 
-        Respond only with the rephrased standalone query.\
-        Do not provide any additional explanations or commentary.\
-        If the user input does not reference any context, simply return it as is.\""""
-    contextualize_q_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", contextualize_q_system_prompt),
-            MessagesPlaceholder(variable_name="chat_history"),
-            ("user", "{complaint}"),
-        ]
-    )
-    contextualize_q_chain = contextualize_q_prompt | llmchat | StrOutputParser()
-    return contextualize_q_chain
+# def get_historical_info_context_chain():
+#     contextualize_q_system_prompt = """Given a chat history and the latest user input \
+#         which might reference context in the chat history, formulate a standalone statement \
+#         which can be understood without the chat history. Do NOT respond to the statement, \
+#         just reformulate it if needed and otherwise return it as is.\
+#
+#         Think it step by step:
+#         First, read through the chat history carefully to understand the context.\
+#         Then, read the latest user input and identify any references to the previous context.\
+#         Next, rephrase the user input into a clear, standalone statement that captures the intent and can be understood independently without the chat history.\
+#         Respond only with the rephrased standalone query.\
+#         Do not provide any additional explanations or commentary.\
+#         If the user input does not reference any context, simply return it as is.\""""
+#     contextualize_q_prompt = ChatPromptTemplate.from_messages(
+#         [
+#             ("system", contextualize_q_system_prompt),
+#             MessagesPlaceholder(variable_name="chat_history"),
+#             ("user", "{complaint}"),
+#         ]
+#     )
+#     contextualize_q_chain = contextualize_q_prompt | llmchat | StrOutputParser()
+#     return contextualize_q_chain
 
 # def agent_coworker_info():
 #     client = mLangChain()
@@ -120,17 +120,13 @@ class mAgentInfo:
         return info_cue
     
     def get_historical_info_context_chain(self):
-        contextualize_q_system_prompt = """Given a chat history and the latest user input \
-            which might reference context in the chat history, formulate a standalone statement \
-            which can be understood without the chat history. Do NOT respond to the statement, \
-            just reformulate it if needed and otherwise return it as is.
-                    
+        contextualize_q_system_prompt = """
             Think it step by step:
-            First, read through the chat history carefully to understand the context.\    
+            First, read through the chat history carefully to understand the context.\
             Then, read the latest user input and identify any references to the previous context.\
-            Next, rephrase the user input into a clear, standalone statement that captures the intent and can be understood independently without the chat history.\ 
+            Next, rephrase the user input into a clear, standalone statement that captures the intent and can be understood independently without the chat history.\
             Respond only with the rephrased standalone query.\
-            Do not provide any additional explanations or commentary.\
+            Do NOT provide any additional explanations or commentary.\
             If the user input does not reference any context, simply return it as is."""
         contextualize_q_prompt = ChatPromptTemplate.from_messages(
             [
@@ -158,9 +154,6 @@ class mAgentInfo:
                     Each cue should be a single phrase of less than 10 words.\
                     Do NOT number the cues.\
                     
-                    INFORMATIONAL SUPPORT point to the solution to the FIVE categories of complaints: 
-                    <Service Quality>, <Product Issue> < Pricing and Charges> <Policy> <Resolution>                 
-                    
                     Customer message: {complaint}
                     Hints: 
                 """
@@ -174,7 +167,7 @@ class mAgentInfo:
         chain = template | client.client_completion
 
         chain = (RunnablePassthrough.assign(
-            context=get_historical_info_context_chain()
+            context=self.get_historical_info_context_chain()
         )
                 | template
                 | llminfo
@@ -249,10 +242,8 @@ class mAgentTrouble:
 
                     Do NOT include steps that have already been tried.\
                     Every step should be less than 10 words.\
-                    
-                    INFORMATIONAL SUPPORT point to the solution to the FIVE categories of complaints: 
-                    <Service Quality>, <Product Issue> < Pricing and Charges> <Policy> <Resolution>                 
-                    ###format every step based on the following form: 
+                                    
+                    ###Format every step in a newline:\
                     Step 1: \n
                     step 2: \n
                     step 3: \n
@@ -395,18 +386,7 @@ def agent_sender_fewshot_twitter():
                 You ONLY play the role of the customer. Do NOT play the role of the representative. \
                 Style your complaint based on your feelings. \
                 Initiate the chat with a ONLY ONE complaint message. \
-                
-                ###your complaints ONLY have FIVE categories below:
-                # 1.Service Quality: Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.
-                # 2.Product Issues: Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.
-                # 3.Pricing and Charges: Financial discrepancies encountered before, during, or after the service, including overcharging, undisclosed fees, or refund problems.
-                # 4.Policy: The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other categories but should have a policy in place.
-                # 5.Resolution: The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and response has been received, where the customer still remains dissatisfied with the resolution.\
-
-                # Ensure diversity in examples to avoid repetition. Use varied scenarios for different contexts instead of repeating the same example, like the air conditioner for hotels.\
-                # Implement a mechanism to track used examples and prevent their reuse. Introduce new examples to maintain diversity.\
-                # Check for and filter out irrelevant or junk responses like 'I can't assist with this task.' Ensure that initial complaints are relevant and meaningful.\###
-                
+               
                 Product: Mobile Network               
                 Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
                 Complaint: O2 I received this a few weeks ago, since then I've been getting 2/3 calls a day from a telemarketer. Is someone using your name?\
@@ -549,9 +529,7 @@ class mAgentER:
         client = mLangChain()
 
         prompt = """You are a representative chatting online with a complaining customer.\
-        
-                    <DO NOT respond until the user input the message.\>
-                    
+                            
                     Reframe your thoughts in the given situation.
                     
                     Situation: An mturk requester rejected my task and I wasn't sure why because I work very hard on my tasks. Being new it affected my approval rating more negatively.\
@@ -612,7 +590,7 @@ class mAgentCustomer:
     def get_civil_chain(self):
         qa_info_prompt = """
             Your role is to act like a CUSTOMER seeking support. \
-            The user is a support representative. \
+            You are speaking to a support REPRESENTATIVE. \
             Respond to the question as if you were the customer. \
             Do NOT reveal your role.\
             
@@ -622,10 +600,10 @@ class mAgentCustomer:
             After 12 turns, do NOT respond further, only respond with "FINISH:999".\
             
             Phrase your responses like an CIVIL customer:\
-            - Talk in a gentle, polite, and respectuful tone of voice.\
-            - Do use good manners. Do use courtesy.\
+            - Talk in a gentle, polite, and respectful tone of voice.\
+            - Do use good manners.\
+            - Do use courtesy.\
             - Act with regard to others.\
-            
             
             Representative: {question}
             Customer:
@@ -651,59 +629,21 @@ class mAgentCustomer:
     def get_uncivil_chain(self):
         qa_info_prompt = """
             Your role is to act like a CUSTOMER seeking support. \
-            The user is a support representative. \
+            You are speaking to a support REPRESENTATIVE. \
             Respond to the question as if you were the customer. \
-            Do NOT reveal your role.\
-            
-            If the user is asking for a specific detail, respond with a believable answer.\
-            If customer has agreed with response then respond with "FINISH:999"
-            After 10 - 12 turns, respond with messages to close the conversation.\
-            After 12 turns, do NOT respond further, only respond with "FINISH:999".\
-            
-            Phrase your responses like an UNCIVIL customer:\
-            - Talk in a rude, impolite, and disrespectuful tone of voice.\
-            - Do NOT use good manners. Do NOT use courtesy.\
-            - Act with disregard to others.\
-            
-            Your MUST act like a grumpy CUSTOMER seeking support. \
-            Your audience is a support representative. \
-            Respond to your audience as if you were the customer. \
             Do NOT reveal your role.\
             Ensure every turn is one to three sentences, and DO NOT make it too long to read.\
             
-            If the user is asking for a specific detail, respond with a believable answer.\
+            If the representative is asking for a specific detail, respond with a believable answer.\
             If customer has agreed with response then respond with "FINISH:999"
             After 10 - 12 turns, respond with messages to close the conversation.\
             After 12 turns, do NOT respond further, only respond with "FINISH:999".\
-            DO NOT close the conversation when user pose questions.\
-            DO NOT close the conversation when it is less than 12 turns.\
-
             
             Phrase your responses like an UNCIVIL customer:\
-            - Use a rude, impolite, and disrespectful tone.
-            - DO NOT show good manners or courtesy.
-            - DO NOT use a polite or nice tone.
-            - Show disregard for others.
-            
-            <Your complaints can ONLY fall into one of the following FIVE categories:
-            1. Service Quality: Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.
-            2. Product Issues: Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.
-            3. Pricing and Charges: Financial discrepancies encountered before, during, or after the service, including overcharging, undisclosed fees, or refund problems.
-            4. Policy: The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other categories but should have a policy in place.
-            5. Resolution: The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and a response has been received, where the customer still remains dissatisfied with the resolution.>
-
-            Ensure diversity in examples to avoid repetition. 
-            Use diverse examples to prevent repetition. Track used examples to avoid reuse and introduce new scenarios for variety.\
-            Avoid repeating the same example, like the air conditioner for hotels.\
-            Filter out irrelevant or junk responses. Ensure initial complaints are relevant and meaningful.
-            
-            Your TASK is to escalate complaints to challenge the representative. As the conversation progresses, increase the intensity of the complaints.
-            
-            ### generate complanits step by step:
-
-            1. Summarize the main issues you are facing, acting as the grumpy CUSTOMER.
-            2. Breaking Down the Issues to ensure the conversation lasts 10-12 turns.
-            3. Generating Responses to CHALLENGE the representative based on their responses. ###
+            - Use a rude, impolite, and disrespectful tone.\
+            - DO NOT show good manners or courtesy.\
+            - DO NOT use a polite or nice tone.\
+            - Show disregard for others.\
             
             Representative: {question}
             Customer:
