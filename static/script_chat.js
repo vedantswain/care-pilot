@@ -34,11 +34,11 @@ function updateQueueDisplay(data) {
     const queueContainer = document.querySelector('.list');
     queueContainer.innerHTML = '';
 
-    data.userQueue.forEach(user => {
-        const userElement = document.createElement('div');
-        userElement.className = 'list-item box';
+    data.clientQueue.forEach(client => {
+        const clientElement = document.createElement('div');
+        clientElement.className = 'list-item box';
         // userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
-        userElement.innerHTML = `
+        clientElement.innerHTML = `
             <div class="media">
                 <div class="media-left">
                     <p>
@@ -50,14 +50,14 @@ function updateQueueDisplay(data) {
                 <div class="media-content is-hidden-mobile">
                     <div class="content">
                         <p>
-                            <strong>${user.name}</strong>
-                            <br><small class="has-text-weight-semibold">${user.product}</small>
+                            <strong>${client.name}</strong>
+                            <br><small class="has-text-weight-semibold">${client.product}</small>
                         </p>
                     </div>
                 </div>
             </div>
         `;
-        queueContainer.appendChild(userElement);
+        queueContainer.appendChild(clientElement);
     });
 }
 
@@ -248,47 +248,16 @@ function retrieveEmoSupport(message, support_type){
         })
         .then(response => response.json())
         .then(data => {
-            var emoMessage = createSupportPane(data.message, "emo")
-            card.appendChild(emoMessage);
+//            var emoMessage = createSupportPane(data.message, "emo")
+//            card.appendChild(emoMessage);
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
-            if (support_type == TYPE_EMO_THOUGHT) {
-                const p = document.createElement('p');
-                p.classList.add('card-header-icon');
-                const span = document.createElement('span');
-                span.classList.add('icon', 'is-small');
-                const icon = document.createElement('i');
-                icon.classList.add('fa-solid', 'fa-lightbulb');
-                span.appendChild(icon);
-                p.appendChild(span);
-                header.appendChild(p);
-
-                const footer = document.createElement('div');
-                footer.classList.add('card-footer');
-
-                const footerItem = document.createElement('div');
-                footerItem.classList.add('card-footer-item');
+            //delete if (support_type == TYPE_EMO_THOUGHT) {
+            if (support_type == TYPE_EMO_SHOES) {
+                const shoesPane = createSupportPane(data.message, "emo");
+                card.appendChild(shoesPane);
                 
-                const label = document.createElement('label');
-                label.setAttribute('for', 'customRange3');
-                label.classList.add('form-label');
-                label.textContent = 'Rate Response';
-                footerItem.appendChild(label);
-
-                const input = document.createElement('input');
-                input.id = `${support_type}-feedback`;
-                input.setAttribute('type', 'range');
-                input.classList.add('form-range');
-                input.setAttribute('min', '1');
-                input.setAttribute('max', '5');
-                input.setAttribute('step', '1');
-                input.style.marginLeft = '5%';
-                footerItem.appendChild(input);
-                footer.appendChild(footerItem)
-                card.appendChild(footer);
-            }
-            else if (support_type == TYPE_EMO_SHOES) {
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -324,6 +293,11 @@ function retrieveEmoSupport(message, support_type){
                 card.appendChild(footer);
             }
             else if (support_type == TYPE_EMO_REFRAME) {
+                const thoughtPane = createSupportPane(data.message.thought, "emo");
+                const reframePane = createSupportPane(data.message.reframe, "emo");
+                card.appendChild(thoughtPane);
+                card.appendChild(reframePane);
+                
                 const p = document.createElement('p');
                 p.classList.add('card-header-icon');
                 const span = document.createElement('span');
@@ -461,7 +435,7 @@ function processClientResponse(data){
     if (data.show_emo == '1') {
         const supportDiv = document.getElementById('supportWindow');
         supportDiv.innerHTML = '';
-        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
+//        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
         retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
         retrieveEmoSupport(data.message,TYPE_EMO_REFRAME);
     }
@@ -544,7 +518,7 @@ function sendMessage() {
             input.disabled = true;
         } else {
             if (showEmo == '1') {
-                retrieveEmoFeedback(TYPE_EMO_THOUGHT);
+                // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
                 retrieveEmoFeedback(TYPE_EMO_SHOES);
                 retrieveEmoFeedback(TYPE_EMO_REFRAME);
             }

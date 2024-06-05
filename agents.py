@@ -38,24 +38,32 @@ llminfo = lcai.AzureChatOpenAI(
     temperature=0.1
 )
 
-def get_historical_info_context_chain():
-    contextualize_q_system_prompt = """Given a chat history and the latest user input \
-        which might reference context in the chat history, formulate a standalone statement \
-        which can be understood without the chat history. Do NOT respond to the statement, \
-        just reformulate it if needed and otherwise return it as is."""
-    contextualize_q_prompt = ChatPromptTemplate.from_messages(
-        [
-            ("system", contextualize_q_system_prompt),
-            MessagesPlaceholder(variable_name="chat_history"),
-            ("user", "{complaint}"),
-        ]
-    )
-    contextualize_q_chain = contextualize_q_prompt | llmchat | StrOutputParser()
-    return contextualize_q_chain
+# def get_historical_info_context_chain():
+#     contextualize_q_system_prompt = """Given a chat history and the latest user input \
+#         which might reference context in the chat history, formulate a standalone statement \
+#         which can be understood without the chat history. Do NOT respond to the statement, \
+#         just reformulate it if needed and otherwise return it as is.\
+#
+#         Think it step by step:
+#         First, read through the chat history carefully to understand the context.\
+#         Then, read the latest user input and identify any references to the previous context.\
+#         Next, rephrase the user input into a clear, standalone statement that captures the intent and can be understood independently without the chat history.\
+#         Respond only with the rephrased standalone query.\
+#         Do not provide any additional explanations or commentary.\
+#         If the user input does not reference any context, simply return it as is.\""""
+#     contextualize_q_prompt = ChatPromptTemplate.from_messages(
+#         [
+#             ("system", contextualize_q_system_prompt),
+#             MessagesPlaceholder(variable_name="chat_history"),
+#             ("user", "{complaint}"),
+#         ]
+#     )
+#     contextualize_q_chain = contextualize_q_prompt | llmchat | StrOutputParser()
+#     return contextualize_q_chain
 
 # def agent_coworker_info():
 #     client = mLangChain()
-#     prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
+#     prompt = Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
 #                 The representative is chatting online with a customer complaining about {product}.  \
                 
 #                 Given the chat history,
@@ -112,10 +120,14 @@ class mAgentInfo:
         return info_cue
     
     def get_historical_info_context_chain(self):
-        contextualize_q_system_prompt = """Given a chat history and the latest user input \
-            which might reference context in the chat history, formulate a standalone statement \
-            which can be understood without the chat history. Do NOT respond to the statement, \
-            just reformulate it if needed and otherwise return it as is."""
+        contextualize_q_system_prompt = """
+            Think it step by step:
+            First, read through the chat history carefully to understand the context.\
+            Then, read the latest user input and identify any references to the previous context.\
+            Next, rephrase the user input into a clear, standalone statement that captures the intent and can be understood independently without the chat history.\
+            Respond only with the rephrased standalone query.\
+            Do NOT provide any additional explanations or commentary.\
+            If the user input does not reference any context, simply return it as is."""
         contextualize_q_prompt = ChatPromptTemplate.from_messages(
             [
                 ("system", contextualize_q_system_prompt),
@@ -155,7 +167,7 @@ class mAgentInfo:
         chain = template | client.client_completion
 
         chain = (RunnablePassthrough.assign(
-            context=get_historical_info_context_chain()
+            context=self.get_historical_info_context_chain()
         )
                 | template
                 | llminfo
@@ -230,6 +242,15 @@ class mAgentTrouble:
 
                     Do NOT include steps that have already been tried.\
                     Every step should be less than 10 words.\
+                                    
+                    ###Format every step in a newline:\
+                    Step 1: \n
+                    step 2: \n
+                    step 3: \n
+                    step 4: \n
+                    step 5: \n
+                    
+                    ... ###
                     
                     Customer message: {complaint}
                     Troubleshooting Steps: 
@@ -365,7 +386,7 @@ def agent_sender_fewshot_twitter():
                 You ONLY play the role of the customer. Do NOT play the role of the representative. \
                 Style your complaint based on your feelings. \
                 Initiate the chat with a ONLY ONE complaint message. \
-                
+               
                 Product: Mobile Network               
                 Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
                 Complaint: O2 I received this a few weeks ago, since then I've been getting 2/3 calls a day from a telemarketer. Is someone using your name?\
@@ -433,13 +454,13 @@ class mAgentER:
         thought = self.thought_chain.invoke({'complaint':user_input['complaint'], 'situation':situation, 'chat_history':user_input['chat_history']})
         reframe = self.reframe_chain.invoke({'thought':thought, 'situation':situation})
 
-        return reframe.strip()
+        return {
+            'situation': situation.strip(),
+            'thought': thought.strip(),
+            'reframe': reframe.strip(),
+        }
     
-    def invokeThought(self, user_input):
-        situation = self.situation_chain.invoke({'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
-        thought = self.thought_chain.invoke({'complaint':user_input['complaint'], 'situation':situation, 'chat_history':user_input['chat_history']})
-        
-        return thought.strip()
+# delete    def invokeThought(self, user_input):
 
     def agent_coworker_emo_situation(self):
         client = mLangChain()
@@ -508,6 +529,7 @@ class mAgentER:
         client = mLangChain()
 
         prompt = """You are a representative chatting online with a complaining customer.\
+                            
                     Reframe your thoughts in the given situation.
                     
                     Situation: An mturk requester rejected my task and I wasn't sure why because I work very hard on my tasks. Being new it affected my approval rating more negatively.\
@@ -568,7 +590,7 @@ class mAgentCustomer:
     def get_civil_chain(self):
         qa_info_prompt = """
             Your role is to act like a CUSTOMER seeking support. \
-            The user is a support representative. \
+            You are speaking to a support REPRESENTATIVE. \
             Respond to the question as if you were the customer. \
             Do NOT reveal your role.\
             
@@ -578,10 +600,10 @@ class mAgentCustomer:
             After 12 turns, do NOT respond further, only respond with "FINISH:999".\
             
             Phrase your responses like an CIVIL customer:\
-            - Talk in a gentle, polite, and respectuful tone of voice.\
-            - Do use good manners. Do use courtesy.\
+            - Talk in a gentle, polite, and respectful tone of voice.\
+            - Do use good manners.\
+            - Do use courtesy.\
             - Act with regard to others.\
-            
             
             Representative: {question}
             Customer:
@@ -607,20 +629,21 @@ class mAgentCustomer:
     def get_uncivil_chain(self):
         qa_info_prompt = """
             Your role is to act like a CUSTOMER seeking support. \
-            The user is a support representative. \
+            You are speaking to a support REPRESENTATIVE. \
             Respond to the question as if you were the customer. \
             Do NOT reveal your role.\
+            Ensure every turn is one to three sentences, and DO NOT make it too long to read.\
             
-            If the user is asking for a specific detail, respond with a believable answer.\
+            If the representative is asking for a specific detail, respond with a believable answer.\
             If customer has agreed with response then respond with "FINISH:999"
             After 10 - 12 turns, respond with messages to close the conversation.\
             After 12 turns, do NOT respond further, only respond with "FINISH:999".\
             
             Phrase your responses like an UNCIVIL customer:\
-            - Talk in a rude, impolite, and disrespectuful tone of voice.\
-            - Do NOT use good manners. Do NOT use courtesy.\
-            - Act with disregard to others.\
-            
+            - Use a rude, impolite, and disrespectful tone.\
+            - DO NOT show good manners or courtesy.\
+            - DO NOT use a polite or nice tone.\
+            - Show disregard for others.\
             
             Representative: {question}
             Customer:
