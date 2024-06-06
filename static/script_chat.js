@@ -404,7 +404,7 @@ function retrieveTroubleSupport(message){
 function updateUserQueue() {
     const sessionId = window.location.pathname.split('/')[1];
 
-    fetch(`/${sessionId}/update-userQueue`)
+    fetch(`/${sessionId}/update-clientQueue`)
     .then(response => response.json())
     .then(data => {
         if (data.url) {
