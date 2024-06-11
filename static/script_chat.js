@@ -401,17 +401,17 @@ function retrieveTroubleSupport(message){
         });
 }
 
-function updateUserQueue() {
+function updateClientQueue() {
     const sessionId = window.location.pathname.split('/')[1];
 
-    fetch(`/${sessionId}/update-userQueue`)
+    fetch(`/${sessionId}/update-clientQueue`)
     .then(response => response.json())
     .then(data => {
         if (data.url) {
             window.location.href = data.url;
         }
     })
-    .catch(error => console.error('Error updating user queue:', error));
+    .catch(error => console.error('Error updating client queue:', error));
 }
 
 function processClientResponse(data){
@@ -472,7 +472,8 @@ function sendMessage() {
     })
     .then(response => response.json())
     .then(data => {
-        if(data.message === "FINISH:999") {
+        const isFinish = data.message.includes("FINISH:999");
+        if(isFinish) {
             const modal = document.createElement('div');
             modal.id = 'finishModal';
             modal.style.position = 'fixed';
@@ -508,7 +509,7 @@ function sendMessage() {
 
             nextButton.onclick = function() {
                 //update pop userQueue  from flask backend
-                updateUserQueue()
+                updateClientQueue()
                 modal.style.display = "none";
                 document.body.removeChild(modal); 
             };
