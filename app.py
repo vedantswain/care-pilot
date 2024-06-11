@@ -16,6 +16,8 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
+from sentiment import analyze_sentiment
+
 from dotenv import load_dotenv
 from uuid import uuid4
 import datetime
@@ -60,7 +62,7 @@ initQueue = [
 clientQueue = initQueue.copy()
 
 TYPE_EMO_THOUGHT = "You might be thinking"
-TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
+TYPE_EMO_SHOES = "Sentiment situation of client"
 TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"
 
 
@@ -83,7 +85,7 @@ def hello():
     return render_template('landing.html')
 
 @app.route('/chat')
-def start_chat():
+def start_chat(): 
     global clientQueue
     if not clientQueue:
         clientQueue = initQueue
@@ -264,7 +266,6 @@ def getEmoSupport(session_id):
 
         if support_type==TYPE_EMO_REFRAME:
             response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
-            response = response_cw_emo
             thought = response_cw_emo['thought']
             reframe = response_cw_emo['reframe']
         # Thought
@@ -292,24 +293,39 @@ def getEmoSupport(session_id):
                     'reframe': reframe
                 }
             })
-        elif support_type==TYPE_EMO_SHOES:
-            response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
-            response = response_cw_emo
-            chat_emo_feedback.insert_one({
-                "session_id": session_id,
-                "client_id": client_id,
-                "turn_number": turn_number,
-                "support_type": "Put Yourself in the Client's Shoes",
-                "support_content": response.strip(),
-                "timestamp_arrival": timestamp
-            })
-            return jsonify({
-                "message": response
-            })
         else:
             return jsonify({"error": "Invalid support_type"}), 400
 
     return jsonify({"error": "Invalid session_id"}), 400
+
+@app.route('/<session_id>/sentiment', methods=['POST'])
+def sentiment(session_id):
+    if session_id in session:
+        client_id = request.json.get("client_id")
+        reply = request.json.get("client_reply")
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+        turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
+
+        # emo_perspec = self.ep_chain.invoke({'complaint':user_input['complaint']})
+        client_latest_response = ep_agent.invoke({'complaint': reply})
+
+        # Perform sentiment analysis
+        sentiment_category = analyze_sentiment(client_latest_response)
+
+        chat_emo_feedback.insert_one({
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": "Sentiment Analysis",
+            "support_content": sentiment_category,
+            "timestamp_arrival": timestamp
+        })
+
+        return jsonify({'sentiment': sentiment_category})
+    else:
+        return jsonify({"error": "Invalid session_id"}), 400
+
+
 
 @app.route('/<session_id>/get-info-support', methods=['POST'])
 def getInfoSupport(session_id):
