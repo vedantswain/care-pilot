@@ -286,12 +286,25 @@ def getEmoSupport(session_id):
                 "support_content": reframe.strip(),
                 "timestamp_arrival": timestamp
             })
-
             return jsonify({
                 "message": {
                     'thought':thought,
                     'reframe': reframe
                 }
+            })
+        elif support_type==TYPE_EMO_SHOES:
+            response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
+            response = response_cw_emo
+            chat_emo_feedback.insert_one({
+                "session_id": session_id,
+                "client_id": client_id,
+                "turn_number": turn_number,
+                "support_type": "Put Yourself in the Client's Shoes",
+                "support_content": response.strip(),
+                "timestamp_arrival": timestamp
+            })
+            return jsonify({
+                "message": response
             })
         else:
             return jsonify({"error": "Invalid support_type"}), 400

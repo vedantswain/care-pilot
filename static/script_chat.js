@@ -430,7 +430,7 @@ function processClientResponse(data){
         const supportDiv = document.getElementById('supportWindow');
         supportDiv.innerHTML = '';
 //        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
-        retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
+//        retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
         retrieveEmoSupport(data.message,TYPE_EMO_REFRAME);
     }
 }
