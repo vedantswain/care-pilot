@@ -1,6 +1,7 @@
 const TYPE_EMO_THOUGHT = "You might be thinking";
-const TYPE_EMO_SHOES = "Sentiment situation of client";
+const TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
 const TYPE_EMO_REFRAME = "Be Mindful of Your Emotions";
+const TYPE_SENTIMENT = "Client's Sentiment";
 
 // let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
 //     { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 1, info: 1, emo: 1},
@@ -101,10 +102,59 @@ function createSupportPane(messageText, msgClass){
     article.classList.add('card-content');
 
     const body = document.createElement('div');
-    body.classList.add('content');
     innerContent = document.createElement('div');
     markedmsgText = marked.parse(messageText);
     innerContent.innerHTML = markedmsgText;
+
+    if (msgClass === "senti"){
+        const span = document.createElement('span');
+        span.classList.add('icon', 'is-small');
+        const icon = document.createElement('i');
+
+        innerContent.classList.add('sentiment-label')
+        switch (messageText) {
+            case 'Very Positive':
+              innerContent.classList.add('very-positive');
+              iconClass = 'fa-face-grin-beam'
+              icon.classList.add('fas', iconClass);
+              break;
+            case 'Positive':
+              innerContent.classList.add('positive');
+              iconClass = 'fa-face-grin'
+              icon.classList.add('fas', iconClass);
+              break;
+            case 'Slightly Positive':
+              innerContent.classList.add('slightly-positive');
+              iconClass = 'fa-face-smile'
+              icon.classList.add('fas', iconClass);
+              break;
+            case 'Neutral':
+              innerContent.classList.add('neutral');
+              iconClass = 'fa-face-meh'
+              icon.classList.add('fas', iconClass);
+              break;
+            case 'Slightly Negative':
+              innerContent.classList.add('slightly-negative');
+              iconClass = 'fa-frown-open'
+              icon.classList.add('fas', iconClass);
+              break;
+            case 'Negative':
+              innerContent.classList.add('negative');
+              iconClass = 'fa-frown'
+              icon.classList.add('fas', iconClass);
+              break;
+            case 'Very Negative':
+              innerContent.classList.add('very-negative');
+              iconClass = 'fa-face-angry'
+              icon.classList.add('fas', iconClass);
+              break;
+          }
+
+
+        span.appendChild(icon);
+        innerContent.appendChild(span);
+    }
+
     body.appendChild(innerContent);
 
     if (msgClass === "info"){
@@ -148,6 +198,45 @@ function createSupportPane(messageText, msgClass){
     article.appendChild(body);
 
     return article
+}
+
+function createFooter(support_type){
+    const footer = document.createElement('p');
+    footer.classList.add('card-footer');
+
+    const footerItem = document.createElement('div');
+    footerItem.classList.add('card-footer-item');
+
+    const label = document.createElement('label');
+    label.setAttribute('for', 'customRange3');
+    label.classList.add('form-label');
+    label.textContent = 'Rate Response';
+    footerItem.appendChild(label);
+
+    const input = document.createElement('input');
+    input.id = `${support_type}-feedback`;
+    input.setAttribute('type', 'range');
+    input.classList.add('form-range');
+    input.setAttribute('min', '1');
+    input.setAttribute('max', '5');
+    input.setAttribute('step', '1');
+    input.style.marginLeft = '5%';
+    footerItem.appendChild(input);
+    footer.appendChild(footerItem)
+
+    return footer
+}
+
+function designHeader(header, iconClass) {
+    const p = document.createElement('p');
+    p.classList.add('card-header-icon');
+    const span = document.createElement('span');
+    span.classList.add('icon', 'is-small');
+    const icon = document.createElement('i');
+    icon.classList.add('fas', iconClass);
+    span.appendChild(icon);
+    p.appendChild(span);
+    header.appendChild(p);
 }
 
 function createLoader(loaderId='info-loader') {
@@ -239,8 +328,26 @@ function retrieveEmoSupport(message, support_type){
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
 
-
-    fetch(`/${sessionId}/get-emo-support`, {
+    if (support_type == TYPE_SENTIMENT) {
+        fetch(`/${sessionId}/sentiment`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ client_reply: message, client_id: clientId }),
+        })
+        .then(response => response.json())
+        .then(data => {
+            // Add this into html
+            document.getElementById(loaderId).remove();
+            const sentimentPane = createSupportPane(data.message, "senti");
+            card.appendChild(sentimentPane);
+            designHeader(header, 'fa-people-arrows');
+        })
+        .catch(error => console.error('Error:', error));
+    }
+    else {
+        fetch(`/${sessionId}/get-emo-support`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -254,83 +361,34 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.appendChild(emoMessage);
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
-    
-            if (support_type == TYPE_EMO_REFRAME) {
-                const thoughtPane = createSupportPane(data.message.thought, "emo");
-                const reframePane = createSupportPane(data.message.reframe, "emo");
-                card.appendChild(thoughtPane);
-                card.appendChild(reframePane);
-                
-                const p = document.createElement('p');
-                p.classList.add('card-header-icon');
-                const span = document.createElement('span');
-                span.classList.add('icon', 'is-small');
-                const icon = document.createElement('i');
-                icon.classList.add('fas', 'fa-spa');
-                span.appendChild(icon);
-                p.appendChild(span);
-                header.appendChild(p);
 
-                const footer = document.createElement('p');
-                footer.classList.add('card-footer');
+        if (support_type == TYPE_EMO_SHOES) {
+                const shoesPane = createSupportPane(data.message, "emo");
+                card.appendChild(shoesPane);
 
-                const footerItem = document.createElement('div');
-                footerItem.classList.add('card-footer-item');
-                
-                const label = document.createElement('label');
-                label.setAttribute('for', 'customRange3');
-                label.classList.add('form-label');
-                label.textContent = 'Rate Response';
-                footerItem.appendChild(label);
+                designHeader(header, 'fa-people-arrows');
 
-                const input = document.createElement('input');
-                input.id = `${support_type}-feedback`;
-                input.setAttribute('type', 'range');
-                input.classList.add('form-range');
-                input.setAttribute('min', '1');
-                input.setAttribute('max', '5');
-                input.setAttribute('step', '1');
-                input.style.marginLeft = '5%';
-                footerItem.appendChild(input);
-                footer.appendChild(footerItem);
+                footer = createFooter(support_type)
                 card.appendChild(footer);
             }
-        else if (support_type == TYPE_EMO_SHOES) {
-            fetch(`/${sessionId}/sentiment`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({ client_reply: message, client_id: clientId }),
-            })
-            .then(response => response.json())
-            .then(data => {
-                // Add this into html 
-                const sentimentPane = document.getElementById('sentiment-pane');
-                sentimentPane.textContent = data.sentiment;
-            })
-            .catch(error => console.error('Error:', error));
+        else if (support_type == TYPE_EMO_REFRAME) {
+            const thoughtPane = createSupportPane(data.message.thought, "emo");
+            const reframePane = createSupportPane(data.message.reframe, "emo");
+            card.appendChild(thoughtPane);
+            card.appendChild(reframePane);
+
+            designHeader(header, 'fa-spa');
+
+            footer = createFooter(support_type);
+            card.appendChild(footer);
         }
-    })
-    .catch((error) => {
-        console.error('Error:', error);
-    });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            });
+    }
 }
-//     fetch(`/${sessionId}/sentiment`, {
-//         method: 'POST',
-//         headers: {
-//             'Content-Type': 'application/json',
-//         },
-//         body: JSON.stringify({ client_reply: message, client_id: clientId }),
-//     })
-//     .then(response => response.json())
-//     .then(data => {
-//         // Display sentiment in the right pane
-//         const sentimentPane = document.getElementById('sentiment-pane');
-//         sentimentPane.textContent = data.sentiment;
-//     })
-//     .catch(error => console.error('Error:', error));
-// }
+
 
 function retrieveEmoFeedback(support_type) {
     const sessionId = window.location.pathname.split('/')[1];
@@ -431,6 +489,7 @@ function processClientResponse(data){
         supportDiv.innerHTML = '';
 //        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
 //        retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
+        retrieveEmoSupport(data.message, TYPE_SENTIMENT);
         retrieveEmoSupport(data.message,TYPE_EMO_REFRAME);
     }
 }
@@ -517,6 +576,7 @@ function sendMessage() {
                 // retrieveEmoFeedback(TYPE_EMO_SHOES);
 
                 retrieveEmoFeedback(TYPE_EMO_REFRAME);
+//                retrieveEmoFeedback(TYPE_SENTIMENT);
             }
             processClientResponse(data);
             input.disabled = false;

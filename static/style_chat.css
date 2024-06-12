@@ -252,3 +252,46 @@ pre {
     border-bottom: 1px solid #dedede;
     color: #333;
 }
+
+.sentiment-label {
+  display: inline-flex;
+  align-items: center;
+  padding: 5px;
+  border-radius: 20px;
+  color: white;
+}
+
+.sentiment-label span {
+    margin-left: 4px;
+}
+
+.very-positive {
+  background-color: #3CB371; /* Example green color */
+}
+
+.positive {
+  background-color: #32CD32; /* Example green color */
+}
+
+.slightly-positive {
+  background-color: #ADFF2F; /* Example green color */
+}
+
+
+.neutral {
+  background-color: #808080; /* Example green color */
+}
+
+.slightly-negative {
+  background-color: #FFA07A; /* Example green color */
+}
+
+
+.negative {
+  background-color: #F6347; /* Example green color */
+}
+
+.very-negative {
+  background-color: #FF4500; /* Example green color */
+}
+

@@ -2,8 +2,17 @@ import nltk
 from nltk.sentiment import SentimentIntensityAnalyzer
 from random import shuffle
 
+import ssl
+
+try:
+    _create_unverified_https_context = ssl._create_unverified_context
+except AttributeError:
+    pass
+else:
+    ssl._create_default_https_context = _create_unverified_https_context
+
 # a lexicon and rule-based sentiment
-nltk.download('vader_lexicon') 
+nltk.download('vader_lexicon')
 # initialize it
 sia = SentimentIntensityAnalyzer()
 

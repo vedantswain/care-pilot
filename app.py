@@ -319,11 +319,8 @@ def sentiment(session_id):
         timestamp = datetime.datetime.now(datetime.timezone.utc)
         turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
 
-        # emo_perspec = self.ep_chain.invoke({'complaint':user_input['complaint']})
-        client_latest_response = ep_agent.invoke({'complaint': reply})
-
         # Perform sentiment analysis
-        sentiment_category = analyze_sentiment(client_latest_response)
+        sentiment_category = analyze_sentiment(reply)
 
         chat_emo_feedback.insert_one({
             "session_id": session_id,
@@ -334,7 +331,7 @@ def sentiment(session_id):
             "timestamp_arrival": timestamp
         })
 
-        return jsonify({'sentiment': sentiment_category})
+        return jsonify({'message': sentiment_category})
     else:
         return jsonify({"error": "Invalid session_id"}), 400
 
