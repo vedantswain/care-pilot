@@ -328,7 +328,9 @@ class mAgentEP:
         self.rephrase = self.paraphraseResponse()
 
     def invoke(self, user_input):
-        emo_perspec = self.ep_chain.invoke({'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+
+        # emo_perspec = self.ep_chain.invoke({'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+        emo_perspec = self.ep_chain.invoke({'complaint':user_input['complaint']})
         final_res = self.rephrase.invoke({'response': emo_perspec})
 
         return final_res
@@ -348,7 +350,7 @@ class mAgentEP:
         template = ChatPromptTemplate.from_messages(
             [
                 ("system", prompt),
-                MessagesPlaceholder(variable_name="chat_history"),
+                # MessagesPlaceholder(variable_name="chat_history"),
                 ("user", "{complaint}"),
             ]
         )
