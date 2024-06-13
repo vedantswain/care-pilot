@@ -18,6 +18,8 @@ from langchain_core.runnables import RunnablePassthrough
 
 from sentiment import analyze_sentiment
 
+import config as common
+
 from dotenv import load_dotenv
 from uuid import uuid4
 import datetime
@@ -61,10 +63,7 @@ initQueue = [
 ]
 clientQueue = initQueue.copy()
 
-TYPE_EMO_THOUGHT = "You might be thinking"
-TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
-TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"
-TYPE_SENTIMENT = "Client's Sentiment"
+
 
 
 sender_initial = agent_sender_fewshot_twitter()
@@ -109,7 +108,7 @@ def index(session_id):
     else:
         current_client = 'Guest'
 
-    return render_template('index_chat.html', session_id=session_id, current_client=current_client)
+    return render_template('index_chat.html', session_id=session_id, current_client=current_client, common_strings=common.SUPPORT_TYPE_STRINGS)
 
 
 
@@ -265,7 +264,7 @@ def getEmoSupport(session_id):
         turn_number = len(chat_history) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-        if support_type==TYPE_EMO_REFRAME:
+        if support_type==common.TYPE_EMO_REFRAME:
             response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
             thought = response_cw_emo['thought']
             reframe = response_cw_emo['reframe']
@@ -293,7 +292,7 @@ def getEmoSupport(session_id):
                     'reframe': reframe
                 }
             })
-        elif support_type==TYPE_EMO_SHOES:
+        elif support_type==common.TYPE_EMO_SHOES:
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
             chat_emo_feedback.insert_one({

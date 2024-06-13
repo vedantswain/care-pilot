@@ -1,7 +1,7 @@
-const TYPE_EMO_THOUGHT = "You might be thinking";
-const TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
-const TYPE_EMO_REFRAME = "Be Mindful of Your Emotions";
-const TYPE_SENTIMENT = "Client's Sentiment";
+const TYPE_EMO_THOUGHT = common_strings["TYPE_EMO_THOUGHT"]
+const TYPE_EMO_SHOES = common_strings["TYPE_EMO_SHOES"]
+const TYPE_EMO_REFRAME = common_strings["TYPE_EMO_REFRAME"]
+const TYPE_SENTIMENT = common_strings["TYPE_SENTIMENT"]
 
 // let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
 //     { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 1, info: 1, emo: 1},
