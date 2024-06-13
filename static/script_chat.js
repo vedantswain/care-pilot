@@ -32,7 +32,7 @@ const TYPE_SENTIMENT = common_strings["TYPE_SENTIMENT"]
 // }
 
 function updateQueueDisplay(data) {
-    const queueContainer = document.querySelector('.list');
+    const queueContainer = document.querySelector('#client-queue');
     queueContainer.innerHTML = '';
 
     data.clientQueue.forEach(client => {
@@ -52,7 +52,7 @@ function updateQueueDisplay(data) {
                     <div class="content">
                         <p>
                             <strong>${client.name}</strong>
-                            <br><small class="has-text-weight-semibold">${client.product}</small>
+                            <br><small class="has-text-weight-semibold">${client.complaint}</small>
                         </p>
                     </div>
                 </div>

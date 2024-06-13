@@ -55,14 +55,9 @@ chat_emo_feedback = db.chat_emo_feedback
 sender_agent = None
 chat_history = [
 ]
-initQueue = [
-    { "id": 1, "name": "Lucy", "product": "Airline" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
-    { "id": 2, "name": "Esther", "product": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
-    { "id": 3, "name": "Peter", "product": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
-    { "id": 4, "name": "Joseph", "product": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0}
-]
-clientQueue = initQueue.copy()
 
+# clientQueue = common.randomQueue.copy()
+clientQueue = []
 
 
 
@@ -88,12 +83,13 @@ def hello():
 def launch():
     return render_template('launch.html')
 
-@app.route('/chat')
-def start_chat(): 
+@app.route('/chat/<scenario>/')
+def start_chat(scenario):
     global clientQueue
     if not clientQueue:
-        clientQueue = initQueue
-    random.shuffle(clientQueue)
+        # clientQueue = common.randomQueue
+        clientQueue = common.get_study_queue(scenario)
+    # random.shuffle(clientQueue)
     client = clientQueue.pop(0)
     session_id = str(uuid4())   ### unique to each user/participant/representative
     # 

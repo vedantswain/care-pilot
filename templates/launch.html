@@ -2,8 +2,8 @@
 <html>
 
 <script>
-    function startChatSession() {
-        window.location.href = '/chat';
+    function startChatSession(scenario) {
+        window.location.href = '/chat/'+scenario+'/';
     }
 </script>
 
@@ -46,7 +46,7 @@
                       is-5-fullhd ">
 
 
-                    <div class="card" onclick="startChatSession();" style="cursor: pointer;">
+                    <div class="card" onclick="startChatSession('hotel');" style="cursor: pointer;">
                         <header class="card-header">
                             <p class="card-header-title">Scenario: Hotel</p>
                             <figure class="image is-1 is-64x64" style="margin: 12px">
@@ -62,7 +62,7 @@
                       is-5-fullhd ">
 
 
-                    <div class="card"  onclick="startChatSession();" style="cursor: pointer;">
+                    <div class="card"  onclick="startChatSession('airlines');" style="cursor: pointer;">
                         <header class="card-header">
                             <p class="card-header-title">Scenario: Airlines</p>
                             <figure class="image is-1 is-64x64" style="margin: 12px">
