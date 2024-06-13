@@ -8,96 +8,104 @@
 </script>
 
 <head>
-    <!-- <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Landing - Free Bulma template</title>
-    <link rel="shortcut icon" href="../images/fav_icon.png" type="image/x-icon">
-    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.7.0/css/font-awesome.min.css">
-    <link href="https://fonts.googleapis.com/css?family=Open+Sans:300,400,700" rel="stylesheet"> -->
     <!-- Bulma Version 1-->
-    <link rel="stylesheet" href="https://unpkg.com/bulma@1.0.0/css/bulma.min.css" />
-    <!-- <link rel="stylesheet" type="text/css" href="../css/landing.css"> -->
+    <title>Pro-Pilot Prototype</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .mobile-only {
+            display: none;
+        }
+        @media(max-width: 500px) {
+          .mobile-only {
+          display: block;
+            }
+          .mobile-remove {
+            display: none;
+          }
+        }
+    </style>
 </head>
 
 <body>
-    <section class="hero is-fullheight">
-        <!-- <div class="hero-head">
-            <nav class="navbar">
-                <div class="container">
-                    <div class="navbar-brand">
-                        <a class="navbar-item" href="../">
-                            <img src="http://bulma.io/images/bulma-type-white.png" alt="Logo">
-                        </a>
-                        <span class="navbar-burger burger" data-target="navbarMenu">
-                            <span></span>
-                            <span></span>
-                            <span></span>
-                        </span>
-                    </div>
-                    <div id="navbarMenu" class="navbar-menu">
-                        <div class="navbar-end">
-                            <span class="navbar-item">
-                                <a class="button is-white is-outlined" href="#">
-                                    <span class="icon">
-                                        <i class="fa fa-home"></i>
-                                    </span>
-                                    <span>Home</span>
-                                </a>
-                            </span>
-                            <span class="navbar-item">
-                                <a class="button is-white is-outlined" href="#">
-                                    <span class="icon">
-                                        <i class="fa fa-superpowers"></i>
-                                    </span>
-                                    <span>Examples</span>
-                                </a>
-                            </span>
-                            <span class="navbar-item">
-                                <a class="button is-white is-outlined" href="#">
-                                    <span class="icon">
-                                        <i class="fa fa-book"></i>
-                                    </span>
-                                    <span>Documentation</span>
-                                </a>
-                            </span>
-                            <span class="navbar-item">
-                                <a class="button is-white is-outlined" href="https://github.com/BulmaTemplates/bulma-templates/blob/master/templates/landing.html">
-                                    <span class="icon">
-                                        <i class="fa fa-github"></i>
-                                    </span>
-                                    <span>View Source</span>
-                                </a>
-                            </span>
+    <section class="hero is-white is-fullheight">
+
+        <div class="hero-body">
+
+            <div class="container">
+                <div class="columns  is-vcentered reverse-columns">
+                    <div class="column
+                      is-5-desktop
+                      is-5-widescreen
+                      is-5-fullhd ">
+
+                        <div class="block mobile-only">
+                            <figure class="image is-5by4">
+                                <img src="{{url_for('static', filename='pro-graphic.png')}}">
+                            </figure>
+                        </div>
+
+                        <h2 class="subtitle subtitled is-3 mb-6">
+                            Can AI-assistants help workers deal with challenging client interactions?
+                        </h2>
+                        <div class="content">
+                            <p style="text-align: left;">We are&nbsp; researchers from <em>Northeastern University</em> focused on improving Human-Computer Interaction and Personal Health Informatics.&nbsp;We are seeking individuals with experience in client/customer-facing to test our prototype AI-coworker, Pro-Pilot:</p>
+
+                            <ul>
+                                <li>90 minute study over Zoom&nbsp;</li>
+                                <li>Include user testing, interviewing and design exercises</li>
+                                <li>We will record the audio and screen of your session for analysis.</li>
+                            </ul>
+                                 Earn up to $50 in the form of an Amazon Gift card on completing the study.<br />
+                                <br />
+                                Help shape future of coworking with AI!<br />
+                                <br />
+                                If you&#39;re interested, please click "Join Study" to see if you are eligible to participate:
                         </div>
                     </div>
-                </div>
-            </nav>
-            </div> -->
+                    <div class="column
+                      is-7-desktop
+                      is-7-widescreen
+                      is-6-fullhd is-offset-1-fullhd">
+                        <div class="block mobile-remove">
+                            <figure class="image is-5by4">
+                                <img src="{{url_for('static', filename='pro-graphic.png')}}">
+                            </figure>
+                        </div>
 
-            <div class="hero-body">
-                <div class="container has-text-centered">
-                    <div class="column is-6 is-offset-3">
-                        <h1 class="title">
-                            Coming Soon
-                        </h1>
-                        <h2 class="subtitle">
-                            $this is the best software platform for running an internet business. We handle billions of dollars every year for forward-thinking businesses around the world.
-                        </h2>
-                        <!-- <div class="box"> -->
-                            <!-- <div class="field is-grouped">
-                                <p class="control"> -->
-                                    <a class="button is-info" onclick="startChatSession();">
-                                        Start Chat!
-                                    </a>
-                                <!-- </p>
-                            </div> -->
-                        <!-- </div> -->
+                        <div class="columns">
+
+                            <div class="block column">
+                                <div class="block">
+                                    <div class="buttons">
+                                        <button class="button" onclick=" window.open('https://neu.co1.qualtrics.com/jfe/form/SV_dmtvecyXQvZcNaC','_blank')">Join Study</button>
+                                        <button class="button is-primary" onclick="startChatSession();">Test Prototype</button>
+                                    </div>
+                                </div>
+
+                                Contact: <a href="https://vedantswain.com/">Dr. Vedant Das Swain</a> </br>
+                                Mail: <a href="mailto:v.dasswain@northeastern.edu">v.dasswain@northeastern.edu</a>
+                            </div>
+
+                            <figure class="image column" >
+                                <img src="{{url_for('static', filename='N-Motto Wordmark_RGB_186+K.png')}}"
+                                     style="
+                                    height: 6em;
+                                    width: unset;">
+                            </figure>
+
+                        </div>
                     </div>
+
                 </div>
             </div>
+        </div>
+
 
     </section>
+
+
     <script async type="text/javascript" src="../js/bulma.js"></script>
 </body>
 
