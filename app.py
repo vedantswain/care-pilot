@@ -84,6 +84,10 @@ trouble_agent = mAgentTrouble()
 def hello():
     return render_template('landing.html')
 
+@app.route('/launch')
+def launch():
+    return render_template('launch.html')
+
 @app.route('/chat')
 def start_chat(): 
     global clientQueue
