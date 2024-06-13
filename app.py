@@ -62,8 +62,9 @@ initQueue = [
 clientQueue = initQueue.copy()
 
 TYPE_EMO_THOUGHT = "You might be thinking"
-TYPE_EMO_SHOES = "Sentiment situation of client"
+TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
 TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"
+TYPE_SENTIMENT = "Client's Sentiment"
 
 
 sender_initial = agent_sender_fewshot_twitter()
