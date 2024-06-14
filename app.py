@@ -16,7 +16,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
-from sentiment import analyze_sentiment
+from sentiment import analyze_sentiment_transformer
 
 from dotenv import load_dotenv
 from uuid import uuid4
@@ -321,7 +321,7 @@ def sentiment(session_id):
         turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
 
         # Perform sentiment analysis
-        sentiment_category = analyze_sentiment(reply)
+        sentiment_category = analyze_sentiment_transformer(reply)
 
         chat_emo_feedback.insert_one({
             "session_id": session_id,
