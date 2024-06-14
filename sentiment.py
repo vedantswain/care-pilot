@@ -1,3 +1,45 @@
+from transformers import pipeline
+
+sentiment_analysis = pipeline("sentiment-analysis")
+
+def get_sentiment_category(score, label):
+    """Categorize sentiment based on score and label."""
+    if label == "POSITIVE":
+        if score > 0.85:
+            return "Very Positive"
+        elif score > 0.70:
+            return "Positive"
+        elif score > 0.55:
+            return "Slightly Positive"
+        elif score >= 0.45:
+            return "Neutral"
+    else:  
+        if score > 0.85:
+            return "Very Negative"
+        elif score > 0.70:
+            return "Negative"
+        elif score > 0.55:
+            return "Slightly Negative"
+        elif score >= 0.45:
+            return "Neutral"
+    return "Neutral"
+
+def analyze_sentiment(client_latest_response):
+    """Analyze sentiment using transformers and return the sentiment category."""
+    result = sentiment_analysis(client_latest_response)
+    sentiment_score = result[0]['score']
+    sentiment_label = result[0]['label']
+    sentiment_category = get_sentiment_category(sentiment_score, sentiment_label)
+    return sentiment_category
+
+# client_latest_response = "Well, you better make it quick! And it better be the best room you have, or there will be even more complaints coming your way."
+# print(analyze_sentiment(client_latest_response))
+
+# client_latest_response = "Oh, you \"hear\" me? That's just great. Listening is one thing, but I want action, not just words! What are you going to do about it?."
+# print(analyze_sentiment(client_latest_response))
+
+
+
 # import nltk
 # from nltk.sentiment import SentimentIntensityAnalyzer
 # from random import shuffle
@@ -87,42 +129,4 @@
 #     print(f"Text: {client_latest_response}\nSentiment Data: {sentiment_data}")
 
 
-from transformers import pipeline
 
-sentiment_analysis = pipeline("sentiment-analysis")
-
-def get_sentiment_category(score, label):
-    """Categorize sentiment based on score and label."""
-    if label == "POSITIVE":
-        if score > 0.85:
-            return "Very Positive"
-        elif score > 0.70:
-            return "Positive"
-        elif score > 0.55:
-            return "Slightly Positive"
-        elif score >= 0.45:
-            return "Neutral"
-    else:  
-        if score > 0.85:
-            return "Very Negative"
-        elif score > 0.70:
-            return "Negative"
-        elif score > 0.55:
-            return "Slightly Negative"
-        elif score >= 0.45:
-            return "Neutral"
-    return "Neutral"
-
-def analyze_sentiment(client_latest_response):
-    """Analyze sentiment using transformers and return the sentiment category."""
-    result = sentiment_analysis(client_latest_response)
-    sentiment_score = result[0]['score']
-    sentiment_label = result[0]['label']
-    sentiment_category = get_sentiment_category(sentiment_score, sentiment_label)
-    return sentiment_category
-
-# client_latest_response = "Well, you better make it quick! And it better be the best room you have, or there will be even more complaints coming your way."
-# print(analyze_sentiment(client_latest_response))
-
-# client_latest_response = "Oh, you \"hear\" me? That's just great. Listening is one thing, but I want action, not just words! What are you going to do about it?."
-# print(analyze_sentiment(client_latest_response))
