@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html>
+
+<script>
+    function startChatSession(scenario) {
+        window.location.href = '/chat/'+scenario+'/';
+    }
+</script>
+
+<head>
+    <!-- Bulma Version 1-->
+    <title>Pro-Pilot Prototype</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.1/css/bulma.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        .mobile-only {
+            display: none;
+        }
+        @media(max-width: 500px) {
+          .mobile-only {
+          display: block;
+            }
+          .mobile-remove {
+            display: none;
+          }
+        }
+    </style>
+</head>
+
+<body>
+<section class="hero is-white is-fullheight">
+
+    <div class="hero-body">
+
+        <div class="container">
+            <h2 class="subtitle subtitled is-3 mb-6">
+                Pro-Pilot: Client Support Simulation
+            </h2>
+            <div class="columns  is-vcentered reverse-columns">
+
+
+                <div class="column
+                      is-5-desktop
+                      is-5-widescreen
+                      is-5-fullhd ">
+
+
+                    <div class="card" onclick="startChatSession('hotel');" style="cursor: pointer;">
+                        <header class="card-header">
+                            <p class="card-header-title">Scenario: Hotel</p>
+                            <figure class="image is-1 is-64x64" style="margin: 12px">
+                                <img class="is-rounded" style="background-color: beige;" src="{{url_for('static', filename='icon_hotel.png')}}">
+                            </figure>
+                        </header>
+                    </div>
+
+                </div>
+                <div class="column
+                      is-5-desktop
+                      is-5-widescreen
+                      is-5-fullhd ">
+
+
+                    <div class="card"  onclick="startChatSession('airlines');" style="cursor: pointer;">
+                        <header class="card-header">
+                            <p class="card-header-title">Scenario: Airlines</p>
+                            <figure class="image is-1 is-64x64" style="margin: 12px">
+                                <img class="is-rounded" style="background-color: beige;" src="{{url_for('static', filename='icon_airlines.png')}}">
+                            </figure>
+                        </header>
+                    </div>
+
+
+                </div>
+
+
+            </div>
+
+            <div class="columns is-vcentered">
+
+                <div class="block column">
+                    Contact: <a href="https://vedantswain.com/">Dr. Vedant Das Swain</a> </br>
+                    Mail: <a href="mailto:v.dasswain@northeastern.edu">v.dasswain@northeastern.edu</a>
+                </div>
+
+                <figure class="image column" >
+                    <img src="{{url_for('static', filename='N-Motto Wordmark_RGB_186+K.png')}}"
+                         style="
+                                        height: 6em;
+                                        width: unset;">
+                </figure>
+            </div>
+        </div>
+    </div>
+
+
+</section>
+
+
+<script async type="text/javascript" src="../js/bulma.js"></script>
+</body>
+
+</html>
