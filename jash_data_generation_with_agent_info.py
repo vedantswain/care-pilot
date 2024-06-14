@@ -20,37 +20,9 @@ categories = {
 }
 
 # Example prompts for initial complaints
-# initial_complaint_examples = {
-#     "Service Quality": [
-#         "I waited over an hour for my food, and the staff was very rude when I asked about it.",
-#         "The hotel check-in process was chaotic and took forever, plus the front desk staff was unhelpful.",
-#         "My flight was delayed, and no one bothered to update us properly."
-#     ],
-#     "Product Issues": [
-#         "The food I was served was cold and tasted terrible.",
-#         "The hotel room was dirty and the bed was uncomfortable.",
-#         "The seat on the airplane was broken and I couldn't recline it."
-#     ],
-#     "Pricing and Charges": [
-#         "I was overcharged for my meal and didn't get a clear explanation.",
-#         "The hotel added unexpected fees to my bill that weren't disclosed upfront.",
-#         "I was charged for baggage even though my ticket said it was included."
-#     ],
-#     "Policy": [
-#         "The restaurant's reservation policy is unfair and inflexible.",
-#         "The hotel's cancellation policy is unreasonable and not clearly explained.",
-#         "The airline's policy on carry-on luggage is confusing and inconsistent."
-#     ],
-#     "Resolution": [
-#         "I complained about my meal but nothing was done to address it.",
-#         "I reported the issue with my hotel room but didn't receive any assistance.",
-#         "I filed a complaint about the flight delay but got no satisfactory response."
-#     ]
-# }
-
 initial_complaint_examples = {
     "Service Quality": [
-        "tried to pay a bill for 60 days No service rude CS and several transfers Look up my equipment  and give me an acct",
+        "tried to pay a bill for 60 days No service rude CS and several transfers Look up my equipment and give me an acct",
         "itd be nice if the book I waited 4 months for wasnt damaged inside of an undented box",
         "my driver just drove me to the department of air travel instead of the airport rufkm"
     ],
@@ -76,13 +48,26 @@ initial_complaint_examples = {
     ]
 }
 
+# Define traits from the table
+agent_traits = {
+    "C0": "You are a routine-oriented customer support agent who has high conscientiousness and sleep quality, and low openness and cognitive ability.",
+    "C1": "You are an emotionally-stable and innovative customer support agent who has high cognitive ability and low neuroticism.",
+    "C2": "You are a withdrawn and prone to stress and irritability customer support agent who has low extraversion, agreeableness, conscientiousness, positive affect, sleep quality, and high neuroticism, cognitive ability, negative affect, and anxiety.",
+    "C3": "You are a positive, friendly, and well-balanced customer support agent who has high extraversion, agreeableness, conscientiousness, positive affect, sleep quality, and low neuroticism, negative affect, and anxiety.",
+    "C4": "You are a curious and adventurous customer support agent who has high openness."
+}
+
 # Define prompts
 initial_complaint_prompt = """
 Generate a realistic initial complaint from a customer in a {domain} setting. The complaint should fit into this category: {category_definition}. Ensure the complaint is concise and limited to 2 sentences, containing all relevant information.
 """
 
 support_agent_prompt = """
-You are a customer support agent. Respond professionally to the customer's complaint: {initial_complaint}. Ensure the response is concise and limited to 2 sentences, containing all relevant information.
+You are a customer support agent responding to the customer's complaint: {initial_complaint}. Ensure the response follows company protocol, is concise, and limited to 2 sentences, containing all relevant information.
+"""
+
+coworker_reframe_prompt = """
+You are a coworker providing emotional support to a customer support agent who has {agent_traits}. Reframe the agent's response to better address the customer's concerns and improve the overall communication: {agent_response}. Ensure the reframe is concise, supportive, and limited to 2 sentences, containing all relevant information.
 """
 
 follow_up_prompt = """
@@ -90,7 +75,7 @@ The customer has received a response from the support agent. Generate a follow-u
 """
 
 final_response_prompt = """
-You are a customer support agent. Respond professionally to the customer's follow-up complaint or question: {follow_up_complaint}. Ensure the response is concise and limited to 2 sentences, containing all relevant information.
+You are a customer support agent responding to the customer's follow-up complaint or question: {follow_up_complaint}. Ensure the response follows company protocol, is concise, and limited to 2 sentences, containing all relevant information.
 """
 
 qa_uncivil_prompt = """
@@ -109,6 +94,10 @@ initial_complaint_template = ChatPromptTemplate.from_messages(
 
 support_agent_template = ChatPromptTemplate.from_messages(
     [("system", support_agent_prompt)]
+)
+
+coworker_reframe_template = ChatPromptTemplate.from_messages(
+    [("system", coworker_reframe_prompt)]
 )
 
 follow_up_template = ChatPromptTemplate.from_messages(
@@ -162,8 +151,8 @@ def is_valid_initial_complaint(complaint):
     ]
     return not any(phrase in complaint for phrase in invalid_phrases)
 
-# Function to generate scenarios
-def generate_scenarios(domains, categories, examples_per_pair):
+# Function to generate 15 scenarios with agent traits
+def generate_15_scenarios_with_traits(agent_traits):
     scenarios = []
     invalid_responses = [
         "Sorry, I can't fulfill this request.",
@@ -172,65 +161,81 @@ def generate_scenarios(domains, categories, examples_per_pair):
     ]
     
     iteration = 1
-    for domain in domains:
-        for category, category_definition in categories.items():
-            for _ in range(examples_per_pair):
-                print(f"Generating scenario {iteration}")
-                iteration += 1          
-                
-                # Generate initial complaint
-                initial_complaint = validate_and_generate(initial_complaint_template, {
-                    'domain': domain,
-                    'category_definition': category_definition
-                }, invalid_responses)
-                
-                # Rephrase initial complaint to be uncivil
-                uncivil_initial_complaint = validate_and_generate(uncivil_template, {
-                    'chat_history': [],
-                    'question': "What is your complaint?",
-                    'input': initial_complaint
-                }, invalid_responses)
-                
-                # Generate support agent response
-                support_agent_response = validate_and_generate(support_agent_template, {
-                    'initial_complaint': uncivil_initial_complaint
-                }, invalid_responses)
+    for trait_key, trait_description in agent_traits.items():
+        for _ in range(3):
+            print(f"Generating scenario {iteration} for trait {trait_key}")
+            iteration += 1
+            
+            # Randomly select domain and category for each scenario
+            domain = "random"
+            category = "random"
+            category_definition = "Random complaint"
 
-                # Generate follow-up complaint
-                follow_up_complaint = validate_and_generate(follow_up_template, {
-                    'support_agent_response': support_agent_response
-                }, invalid_responses)
+            # Generate initial complaint
+            initial_complaint = validate_and_generate(initial_complaint_template, {
+                'domain': domain,
+                'category_definition': category_definition
+            }, invalid_responses)
+            
+            # Rephrase initial complaint to be uncivil
+            uncivil_initial_complaint = validate_and_generate(uncivil_template, {
+                'chat_history': [],
+                'question': "What is your complaint?",
+                'input': initial_complaint
+            }, invalid_responses)
+            
+            # Generate support agent response
+            support_agent_response = validate_and_generate(support_agent_template, {
+                'initial_complaint': uncivil_initial_complaint
+            }, invalid_responses)
 
-                # Rephrase follow-up complaint to be uncivil
-                uncivil_follow_up_complaint = validate_and_generate(uncivil_template, {
-                    'chat_history': [],
-                    'question': support_agent_response,
-                    'input': follow_up_complaint
-                }, invalid_responses)
+            # Generate coworker reframe for initial response
+            coworker_reframe_1 = validate_and_generate(coworker_reframe_template, {
+                'agent_traits': trait_description,
+                'agent_response': support_agent_response
+            }, invalid_responses)
 
-                # Generate final response from support agent
-                final_response = validate_and_generate(final_response_template, {
-                    'follow_up_complaint': uncivil_follow_up_complaint
-                }, invalid_responses)
+            # Generate follow-up complaint
+            follow_up_complaint = validate_and_generate(follow_up_template, {
+                'support_agent_response': support_agent_response
+            }, invalid_responses)
 
-                # Store scenario
-                scenarios.append({
-                    "Category": category,
-                    "Domain": domain,
-                    "Initial Complaint": uncivil_initial_complaint,
-                    "Support Agent Response 1": support_agent_response,
-                    "Follow-up Complaint": uncivil_follow_up_complaint,
-                    "Support Agent Response 2": final_response
-                })
+            # Rephrase follow-up complaint to be uncivil
+            uncivil_follow_up_complaint = validate_and_generate(uncivil_template, {
+                'chat_history': [],
+                'question': support_agent_response,
+                'input': follow_up_complaint
+            }, invalid_responses)
+
+            # Generate final response from support agent
+            final_response = validate_and_generate(final_response_template, {
+                'follow_up_complaint': uncivil_follow_up_complaint
+            }, invalid_responses)
+
+            # Generate coworker reframe for final response
+            coworker_reframe_2 = validate_and_generate(coworker_reframe_template, {
+                'agent_traits': trait_description,
+                'agent_response': final_response
+            }, invalid_responses)
+
+            # Store scenario
+            scenarios.append({
+                "Trait": trait_key,
+                "Initial Complaint": uncivil_initial_complaint,
+                "Support Agent Response 1": support_agent_response,
+                "Coworker Reframe 1": coworker_reframe_1,
+                "Follow-up Complaint": uncivil_follow_up_complaint,
+                "Support Agent Response 2": final_response,
+                "Coworker Reframe 2": coworker_reframe_2
+            })
 
     return scenarios
 
-
-# Generate scenarios
-domains = ["restaurant", "hotel", "airplane/airport"]
-scenarios = generate_scenarios(domains, categories, examples_per_pair=3)
+# Generate 15 scenarios with traits
+scenarios = generate_15_scenarios_with_traits(agent_traits)
 
 df = pd.DataFrame(scenarios)
-df.to_csv("/Users/jashparekh/Desktop/scenarios_using_twitter_examples.csv", index=False)
+df.to_csv("/Users/jashparekh/Desktop/scenarios_with_traits2.csv", index=False)
 
-print("scenarios_using_twitter_examples.csv")
+print("Scenarios with traits saved to scenarios_with_traits.csv")
+
