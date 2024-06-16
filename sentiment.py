@@ -26,22 +26,22 @@ sentiment_analysis = pipeline("sentiment-analysis")
 def get_sentiment_category_transformer(score, label):
     """Categorize sentiment based on score and label."""
     if label == "POSITIVE":
-        if score > 0.85:
+        if 0.75 < score <= 1:
             return "Very Positive"
-        elif score > 0.70:
+        elif 0.5 < score <= 0.75:
             return "Positive"
-        elif score > 0.55:
+        elif 0.25 < score <= 0.5:
             return "Slightly Positive"
-        elif score >= 0.45:
+        elif 0 < score <= 0.25:
             return "Neutral"
     else:  
-        if score > 0.85:
+        if 0.75 < score <= 1:
             return "Very Negative"
-        elif score > 0.70:
+        elif 0.5 < score <= 0.75:
             return "Negative"
-        elif score > 0.55:
+        elif 0.25 < score <= 0.5:
             return "Slightly Negative"
-        elif score >= 0.45:
+        elif 0 < score <= 0.25:
             return "Neutral"
     return "Neutral"
 
@@ -67,19 +67,19 @@ sia = SentimentIntensityAnalyzer()
 
 # categorize sentiment into 7 levels，  it can range from -1 to 1.
 def get_sentiment_category_nltk(score):
-    """Categorize sentiment score into a 7-point scale."""
-    if score >= 0.75:
+    """Categorize sentiment score into a 7-point scale with equal intervals."""
+    if 1 > score >= 2/3:
         return "Very Positive"
-    elif score >= 0.5:
+    elif score >= 1/3:
         return "Positive"
-    elif score >= 0.25:
+    elif score >= 0:
         return "Slightly Positive"
-    elif score > -0.25:
+    elif score >= -1/3:
         return "Neutral"
-    elif score > -0.5:
+    elif score >= -2/3:
         return "Slightly Negative"
-    elif score > -0.75:
-        return " Negative"
+    elif score > -1:
+        return "Negative"
     else:
         return "Very Negative"
     
