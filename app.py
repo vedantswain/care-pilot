@@ -54,10 +54,10 @@ sender_agent = None
 chat_history = [
 ]
 initQueue = [
-    { "id": 1, "name": "Lucy", "product": "Airline" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
-    { "id": 2, "name": "Esther", "product": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
-    { "id": 3, "name": "Peter", "product": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
-    { "id": 4, "name": "Joseph", "product": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0}
+    { "id": 1, "name": "Lucy", "domain": "Airline" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
+    { "id": 2, "name": "Esther", "domain": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
+    { "id": 3, "name": "Peter", "domain": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
+    { "id": 4, "name": "Joseph", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0}
 ]
 clientQueue = initQueue.copy()
 
@@ -97,7 +97,7 @@ def start_chat():
     current_client = client['name']
     session[session_id] = {}
     session[session_id]['current_client'] = current_client
-    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientParam = f"?domain={client['domain']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     # 
     return redirect(url_for('index', session_id=session_id) + clientParam)
 
@@ -117,7 +117,7 @@ def index(session_id):
 def getReply(session_id):
     global clientQueue
     if request.method == 'GET':
-        val_product = request.args.get('product')
+        val_domain = request.args.get('domain')
         val_grateful = request.args.get('grateful')
         val_ranting = request.args.get('ranting')
         val_expression = request.args.get('expression')
@@ -126,7 +126,7 @@ def getReply(session_id):
         show_emo = request.args.get('emo')
 
         complaint_parameters = {
-            "product": val_product,
+            "domain": val_domain,
             "is_grateful": 'grateful' if val_grateful==0 else 'NOT grateful',
             "is_ranting": 'ranting' if val_ranting==0 else 'NOT ranting',
             "is_expression": 'expression' if val_expression==0 else 'NOT expression'
@@ -136,7 +136,7 @@ def getReply(session_id):
 
         client_id = str(uuid4())
         current_client = session[session_id]['current_client']
-        session[session_id][client_id] = {"current_client": current_client, "product": val_product, "civil": val_civil, "chat_history": []}
+        session[session_id][client_id] = {"current_client": current_client, "domain": val_domain, "civil": val_civil, "chat_history": []}
         session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
         
 
@@ -146,7 +146,7 @@ def getReply(session_id):
         chat_client_info.insert_one({
             "session_id": session_id,
             "client_id": client_id,
-            "product": val_product,
+            "domain": val_domain,
             "grateful": val_grateful,
             "ranting": val_ranting,
             "expression": val_expression,
@@ -217,7 +217,7 @@ def update_client_queue(session_id):
     if not clientQueue:
         clientQueue = initQueue.copy()
     client = clientQueue.pop(0) 
-    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientParam = f"?domain={client['domain']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     new_url = url_for('index', session_id=session_id) + clientParam
 
     return jsonify({"url": new_url})
@@ -349,7 +349,7 @@ def getInfoSupport(session_id):
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        response_cw_info = info_agent.invoke({'product': session[session_id][client_id]["product"],'complaint':reply, "chat_history": chat_history})
+        response_cw_info = info_agent.invoke({'domain': session[session_id][client_id]["domain"],'complaint':reply, "chat_history": chat_history})
         # response = response_cw_info.content
 
         return jsonify({
@@ -366,7 +366,7 @@ def getTroubleSupport(session_id):
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        response_cw_trouble = trouble_agent.invoke({'product': session[session_id][client_id]["product"],'complaint':reply, "chat_history": chat_history})
+        response_cw_trouble = trouble_agent.invoke({'domain': session[session_id][client_id]["domain"],'complaint':reply, "chat_history": chat_history})
         response = "Troubleshooting Guide:\n" + response_cw_trouble
 
         return jsonify({

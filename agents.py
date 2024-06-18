@@ -64,7 +64,7 @@ llminfo = lcai.AzureChatOpenAI(
 # def agent_coworker_info():
 #     client = mLangChain()
 #     prompt = Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
-#                 The representative is chatting online with a customer complaining about {product}.  \
+#                 The representative is chatting online with a customer complaining about {domain}.  \
                 
 #                 Given the chat history,
 #                 provide 2-3 hints to help the representative's response.\
@@ -84,7 +84,7 @@ llminfo = lcai.AzureChatOpenAI(
 #         [
 #             ("system", prompt),
 #             MessagesPlaceholder(variable_name="chat_history"),
-#             ("user", "{product}: {complaint}"),
+#             ("user", "{domain}: {complaint}"),
 #         ]
 #     )
 #     chain = template | client.client_completion
@@ -115,7 +115,7 @@ class mAgentInfo:
         self.info_chain = self.agent_coworker_info()
 
     def invoke(self, user_input):
-        info_cue = self.info_chain.invoke({'product':user_input['product'], 'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+        info_cue = self.info_chain.invoke({'domain':user_input['domain'], 'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
 
         return info_cue
     
@@ -141,7 +141,7 @@ class mAgentInfo:
     def agent_coworker_info(self):
         client = mLangChain()
         prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
-                    The representative is chatting online with a customer complaining about {product}.  \
+                    The representative is chatting online with a customer complaining about {domain}.  \
                     
                     Given the chat history,
                     provide 2-3 hints to help the representative's response.\
@@ -161,7 +161,7 @@ class mAgentInfo:
             [
                 ("system", prompt),
                 MessagesPlaceholder(variable_name="chat_history"),
-                ("user", "{product}: {complaint}"),
+                ("user", "{domain}: {complaint}"),
             ]
         )
         chain = template | client.client_completion
@@ -192,7 +192,7 @@ class mAgentInfo:
 # def agent_coworker_trouble():
 #     client = mLangChain()
 #     prompt = """Your role is to help a service representative by providing PROCEDURAL SUPPORT. \
-#                 The representative is chatting online with a customer complaining about {product}. \
+#                 The representative is chatting online with a customer complaining about {domain}. \
 #                 Given the chat history,
 #                 list 3-7 steps to guide the representative in resolving the customer complaint.\
 #                 Review the similar PROCEDURAL SUPPORT history if exist, then assess the current situation in depth and provide detailed steps for resolution\
@@ -208,7 +208,7 @@ class mAgentInfo:
 #         [
 #             ("system", prompt),
 #             MessagesPlaceholder(variable_name="chat_history"),
-#             ("user", "{product}: {complaint}"),
+#             ("user", "{domain}: {complaint}"),
 #         ]
 #     )
 #     chain = template | client.client_completion
@@ -227,14 +227,14 @@ class mAgentTrouble:
         self.trouble_chain = self.agent_coworker_trouble()
 
     def invoke(self, user_input):
-        trouble_steps = self.trouble_chain.invoke({'product':user_input['product'], 'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+        trouble_steps = self.trouble_chain.invoke({'domain':user_input['domain'], 'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
 
         return trouble_steps
     
     def agent_coworker_trouble(self):
         client = mLangChain()
         prompt = """Your role is to help a service representative by providing PROCEDURAL SUPPORT. \
-                    The representative is chatting online with a customer complaining about {product}. \
+                    The representative is chatting online with a customer complaining about {domain}. \
                     Given the chat history,
                     list 3-7 steps to guide the representative in resolving the customer complaint.\
                     Review the similar PROCEDURAL SUPPORT history if exist, then assess the current situation in depth and provide detailed steps for resolution\
@@ -259,7 +259,7 @@ class mAgentTrouble:
             [
                 ("system", prompt),
                 MessagesPlaceholder(variable_name="chat_history"),
-                ("user", "{product}: {complaint}"),
+                ("user", "{domain}: {complaint}"),
             ]
         )
         chain = template | client.client_completion
@@ -433,7 +433,7 @@ def agent_sender_fewshot_twitter():
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
                 Complaint: Got id'd Tesco for buying one Adnams Broadside. Is being blind part of the job-spec? I am 35 and 99 kilos. \
                 
-                Product: {product}
+                Product: {domain}
                 Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expression}.\
                 Complaint:
             """

@@ -38,7 +38,7 @@ function updateQueueDisplay(data) {
     data.clientQueue.forEach(client => {
         const clientElement = document.createElement('div');
         clientElement.className = 'list-item box';
-        // userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
+        // userElement.href = `../?domain=${user.domain}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
         clientElement.innerHTML = `
             <div class="media">
                 <div class="media-left">
@@ -52,7 +52,7 @@ function updateQueueDisplay(data) {
                     <div class="content">
                         <p>
                             <strong>${client.name}</strong>
-                            <br><small class="has-text-weight-semibold">${client.product}</small>
+                            <br><small class="has-text-weight-semibold">${client.domain}</small>
                         </p>
                     </div>
                 </div>
