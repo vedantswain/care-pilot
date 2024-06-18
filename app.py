@@ -117,6 +117,7 @@ def index(session_id):
 def getReply(session_id):
     global clientQueue
     if request.method == 'GET':
+        val_category = request.args.get('category')
         val_domain = request.args.get('domain')
         val_grateful = request.args.get('grateful')
         val_ranting = request.args.get('ranting')
@@ -126,6 +127,7 @@ def getReply(session_id):
         show_emo = request.args.get('emo')
 
         complaint_parameters = {
+            "category": val_category,
             "domain": val_domain,
             "is_grateful": 'grateful' if val_grateful==0 else 'NOT grateful',
             "is_ranting": 'ranting' if val_ranting==0 else 'NOT ranting',
@@ -136,7 +138,7 @@ def getReply(session_id):
 
         client_id = str(uuid4())
         current_client = session[session_id]['current_client']
-        session[session_id][client_id] = {"current_client": current_client, "domain": val_domain, "civil": val_civil, "chat_history": []}
+        session[session_id][client_id] = {"current_client": current_client, "domain": val_domain, "category": val_category,"civil": val_civil, "chat_history": []}
         session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
         
 
@@ -147,6 +149,7 @@ def getReply(session_id):
             "session_id": session_id,
             "client_id": client_id,
             "domain": val_domain,
+            "category": val_category,
             "grateful": val_grateful,
             "ranting": val_ranting,
             "expression": val_expression,

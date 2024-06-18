@@ -110,12 +110,26 @@ llminfo = lcai.AzureChatOpenAI(
 
 #     return chain
 
+# Category definitions
+category = {
+    "Service Quality": "Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.",
+    "Product Issues": "Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.",
+    "Pricing and Charges": "Financial discrepancies encountered before, during, or after the service, including overcharging, undisclosed fees, or refund problems.",
+    "Policy": "The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other category but should have a policy in place.",
+    "Resolution": "The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and response has been received, where the customer still remains dissatisfied with the resolution."
+}
+
 class mAgentInfo:
     def __init__(self):
         self.info_chain = self.agent_coworker_info()
 
     def invoke(self, user_input):
-        info_cue = self.info_chain.invoke({'domain':user_input['domain'], 'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+        info_cue = self.info_chain.invoke({
+            'domain': user_input['domain'],
+            'complaint': user_input['complaint'],
+            'chat_history': user_input['chat_history'],
+            'category_definition': category[user_input['category']]  
+        })
 
         return info_cue
     
@@ -141,7 +155,8 @@ class mAgentInfo:
     def agent_coworker_info(self):
         client = mLangChain()
         prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
-                    The representative is chatting online with a customer complaining about {domain}.  \
+                    The representative is chatting online with a customer complaining about issues related to {domain}. \
+                    The INFORMATIONAL SUPPORT should effectively address the problems specific to {domain} and align with the following category definition: {category}.\
                     
                     Given the chat history,
                     provide 2-3 hints to help the representative's response.\
@@ -227,14 +242,22 @@ class mAgentTrouble:
         self.trouble_chain = self.agent_coworker_trouble()
 
     def invoke(self, user_input):
-        trouble_steps = self.trouble_chain.invoke({'domain':user_input['domain'], 'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+        trouble_steps = self.trouble_chain.invoke({
+            'domain':user_input['domain'], 
+            'complaint':user_input['complaint'], 
+            'chat_history':user_input['chat_history'],
+            'category_definition': category[user_input['category']]  
+
+})
 
         return trouble_steps
     
     def agent_coworker_trouble(self):
         client = mLangChain()
         prompt = """Your role is to help a service representative by providing PROCEDURAL SUPPORT. \
-                    The representative is chatting online with a customer complaining about {domain}. \
+                    The representative is chatting online with a customer complaining about  issues related to {domain}. \
+                    The PROCEDURAL SUPPORT should effectively address the problems specific to {domain} and align with the following category definition: {category}.\
+                    
                     Given the chat history,
                     list 3-7 steps to guide the representative in resolving the customer complaint.\
                     Review the similar PROCEDURAL SUPPORT history if exist, then assess the current situation in depth and provide detailed steps for resolution\
@@ -383,7 +406,11 @@ class mAgentEP:
 
 def agent_sender_fewshot_twitter():
     client = mLangChain()
-    prompt = """Your role is to act like a customer seeking support. \
+    prompt = """
+                Generate a realistic initial complaint from a customer in a {domain} setting.\
+                The complaint should fit into this category: {category}. \
+                Ensure the complaint is concise and limited to 2 sentences, containing all relevant information.\
+                Your role is to act like a customer seeking support. \
                 You are messaging a service representative via the support chat.\
                 You ONLY play the role of the customer. Do NOT play the role of the representative. \
                 Style your complaint based on your feelings. \
@@ -432,6 +459,7 @@ def agent_sender_fewshot_twitter():
                 Product: Convenience Store                
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
                 Complaint: Got id'd Tesco for buying one Adnams Broadside. Is being blind part of the job-spec? I am 35 and 99 kilos. \
+                
                 
                 Product: {domain}
                 Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expression}.\
