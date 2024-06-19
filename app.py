@@ -67,7 +67,7 @@ TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"
 TYPE_SENTIMENT = "Client's Sentiment"
 
 
-sender_initial = agent_sender_fewshot_twitter()
+sender_initial = new_agent_sender_fewshot_twitter()
 sender_agent = mAgentCustomer()
 # perspective / thoughts
 
@@ -136,7 +136,8 @@ def getReply(session_id):
             "domain": val_domain,
             "is_grateful": 'grateful' if val_grateful==0 else 'NOT grateful',
             "is_ranting": 'ranting' if val_ranting==0 else 'NOT ranting',
-            "is_expression": 'expression' if val_expression==0 else 'NOT expression'
+            "is_expression": 'expression' if val_expression==0 else 'NOT expression',
+            "categories": ', '.join(categories.keys()) 
         }
 
         response = sender_initial.invoke(complaint_parameters)

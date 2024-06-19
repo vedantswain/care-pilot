@@ -122,7 +122,12 @@ class mAgentInfo:
         self.info_chain = self.agent_coworker_info()
 
     def invoke(self, user_input):
-        info_cue = self.info_chain.invoke({'domain':user_input['domain'], 'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+        info_cue = self.info_chain.invoke({
+            'domain':user_input['domain'], 
+            'complaint':user_input['complaint'], 
+            'chat_history':user_input['chat_history'],
+            'categories': ', '.join(categories.keys()) 
+            })
 
         return info_cue
     
@@ -149,6 +154,7 @@ class mAgentInfo:
         client = mLangChain()
         prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
                     The representative is chatting online with a customer complaining about {domain}.  \
+                    The INFORMATIONAL SUPPORT should fit into 5 categories: {categories}.\
                     
                     Given the chat history,
                     provide 2-3 hints to help the representative's response.\
@@ -162,7 +168,7 @@ class mAgentInfo:
                     Do NOT number the cues.\
                     
                     Customer message: {complaint}
-                    Hints: 
+                    Hints: {categories}
                 """
         template = ChatPromptTemplate.from_messages(
             [
@@ -234,7 +240,12 @@ class mAgentTrouble:
         self.trouble_chain = self.agent_coworker_trouble()
 
     def invoke(self, user_input):
-        trouble_steps = self.trouble_chain.invoke({'domain':user_input['domain'], 'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+        trouble_steps = self.trouble_chain.invoke({
+            'domain':user_input['domain'], 
+            'complaint':user_input['complaint'], 
+            'chat_history':user_input['chat_history'],
+            'categories': ', '.join(categories.keys()) 
+            })
 
         return trouble_steps
     
@@ -242,6 +253,7 @@ class mAgentTrouble:
         client = mLangChain()
         prompt = """Your role is to help a service representative by providing PROCEDURAL SUPPORT. \
                     The representative is chatting online with a customer complaining about {domain}. \
+                    The PROCEDURAL SUPPORT should fit into 5 categories: {categories}.\
                     Given the chat history,
                     list 3-7 steps to guide the representative in resolving the customer complaint.\
                     Review the similar PROCEDURAL SUPPORT history if exist, then assess the current situation in depth and provide detailed steps for resolution\
@@ -260,7 +272,7 @@ class mAgentTrouble:
                     ... ###
                     
                     Customer message: {complaint}
-                    Troubleshooting Steps: 
+                    Troubleshooting Steps: {categories}
                 """
         template = ChatPromptTemplate.from_messages(
             [
@@ -387,6 +399,94 @@ class mAgentEP:
         chain = template | client.client_completion
         return chain
 
+def new_agent_sender_fewshot_twitter():
+    client = mLangChain()
+    prompt = """Your role is to act like a customer seeking support. \
+                You are messaging a service representative via the support chat.\
+                You ONLY play the role of the customer. Do NOT play the role of the representative. \
+                Style your complaint based on your feelings. \
+                Initiate the chat with a ONLY ONE complaint message.\
+                Ensure the complaint is concise and limited to 2 sentences.\
+                Generate a realistic initial complaint from a customer in a {domain} setting.\
+                The complaint should fit into 5 categories: {categories}.\
+                
+                Categories: Product Issues
+                Domain: Mobile Network 
+                Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: Thank you AppleSupport I updated my phone and now it is even slower and barely works Thank you for ruining my phone.\
+
+                Categories: Product Issues
+                Domain: Airline
+                Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: SouthwestAir Why would we be receiving errors when we try to checkin Our flight takes off at 4 but we keep getting error messages.\
+
+                Categories: Product Issues
+                Domain: Airline             
+                Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: delta this has been my inflight studio experience today Nothing works except Twitter.\
+                
+                Categories: Service Quality
+                Domain: Airline            
+                Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: I really hadthe WORST experience ever from start to finish with SouthwestAir will never fly internationally again with them.\
+                
+                Categories: Service Quality
+                Domain: Hotel
+                Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
+                Complaint: Fsomebody from VerizonSupport please help meeeeee  Im having the worst luck with your customer service.\
+                
+                Categories: Service Quality
+                Domain: Trains
+                Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
+                Complaint: VirginTrains so i wait almost 3 hours and then they are rude and arrogant amp unhelpful after which she is raising a technical case.\
+                
+                Categories: Pricing and Charges
+                Domain: Airline
+                Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
+                Complaint:  DELTA i booked my flight using delta amex card Checking in now amp was being charged for baggage. \
+                
+                Categories: Pricing and Charges
+                Domain: Airline 
+                Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
+                Complaint:  Im sorry what Its going to COST me 50 to transfer 4000 AA Advantage points to my spouse AmericanAir this is ridiculous.\
+                
+                Categories: Pricing and Charges
+                Domain: Airline
+                Feeling: You are NOT grateful. You are ranting. You are expressive.\
+                Complaint: Categories: Pricing and Charges. \
+                
+                Categories: Policy
+                Domain: Hotel
+                Feeling: You are NOT grateful. You are ranting. You are expressive.\
+                Complaint: Hey  were gonna need to talk about all these pending charges that keep going through my account 5 days after the transaction was made Im getting real irritated \
+                
+                Categories: Resolution
+                Domain: Airline
+                Feeling: You are NOT grateful. You are ranting. You are expressive.\
+                Complaint:  delta  moves you to  the moment you have a  with no results Just got some   but no real reason why they changed our. \
+                
+                Categories: Resolution
+                Domain: Airline                                                    
+                Feeling: You are grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: Delta why wasnt earlier flight offered when I tried to rebook not cool at all Just happened to look at moniter after deplaning.\
+
+                Categories: Resolution
+                Domain: Airline   
+                Feeling: You are grateful. You are NOT ranting. You are expressive.\
+                Complaint: Hi British_Airways My flight from MANLHRBWI for Nov 3 was canceled I was excited to try your Club 787 product Only available flight is now to IAD which is a hassle but rebooked anywaymy only option Any availability in first class on BA293 for the troubles please \
+                
+                Categories: {categories}
+                Domain: {domain}
+                Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expression}.\
+                Complaint:
+            """
+    template = ChatPromptTemplate.from_messages(
+        [
+            ("system", prompt),
+        ]
+    )
+    chain = template | client.client_completion
+    return chain   
 
 def agent_sender_fewshot_twitter():
     client = mLangChain()
@@ -395,6 +495,9 @@ def agent_sender_fewshot_twitter():
                 You ONLY play the role of the customer. Do NOT play the role of the representative. \
                 Style your complaint based on your feelings. \
                 Initiate the chat with a ONLY ONE complaint message. \
+                Ensure the complaint is concise and limited to 2 sentences.\
+                Generate a realistic initial complaint from a customer in a {domain} setting.\
+                The complaint should fit into 5 categories: {categories}.\
                
                 Domain: Mobile Network               
                 Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
