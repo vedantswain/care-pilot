@@ -1,4 +1,5 @@
 import os
+import random
 
 from langchain.schema import messages_from_dict, messages_to_dict
 
@@ -109,7 +110,13 @@ llminfo = lcai.AzureChatOpenAI(
 #     chain = chain | extract_cues
 
 #     return chain
-
+categories = {
+    "Service Quality": "Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.",
+    "Product Issues": "Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.",
+    "Pricing and Charges": "Financial discrepancies encountered before, during, or after the service, including overcharging, undisclosed fees, or refund problems.",
+    "Policy": "The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other categories but should have a policy in place.",
+    "Resolution": "The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and response has been received, where the customer still remains dissatisfied with the resolution."
+}
 class mAgentInfo:
     def __init__(self):
         self.info_chain = self.agent_coworker_info()
@@ -389,51 +396,51 @@ def agent_sender_fewshot_twitter():
                 Style your complaint based on your feelings. \
                 Initiate the chat with a ONLY ONE complaint message. \
                
-                Product: Mobile Network               
+                Domain: Mobile Network               
                 Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
                 Complaint: O2 I received this a few weeks ago, since then I've been getting 2/3 calls a day from a telemarketer. Is someone using your name?\
                 
-                Product: Air Travel
+                Domain: Air Travel
                 Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
                 Complaint: First flight for long time with British Airways. Now over one 1h delay for the short jump FRA-LCY and NO one here to provide status updates\
                 
-                Product: Mobile Device
+                Domain: Mobile Device
                 Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
                 Complaint: You‚ have paralysed my phone with your update grrrrrrrrrr\
                 
-                Product: Mobile Device
+                Domain: Mobile Device
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
                 Complaint:  After the 11.0.2 my phone just sucks most of the apps are broken, wifi disconnects frequently apple. Painfulupdate! \
                 
-                Product: Mobile Device
+                Domain: Mobile Device
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
                 Complaint:  Apple Support ios11 update - is still killing my battery within 12 hours - phone is 10 months old - it's a disgrace - used to get 2 days \
                 
-                Product: Air Travel
+                Domain: Air Travel
                 Feeling: You are NOT grateful. You are ranting. You are expressive.\
                 Complaint:  I really hope you all change but I'm sure you won't! Because you don't have to! \
                 
-                Product: Mobile Device
+                Domain: Mobile Device
                 Feeling: You are NOT grateful. You are ranting. You are expressive.\
                 Complaint:  I just updated my phone and suddenly everything takes ages to load wtf this update sux I hate it fix it bye \
                   
-                Product: Mobile Device
+                Domain: Mobile Device
                 Feeling: You are NOT grateful. You are ranting. You are expressive.\
                 Complaint:  Okay I used my fucking phone for 2 minutes and it drains it down 8 fucking percent \
                 
-                Product: Mobile Device                                                     
+                Domain: Mobile Device                                                     
                 Feeling: You are grateful. You are NOT ranting. You are NOT expressive.\
                 Complaint: hi #apple, I‚ have a concern about the latest ios is too slow on iphone6 and i am not happy with it. Any solution please? \
 
-                Product: Mobile App
+                Domain: Mobile App
                 Feeling: You are grateful. You are NOT ranting. You are expressive.\
                 Complaint: Please help! Spotify Premium skipping through songs constantly on android tablet  bluetooth speaker. Tried everything! \
                 
-                Product: Convenience Store                
+                Domain: Convenience Store                
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
                 Complaint: Got id'd Tesco for buying one Adnams Broadside. Is being blind part of the job-spec? I am 35 and 99 kilos. \
                 
-                Product: {domain}
+                Domain: {domain}
                 Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expression}.\
                 Complaint:
             """
@@ -444,6 +451,7 @@ def agent_sender_fewshot_twitter():
     )
     chain = template | client.client_completion
     return chain
+
 
 class mAgentER:
     def __init__(self):
