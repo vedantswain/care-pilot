@@ -78,28 +78,31 @@ ep_agent = mAgentEP()
 info_agent = mAgentInfo()
 trouble_agent = mAgentTrouble()
 
-#limitation_agent = limitation_sender_zeroshot()
-
 
 @app.route('/')
 def hello():
     return render_template('landing.html')
 
+ # just for testing
 @app.route('/chat')
 def start_chat(): 
-    global clientQueue
-    if not clientQueue:
-        clientQueue = initQueue
-    random.shuffle(clientQueue)
-    client = clientQueue.pop(0)
-    session_id = str(uuid4())   ### unique to each user/participant/representative
-    # 
-    current_client = client['name']
-    session[session_id] = {}
-    session[session_id]['current_client'] = current_client
-    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
-    # 
-    return redirect(url_for('index', session_id=session_id) + clientParam)
+    return render_template('feedback.html')
+
+# @app.route('/chat')
+# def start_chat(): 
+#     global clientQueue
+#     if not clientQueue:
+#         clientQueue = initQueue
+#     random.shuffle(clientQueue)
+#     client = clientQueue.pop(0)
+#     session_id = str(uuid4())   ### unique to each user/participant/representative
+#     # 
+#     current_client = client['name']
+#     session[session_id] = {}
+#     session[session_id]['current_client'] = current_client
+#     clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+  
+#     return redirect(url_for('index', session_id=session_id) + clientParam)
 
 
 @app.route('/<session_id>/')

@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post-task Survey</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='js/bulma.js') }}">
+</head>
+
+<form id="feedbackForm" onsubmit="submitSurvey(event);">
+
+<body>
+
+    <div class="modal" id="surveyModal">
+        <div class="modal-background"></div>
+        <div class="modal-content">
+
+            <!-- Interaction -->
+            <div class="survey-section">
+                <h2>Q1. To what extent do you agree with the following statements about the client you conversed with ？</h2>
+                <h3>1 - The client treated me in a polite manner:</h3>
+                <label><input type="radio" name="polite" value="1"> Strongly disagree</label>
+                <label><input type="radio" name="polite" value="2"> Disagree</label>
+                <label><input type="radio" name="polite" value="3"> Somewhat disagree</label>
+                <label><input type="radio" name="polite" value="4"> Neither agree nor disagree</label>
+                <label><input type="radio" name="polite" value="5"> Somewhat agree</label>
+                <label><input type="radio" name="polite" value="6"> Agree</label>
+                <label><input type="radio" name="polite" value="7"> Strongly agree</label>
+
+                <h3>2 - The client treated me with dignity:</h3>
+                <label><input type="radio" name="polite" value="1"> Strongly disagree</label>
+                <label><input type="radio" name="polite" value="2"> Disagree</label>
+                <label><input type="radio" name="polite" value="3"> Somewhat disagree</label>
+                <label><input type="radio" name="polite" value="4"> Neither agree nor disagree</label>
+                <label><input type="radio" name="polite" value="5"> Somewhat agree</label>
+                <label><input type="radio" name="polite" value="6"> Agree</label>
+                <label><input type="radio" name="polite" value="7"> Strongly agree</label>
+
+                <h3>3 - The client treated me with respect:</h3>
+                <label><input type="radio" name="polite" value="1"> Strongly disagree</label>
+                <label><input type="radio" name="polite" value="2"> Disagree</label>
+                <label><input type="radio" name="polite" value="3"> Somewhat disagree</label>
+                <label><input type="radio" name="polite" value="4"> Neither agree nor disagree</label>
+                <label><input type="radio" name="polite" value="5"> Somewhat agree</label>
+                <label><input type="radio" name="polite" value="6"> Agree</label>
+                <label><input type="radio" name="polite" value="7"> Strongly agree</label>
+            </div>
+
+            <!-- Cognitive Demands/Resources -->
+            <div class="survey-section">
+                <h2>Q2. In the context of your last conversation...?</h2>
+                <h3>1 - how would you rate the demands on you:</h3>
+                <div class="range-labels">
+                    <span>Very low</span> 
+                    <input type="range" name="demands" min="1" max="5" value="3" class="slider">
+                    <span>Very High</span>
+                </div>
+                
+                <h3>2 - how would you rate the resources available to you:</h3>
+                <div class="range-labels">
+                    <span>Very low</span> 
+                    <input type="range" name="demands" min="1" max="5" value="3" class="slider">
+                    <span>Very High</span>
+                </div>                
+
+
+            <!-- Valence/Arousal -->
+            <div class="survey-section">
+                <h2>Q3. How do you feel after the conversation?</h2>
+
+                <h3>1 - Rate your level of pleasure:</h3>
+                <div class="slider-container">
+                    <span>Negative</span> 
+                    <input type="range" name="Valence" min="1" max="5" value="3" class="slider">
+                    <span>Positive</span>
+                </div>
+             
+                
+                <h3>2 - Rate your level of energy:</h3>
+                <div class="slider-container">
+                    <span>Calm</span> 
+                    <input type="range" name="Arousal" min="1" max="5" value="3" class="slider">
+                    <span>Excited</span>
+                </div>
+
+            <!-- Support -->
+             <!-- should we reverse the lable? bc the above option is from negative to positive，
+              it's challenging for me to change the fixed the feeling when i fill out the form-->
+            <div class="survey-section">
+                <h2>How did you feel after reading the messages from Pro-pilot?</h2>
+
+                <!-- <label>Effectiveness:</label> -->
+                <div class="slider-container">
+                    <span>Effective</span> 
+                    <input type="range" name="effective" min="1" max="5" value="3" class="slider">
+                    <span>Ineffective</span>
+                </div>
+
+                <div class="slider-container">
+                    <span>Helpful</span>
+                    <input type="range" name="helpful" min="1" max="5" value="3" class="slider">
+                    <span>Unhelpful</span>
+                </div>
+                <div class="slider-container">
+                    <span>Beneficial</span>
+                    <input type="range" name="beneficial" min="1" max="5" value="3" class="slider">
+                    <span>Not Beneficial</span>
+                </div>
+                <div class="slider-container">
+                    <span>Adequate</span>
+                    <input type="range" name="adequate" min="1" max="5" value="3" class="slider">
+                    <span>Inadequate</span>
+                </div>
+                <div class="slider-container">
+                    <span>Sensitive</span>
+                    <input type="range" name="sensitive" min="1" max="5" value="3" class="slider">
+                    <span>Insensitive</span>
+                </div>
+                <div class="slider-container">
+                    <span>Caring</span>
+                    <input type="range" name="caring" min="1" max="5" value="3" class="slider">
+                    <span>Uncaring</span>
+                </div>
+                <div class="slider-container">
+                    <span>Understanding</span>
+                    <input type="range" name="understanding" min="1" max="5" value="3" class="slider">
+                    <span>Not Understanding</span>
+                </div>
+                <div class="slider-container">
+                    <span>Supportive</span>
+                    <input type="range" name="supportive" min="1" max="5" value="3" class="slider">
+                    <span>Unsupportive</span>
+                </div>
+                
+            <button onclick="closeSurveyAndStartChat();">Submit Survey and Start Chat</button>
+        </div>
+    </div>
+
+
+<script src="{{ url_for('static', filename='feedback.js') }}"></script>
+<script>document.getElementById('surveyModal').style.display = 'block'; 
+</script>
+
+</body>
+</html>
+
+
