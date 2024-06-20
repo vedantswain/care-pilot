@@ -44,8 +44,8 @@ Session(app)
 # db = client[DB_NAME]
 # print(client.list_databases())
 client = MongoClient('localhost', 27017)
-
 db = client.flask_db
+survey = db['surveyData']
 chat_history_collection = db.chat_history_collection
 chat_client_info = db.chat_client_info
 chat_emo_feedback = db.chat_emo_feedback
@@ -224,6 +224,48 @@ def update_client_queue(session_id):
     new_url = url_for('index', session_id=session_id) + clientParam
 
     return jsonify({"url": new_url})
+
+
+
+@app.route('/get-survey', methods=['POST'])
+def getSurvey():
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "No data received"}), 400
+    
+    data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
+    
+    try:
+        result = survey.insert_one(data)
+        if result.inserted_id:
+            return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+        else:
+            return jsonify({"message": "Failed to save data"}), 500
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+# @app.route('/get-survey', methods=['POST'])
+# def getSurvey():
+#     if 'session_id' in session:
+#         data = request.get_json()
+#         if not data:
+#             return jsonify({"message": "No data received"}), 400
+        
+#         data['session_id'] = session['session_id']
+#         data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
+        
+#         try:
+#             result = survey.insert_one(data)
+#             if result.inserted_id:
+#                 return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+#             else:
+#                 return jsonify({"message": "Failed to save data"}), 500
+#         except Exception as e:
+#             return jsonify({"message": str(e)}), 500
+#     else:
+#         return jsonify({"message": "Invalid session or session expired"}), 400
+
+
 
 @app.route('/<session_id>/get-emo-feedback', methods=['POST'])
 def getEmoFeedback(session_id):
