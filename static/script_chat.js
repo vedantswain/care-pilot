@@ -389,7 +389,6 @@ function retrieveEmoSupport(message, support_type){
     }
 }
 
-
 function retrieveEmoFeedback(support_type) {
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
@@ -551,21 +550,35 @@ function sendMessage() {
             value.innerHTML = "CONVERSATION RESOLVED";
             modalContent.appendChild(value);
             
-            const nextButton = document.createElement('button');
-            nextButton.innerHTML = "Next";
-            nextButton.classList.add('next-button');
-            modalContent.appendChild(nextButton);
+            const surveyButton = document.createElement('button');
+            surveyButton.innerHTML = "Post-task Survey";
+            surveyButton.classList.add('surveyButton');
+            modalContent.appendChild(surveyButton);
 
+            surveyButton.onclick = function() {
+                window.location.href = `/${sessionId}/set-survey`;
+            };
 
             modal.appendChild(modalContent);
             document.body.appendChild(modal);
 
-            nextButton.onclick = function() {
-                //update pop userQueue  from flask backend
-                updateClientQueue()
-                modal.style.display = "none";
-                document.body.removeChild(modal); 
-            };
+            // surveyButton.onclick = function() {
+            //     modal.style.display = "none";
+            //     document.getElementById('surveyModal').style.display = 'block'; 
+            // };
+
+
+            // const submitButton = document.createElement('button');
+            // submitButton.innerHTML = "submit";
+            // submitButton.classList.add('submitButton');
+            // modalContent.appendChild(submitButton);
+
+            // submitButton.onclick = function() {
+            //     //update pop userQueue  from flask backend
+            //     updateClientQueue()
+            //     modal.style.display = "none";
+            //     document.body.removeChild(modal); 
+            // };
 
             modal.style.display = "block";
             typing.style.display = 'none';
@@ -586,6 +599,63 @@ function sendMessage() {
         console.error('Error:', error);
     });
 }
+
+document.addEventListener('DOMContentLoaded', function () {
+    const form = document.getElementById('feedbackForm');
+    form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        const formData = new FormData(this);
+        const data = {};
+        formData.forEach((value, key) => { data[key] = value; });
+
+        const sessionId = window.location.pathname.split('/')[1];
+
+        fetch(`/${sessionId}/get-survey`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data)
+        })
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Network response was not ok');
+            }
+            return response.json();
+        })
+        .then(data => {
+            console.log('Success:', data);
+            alert('Feedback submitted successfully!');
+            document.getElementById('surveyModal').style.display = 'none';
+
+            fetch(`/${sessionId}/get-reply`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ start_new_chat: true })
+            })
+            .then(response => {
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return response.json();
+            })
+            .then(data => {
+                window.location.href = data.new_chat_url;
+            })
+            .catch((error) => {
+                console.error('Error:', error);
+                alert('Error starting new chat');
+            });
+        })
+        .catch((error) => {
+            console.error('Error:', error);
+            alert('Error submitting feedback');
+        });
+    });
+});
+
 
 
 // Define a function to execute after the page loads
