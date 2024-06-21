@@ -83,11 +83,6 @@ trouble_agent = mAgentTrouble()
 def hello():
     return render_template('landing.html')
 
- # just for testing
-# @app.route('/chat')
-# def start_chat(): 
-#     return render_template('feedback.html')
-
 @app.route('/chat')
 def start_chat(): 
     global clientQueue
@@ -223,39 +218,7 @@ def update_client_queue(session_id):
 
     return jsonify({"url": new_url})
 
-
-# Below is testing code.
-# @app.route('/get-survey', methods=['POST'])
-# def getSurvey():
-#     data = request.get_json()
-#     if not data:
-#         return jsonify({"message": "No data received"}), 400
-    
-#     data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
-    
-#     try:
-#         result = survey.insert_one(data)
-#         if result.inserted_id:
-#             return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
-#         else:
-#             return jsonify({"message": "Failed to save data"}), 500
-#     except Exception as e:
-#         return jsonify({"message": str(e)}), 500
-@app.route('/<session_id>/start-chat')
-def start_new_chat(session_id):
-    global clientQueue
-    if not clientQueue:
-        clientQueue = initQueue
-    random.shuffle(clientQueue)
-    client = clientQueue.pop(0)
-    new_session_id = str(uuid4())
-    current_client = client['name']
-    session[new_session_id] = {}
-    session[new_session_id]['current_client'] = current_client
-    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
-
-    return redirect(url_for('index', session_id=new_session_id) + clientParam)
-
+# survey session
 
 @app.route('/<session_id>/set-survey')
 def setSurvey(session_id):
@@ -282,28 +245,21 @@ def getSurvey(session_id):
     else:
         return jsonify({"message": "Invalid session or session expired"}), 400
 
+# maybe it’s not necessary
+@app.route('/<session_id>/start-chat')
+def start_new_chat(session_id):
+    global clientQueue
+    if not clientQueue:
+        clientQueue = initQueue
+    random.shuffle(clientQueue)
+    client = clientQueue.pop(0)
+    new_session_id = str(uuid4())
+    current_client = client['name']
+    session[new_session_id] = {}
+    session[new_session_id]['current_client'] = current_client
+    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
 
-# @app.route('/<session_id>/get-survey', methods=['POST'])
-# def getSurvey():
-#     if 'session_id' in session:
-#         data = request.get_json()
-#         if not data:
-#             return jsonify({"message": "No data received"}), 400
-        
-#         data['session_id'] = session['session_id']
-#         data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
-        
-#         try:
-#             result = survey.insert_one(data)
-#             if result.inserted_id:
-#                 return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
-#             else:
-#                 return jsonify({"message": "Failed to save data"}), 500
-#         except Exception as e:
-#             return jsonify({"message": str(e)}), 500
-#     else:
-#         return jsonify({"message": "Invalid session or session expired"}), 400
-
+    return redirect(url_for('index', session_id=new_session_id) + clientParam)
 
 
 @app.route('/<session_id>/get-emo-feedback', methods=['POST'])
