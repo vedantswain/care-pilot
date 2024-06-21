@@ -18,6 +18,10 @@
         }
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked@12.0.1/lib/marked.umd.min.js"></script>
+    <script type="text/javascript">
+        var common_strings = {{ common_strings|tojson|safe }};
+        console.log(common_strings)
+    </script>
     <script src="{{ url_for('static', filename='script_chat.js') }}"></script>
 </head>
 <body>
@@ -34,7 +38,7 @@
             </div>
         </div>
 
-       <div class="list">
+       <div class="list" id="client-queue">
             <!-- <a class="list-item box" href="../?product=pizza&grateful=0&ranting=0&expression=0">
                 <div class="media">
                     <div class="media-left">

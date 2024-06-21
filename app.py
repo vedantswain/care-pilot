@@ -16,7 +16,9 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
-from sentiment import analyze_sentiment
+from sentiment import analyze_sentiment_transformer
+
+import config as common
 
 from dotenv import load_dotenv
 from uuid import uuid4
@@ -53,18 +55,10 @@ chat_emo_feedback = db.chat_emo_feedback
 sender_agent = None
 chat_history = [
 ]
-initQueue = [
-    { "id": 1, "name": "Lucy", "product": "Airline" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
-    { "id": 2, "name": "Esther", "product": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
-    { "id": 3, "name": "Peter", "product": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
-    { "id": 4, "name": "Joseph", "product": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0}
-]
-clientQueue = initQueue.copy()
 
-TYPE_EMO_THOUGHT = "You might be thinking"
-TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
-TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"
-TYPE_SENTIMENT = "Client's Sentiment"
+# clientQueue = common.randomQueue.copy()
+clientQueue = []
+
 
 
 sender_initial = agent_sender_fewshot_twitter()
@@ -83,12 +77,17 @@ trouble_agent = mAgentTrouble()
 def hello():
     return render_template('landing.html')
 
-@app.route('/chat')
-def start_chat(): 
+@app.route('/launch')
+def launch():
+    return render_template('launch.html')
+
+@app.route('/chat/<scenario>/')
+def start_chat(scenario):
     global clientQueue
     if not clientQueue:
-        clientQueue = initQueue
-    random.shuffle(clientQueue)
+        # clientQueue = common.randomQueue
+        clientQueue = common.get_study_queue(scenario)
+    # random.shuffle(clientQueue)
     client = clientQueue.pop(0)
     session_id = str(uuid4())   ### unique to each user/participant/representative
     current_client = client['name']
@@ -106,7 +105,7 @@ def index(session_id):
     else:
         current_client = 'Guest'
 
-    return render_template('index_chat.html', session_id=session_id, current_client=current_client)
+    return render_template('index_chat.html', session_id=session_id, current_client=current_client, common_strings=common.SUPPORT_TYPE_STRINGS)
 
 
 @app.route('/<session_id>/get-reply', methods=['GET','POST'])
@@ -305,7 +304,7 @@ def getEmoSupport(session_id):
         turn_number = len(chat_history) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-        if support_type==TYPE_EMO_REFRAME:
+        if support_type==common.TYPE_EMO_REFRAME:
             response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
             thought = response_cw_emo['thought']
             reframe = response_cw_emo['reframe']
@@ -333,7 +332,7 @@ def getEmoSupport(session_id):
                     'reframe': reframe
                 }
             })
-        elif support_type==TYPE_EMO_SHOES:
+        elif support_type==common.TYPE_EMO_SHOES:
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
             chat_emo_feedback.insert_one({
@@ -361,7 +360,7 @@ def sentiment(session_id):
         turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
 
         # Perform sentiment analysis
-        sentiment_category = analyze_sentiment(reply)
+        sentiment_category = analyze_sentiment_transformer(reply)
 
         chat_emo_feedback.insert_one({
             "session_id": session_id,
