@@ -114,7 +114,6 @@ def index(session_id):
     return render_template('index_chat.html', session_id=session_id, current_client=current_client)
 
 
-
 @app.route('/<session_id>/get-reply', methods=['GET','POST'])
 def getReply(session_id):
     global clientQueue
@@ -242,20 +241,34 @@ def update_client_queue(session_id):
 #             return jsonify({"message": "Failed to save data"}), 500
 #     except Exception as e:
 #         return jsonify({"message": str(e)}), 500
+@app.route('/<session_id>/start-chat')
+def start_new_chat(session_id):
+    global clientQueue
+    if not clientQueue:
+        clientQueue = initQueue
+    random.shuffle(clientQueue)
+    client = clientQueue.pop(0)
+    new_session_id = str(uuid4())
+    current_client = client['name']
+    session[new_session_id] = {}
+    session[new_session_id]['current_client'] = current_client
+    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+
+    return redirect(url_for('index', session_id=new_session_id) + clientParam)
+
 
 @app.route('/<session_id>/set-survey')
 def setSurvey(session_id):
     return render_template('feedback.html', session_id=session_id)
 
-
 @app.route('/<session_id>/get-survey', methods=['POST'])
-def getSurvey():
-    if 'session_id' in session:
+def getSurvey(session_id):
+    if session_id in session:
         data = request.get_json()
         if not data:
             return jsonify({"message": "No data received"}), 400
         
-        data['session_id'] = session['session_id']
+        data['session_id'] = session_id
         data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
         
         try:
@@ -268,6 +281,28 @@ def getSurvey():
             return jsonify({"message": str(e)}), 500
     else:
         return jsonify({"message": "Invalid session or session expired"}), 400
+
+
+# @app.route('/<session_id>/get-survey', methods=['POST'])
+# def getSurvey():
+#     if 'session_id' in session:
+#         data = request.get_json()
+#         if not data:
+#             return jsonify({"message": "No data received"}), 400
+        
+#         data['session_id'] = session['session_id']
+#         data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
+        
+#         try:
+#             result = survey.insert_one(data)
+#             if result.inserted_id:
+#                 return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+#             else:
+#                 return jsonify({"message": "Failed to save data"}), 500
+#         except Exception as e:
+#             return jsonify({"message": str(e)}), 500
+#     else:
+#         return jsonify({"message": "Invalid session or session expired"}), 400
 
 
 

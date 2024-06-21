@@ -7,7 +7,7 @@
 </head>
 <body>
 
-<form id="feedbackForm" onsubmit="submitSurvey(event);">
+<form id="feedbackForm">
     <div class="modal" id="surveyModal">
         <div class="modal-background"></div>
         <div class="modal-content">
@@ -128,8 +128,6 @@
         </div>
     </div>
 </form>
-
-
 
 <script src="{{ url_for('static', filename='feedback.js') }}"></script>
 <script>document.getElementById('surveyModal').style.display = 'block';</script>
