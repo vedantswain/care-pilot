@@ -4,127 +4,143 @@
     <meta charset="UTF-8">
     <title>Post-task Survey</title>
     <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_chat.css') }}">
 </head>
 <body>
 
 <form id="feedbackForm">
     <div class="modal" id="surveyModal">
-        <div class="modal-background"></div>
         <div class="modal-content">
 
             <!-- Interaction -->
-            <div class="survey-section">
-                <h2>Q1. To what extent do you agree with the following statements about the client you conversed with ？</h2>
-                <h3>1 - The client treated me in a polite manner:</h3>
-                <label><input type="radio" name="polite" value="1"> Strongly disagree</label>
-                <label><input type="radio" name="polite" value="2"> Disagree</label>
-                <label><input type="radio" name="polite" value="3"> Somewhat disagree</label>
-                <label><input type="radio" name="polite" value="4"> Neither agree nor disagree</label>
-                <label><input type="radio" name="polite" value="5"> Somewhat agree</label>
-                <label><input type="radio" name="polite" value="6"> Agree</label>
-                <label><input type="radio" name="polite" value="7"> Strongly agree</label>
+            <div class="block survey-section">
+                <div class="control content">
+                    <h5>Q1. To what extent do you agree with the following statements about the client you conversed with ？</h5>
+                    <h6>The client treated me in a polite manner:</h6>
+                        <label class="radio"><input type="radio" name="polite" value="-3"> Strongly disagree</label>
+                        <label class="radio"><input type="radio" name="polite" value="-2"> Disagree</label>
+                        <label class="radio"><input type="radio" name="polite" value="-1"> Somewhat disagree</label>
+                        <label class="radio"><input type="radio" name="polite" value="0"> Neither agree nor disagree</label>
+                        <label class="radio"><input type="radio" name="polite" value="1"> Somewhat agree</label>
+                        <label class="radio"><input type="radio" name="polite" value="2"> Agree</label>
+                        <label class="radio"><input type="radio" name="polite" value="3"> Strongly agree</label>
 
-                <h3>2 - The client treated me with dignity:</h3>
-                <label><input type="radio" name="dignity" value="1"> Strongly disagree</label>
-                <label><input type="radio" name="dignity" value="2"> Disagree</label>
-                <label><input type="radio" name="dignity" value="3"> Somewhat disagree</label>
-                <label><input type="radio" name="dignity" value="4"> Neither agree nor disagree</label>
-                <label><input type="radio" name="dignity" value="5"> Somewhat agree</label>
-                <label><input type="radio" name="dignity" value="6"> Agree</label>
-                <label><input type="radio" name="dignity" value="7"> Strongly agree</label>
+                </div>
+                <div class="control content">
 
-                <h3>3 - The client treated me with respect:</h3>
-                <label><input type="radio" name="respect" value="1"> Strongly disagree</label>
-                <label><input type="radio" name="respect" value="2"> Disagree</label>
-                <label><input type="radio" name="respect" value="3"> Somewhat disagree</label>
-                <label><input type="radio" name="respect" value="4"> Neither agree nor disagree</label>
-                <label><input type="radio" name="respect" value="5"> Somewhat agree</label>
-                <label><input type="radio" name="respect" value="6"> Agree</label>
-                <label><input type="radio" name="respect" value="7"> Strongly agree</label>
+                    <h6>The client treated me with dignity:</h6>
+                        <label class="radio"><input type="radio" name="dignity" value="-3"> Strongly disagree</label>
+                        <label class="radio"><input type="radio" name="dignity" value="-2"> Disagree</label>
+                        <label class="radio"><input type="radio" name="dignity" value="-1"> Somewhat disagree</label>
+                        <label class="radio"><input type="radio" name="dignity" value="0"> Neither agree nor disagree</label>
+                        <label class="radio"><input type="radio" name="dignity" value="1"> Somewhat agree</label>
+                        <label class="radio"><input type="radio" name="dignity" value="2"> Agree</label>
+                        <label class="radio"><input type="radio" name="dignity" value="3"> Strongly agree</label>
+
+                </div>
+                <div class="control content">
+
+                    <h6>The client treated me with respect:</h6>
+                        <label class="radio"><input type="radio" name="respect" value="-3"> Strongly disagree</label>
+                        <label class="radio"><input type="radio" name="respect" value="-2"> Disagree</label>
+                        <label class="radio"><input type="radio" name="respect" value="-1"> Somewhat disagree</label>
+                        <label class="radio"><input type="radio" name="respect" value="0"> Neither agree nor disagree</label>
+                        <label class="radio"><input type="radio" name="respect" value="1"> Somewhat agree</label>
+                        <label class="radio"><input type="radio" name="respect" value="2"> Agree</label>
+                        <label class="radio"><input type="radio" name="respect" value="3"> Strongly agree</label>
+                </div>
             </div>
 
             <!-- Cognitive Demands/Resources -->
-            <div class="survey-section">
-                <h2>Q2. In the context of your last conversation...?</h2>
-                <h3>1 - How would you rate the demands on you:</h3>
-                <div class="range-labels">
-                    <span>Very low</span> 
-                    <input type="range" name="demands" min="1" max="5" value="3" class="slider">
-                    <span>Very High</span>
+            <div class="block survey-section">
+                <div class="control content">
+                    <h5>Q2. In the context of your last conversation...?</h5>
+                    <h6>How would you rate the demands on you:</h6>
+                    <div class="slider-container">
+                        <span>Very low</span>
+                        <input type="range" name="demands" min="-2" max="2"  class="slider">
+                        <span>Very High</span>
+                    </div>
                 </div>
-                
-                <h3>2 - How would you rate the resources available to you:</h3>
-                <div class="range-labels">
-                    <span>Very low</span> 
-                    <input type="range" name="resources" min="1" max="5" value="3" class="slider">
-                    <span>Very High</span>
+                <div class="control content">
+                    <h6>How would you rate the resources available to you:</h6>
+                    <div class="slider-container">
+                        <span>Very low</span>
+                        <input type="range" name="resources" min="-2" max="2"  class="slider">
+                        <span>Very High</span>
+                    </div>
                 </div>
             </div>                
 
             <!-- Valence/Arousal -->
-            <div class="survey-section">
-                <h2>Q3. How do you feel after the conversation?</h2>
-                <h3>1 - Rate your level of pleasure:</h3>
-                <div class="slider-container">
-                    <span>Negative</span> 
-                    <input type="range" name="valence" min="1" max="5" value="3" class="slider">
-                    <span>Positive</span>
+            <div class="block survey-section">
+                <div class="control content">
+                    <h5>Q3. How do you feel after the conversation?</h5>
+                    <h6>Rate your level of pleasure:</h6>
+                    <div class="slider-container">
+                        <span>Negative</span>
+                        <input type="range" name="valence" min="-2" max="2"  class="slider">
+                        <span>Positive</span>
+                    </div>
                 </div>
-                
-                <h3>2 - Rate your level of energy:</h3>
-                <div class="slider-container">
-                    <span>Calm</span> 
-                    <input type="range" name="arousal" min="1" max="5" value="3" class="slider">
-                    <span>Excited</span>
+                <div class="control content">
+                    <h6>Rate your level of energy:</h6>
+                    <div class="slider-container">
+                        <span>Calm</span>
+                        <input type="range" name="arousal" min="-2" max="2"  class="slider">
+                        <span>Excited</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Support -->
-            <div class="survey-section">
-                <h2>How did you feel after reading the messages from Pro-pilot?</h2>
-                <div class="slider-container">
-                    <span>Effective</span> 
-                    <input type="range" name="effective" min="1" max="5" value="3" class="slider">
-                    <span>Ineffective</span>
-                </div>
-                <div class="slider-container">
-                    <span>Helpful</span>
-                    <input type="range" name="helpful" min="1" max="5" value="3" class="slider">
-                    <span>Unhelpful</span>
-                </div>
-                <div class="slider-container">
-                    <span>Beneficial</span>
-                    <input type="range" name="beneficial" min="1" max="5" value="3" class="slider">
-                    <span>Not Beneficial</span>
-                </div>
-                <div class="slider-container">
-                    <span>Adequate</span>
-                    <input type="range" name="adequate" min="1" max="5" value="3" class="slider">
-                    <span>Inadequate</span>
-                </div>
-                <div class="slider-container">
-                    <span>Sensitive</span>
-                    <input type="range" name="sensitive" min="1" max="5" value="3" class="slider">
-                    <span>Insensitive</span>
-                </div>
-                <div class="slider-container">
-                    <span>Caring</span>
-                    <input type="range" name="caring" min="1" max="5" value="3" class="slider">
-                    <span>Uncaring</span>
-                </div>
-                <div class="slider-container">
-                    <span>Understanding</span>
-                    <input type="range" name="understanding" min="1" max="5" value="3" class="slider">
-                    <span>Not Understanding</span>
-                </div>
-                <div class="slider-container">
-                    <span>Supportive</span>
-                    <input type="range" name="supportive" min="1" max="5" value="3" class="slider">
-                    <span>Unsupportive</span>
+            <div class="block survey-section">
+                <div class="control content">
+                    <h5>How did you feel after reading the messages from Pro-pilot?</h5>
+                    <div class="slider-container">
+                        <span>Effective</span>
+                        <input type="range" name="effective" min="-2" max="2" class="slider">
+                        <span>Ineffective</span>
+                    </div>
+                    <div class="slider-container">
+                        <span>Helpful</span>
+                        <input type="range" name="helpful" min="-2" max="2" class="slider">
+                        <span>Unhelpful</span>
+                    </div>
+                    <div class="slider-container">
+                        <span>Beneficial</span>
+                        <input type="range" name="beneficial" min="-2" max="2" class="slider">
+                        <span>Not Beneficial</span>
+                    </div>
+                    <div class="slider-container">
+                        <span>Adequate</span>
+                        <input type="range" name="adequate" min="-2" max="2" class="slider">
+                        <span>Inadequate</span>
+                    </div>
+                    <div class="slider-container">
+                        <span>Sensitive</span>
+                        <input type="range" name="sensitive" min="-2" max="2" class="slider">
+                        <span>Insensitive</span>
+                    </div>
+                    <div class="slider-container">
+                        <span>Caring</span>
+                        <input type="range" name="caring" min="-2" max="2" class="slider">
+                        <span>Uncaring</span>
+                    </div>
+                    <div class="slider-container">
+                        <span>Understanding</span>
+                        <input type="range" name="understanding" min="-2" max="2" class="slider">
+                        <span>Not Understanding</span>
+                    </div>
+                    <div class="slider-container">
+                        <span>Supportive</span>
+                        <input type="range" name="supportive" min="-2" max="2" class="slider">
+                        <span>Unsupportive</span>
+                    </div>
                 </div>
             </div>
             
-            <button type="submit">Submit Survey and Start Next Chat</button>
+            <button class="button is-success" type="submit">Submit Survey and Start Next Chat</button>
         </div>
     </div>
 </form>
