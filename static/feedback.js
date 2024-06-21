@@ -26,7 +26,7 @@ document.addEventListener('DOMContentLoaded', function() {
             alert('Feedback submitted successfully!');
             document.getElementById('surveyModal').style.display = 'none';
 
-            window.location.href = `/${sessionId}/start-chat`;  // 重定向到新的聊天会话
+            window.location.href = `/${sessionId}/start-chat`;  
         })
         .catch((error) => {
             console.error('Error:', error);
