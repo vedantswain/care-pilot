@@ -452,19 +452,6 @@ function retrieveTroubleSupport(message){
         });
 }
 
-function updateClientQueue() {
-    const sessionId = window.location.pathname.split('/')[1];
-
-    fetch(`/${sessionId}/update-clientQueue`)
-    .then(response => response.json())
-    .then(data => {
-        if (data.url) {
-            window.location.href = data.url;
-        }
-    })
-    .catch(error => console.error('Error updating client queue:', error));
-}
-
 function processClientResponse(data){
     const chatDiv = document.getElementById('chatWindow');
     const typing = document.getElementById('typing');

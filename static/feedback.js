@@ -5,6 +5,19 @@ function updateSlider(sliderName, slideAmount) {
     sliderValues[sliderName] = slideAmount;
 }
 
+function updateClientQueue() {
+    const sessionId = window.location.pathname.split('/')[1];
+
+    fetch(`/${sessionId}/update-clientQueue`)
+    .then(response => response.json())
+    .then(data => {
+        if (data.url) {
+            window.location.href = data.url;
+        }
+    })
+    .catch(error => console.error('Error updating client queue:', error));
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('feedbackForm');
     form.addEventListener('submit', function(e) {
@@ -49,9 +62,8 @@ document.addEventListener('DOMContentLoaded', function() {
         .then(data => {
             console.log('Success:', data);
             alert('Feedback submitted successfully!');
-            document.getElementById('surveyModal').style.display = 'none';
 
-            window.location.href = `/${sessionId}/start-chat`;  
+            updateClientQueue();
         })
         .catch((error) => {
             console.error('Error:', error);

@@ -93,6 +93,7 @@ def start_chat(scenario):
     current_client = client['name']
     session[session_id] = {}
     session[session_id]['current_client'] = current_client
+    session[session_id]['client_queue'] = clientQueue
     clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
   
     return redirect(url_for('index', session_id=session_id) + clientParam)
@@ -110,7 +111,7 @@ def index(session_id):
 
 @app.route('/<session_id>/get-reply', methods=['GET','POST'])
 def getReply(session_id):
-    global clientQueue
+    clientQueue = session[session_id]['client_queue']
     if request.method == 'GET':
         val_product = request.args.get('product')
         val_grateful = request.args.get('grateful')
@@ -208,17 +209,18 @@ def getReply(session_id):
 
 @app.route('/<session_id>/update-clientQueue')
 def update_client_queue(session_id):
-    global clientQueue
-    if not clientQueue:
-        clientQueue = initQueue.copy()
-    client = clientQueue.pop(0) 
+    clientQueue = session[session_id]['client_queue']
+    client = clientQueue.pop(0)
+    current_client = client['name']
+    session[session_id]['current_client'] = current_client
+    session[session_id]['client_queue'] = clientQueue
+
     clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     new_url = url_for('index', session_id=session_id) + clientParam
 
     return jsonify({"url": new_url})
 
-# survey session
-
+# End-point to test the survey HTML
 @app.route('/<session_id>/set-survey')
 def setSurvey(session_id):
     return render_template('feedback.html', session_id=session_id)
@@ -246,22 +248,6 @@ def getSurvey(session_id):
             return jsonify({"message": str(e)}), 500
     else:
         return jsonify({"message": "Invalid session or session expired"}), 400
-
-# maybe it’s not necessary
-@app.route('/<session_id>/start-chat')
-def start_new_chat(session_id):
-    global clientQueue
-    if not clientQueue:
-        clientQueue = initQueue
-    random.shuffle(clientQueue)
-    client = clientQueue.pop(0)
-    new_session_id = str(uuid4())
-    current_client = client['name']
-    session[new_session_id] = {}
-    session[new_session_id]['current_client'] = current_client
-    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
-
-    return redirect(url_for('index', session_id=new_session_id) + clientParam)
 
 
 @app.route('/<session_id>/get-emo-feedback', methods=['POST'])
