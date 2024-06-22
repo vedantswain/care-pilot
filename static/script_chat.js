@@ -395,7 +395,7 @@ function retrieveEmoFeedback(support_type) {
 
     var input = document.getElementById(`${support_type}-feedback`);
     var rate = input.value;
-    fetch(`/${sessionId}/get-emo-feedback`, {
+    fetch(`/${sessionId}/store-emo-feedback`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -221,12 +221,12 @@ def update_client_queue(session_id):
     return jsonify({"url": new_url})
 
 # End-point to test the survey HTML
-@app.route('/<session_id>/set-survey')
-def setSurvey(session_id):
+@app.route('/<session_id>/post-task-survey')
+def getSurvey(session_id):
     return render_template('feedback.html', session_id=session_id)
 
-@app.route('/<session_id>/get-survey', methods=['POST'])
-def getSurvey(session_id):
+@app.route('/<session_id>/store-survey', methods=['POST'])
+def storePostSurvey(session_id):
     if session_id in session:
         data = request.get_json()
         for k in data:  # Convert string values into integers
@@ -250,8 +250,8 @@ def getSurvey(session_id):
         return jsonify({"message": "Invalid session or session expired"}), 400
 
 
-@app.route('/<session_id>/get-emo-feedback', methods=['POST'])
-def getEmoFeedback(session_id):
+@app.route('/<session_id>/store-emo-feedback', methods=['POST'])
+def storeEmoFeedback(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
         rate = request.json.get("rate")
