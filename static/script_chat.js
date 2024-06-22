@@ -525,64 +525,10 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         const isFinish = data.message.includes("FINISH:999");
-        if(isFinish) {
-            const modal = document.createElement('div');
-            modal.id = 'finishModal';
-            modal.style.position = 'fixed';
-            modal.style.display = 'flex';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.alignContent = 'center';
-            modal.style.alignItems = 'center';
-            modal.style.backgroundColor = 'rgba(0,0,0,0.4)';
-            modal.classList.add('modal');
+        if(!isFinish) {
+            const modal = document.querySelector('#finish-modal');
+            modal.classList.add("is-active");
 
-            const modalContent = document.createElement('div');
-            modalContent.classList.add('modal-content');
-            modalContent.style.backgroundColor = 'white'; 
-            modalContent.style.padding = '20px';
-            modalContent.style.borderRadius = '5px';
-            modalContent.style.width = 'fit-content';
-            modalContent.style.flexDirection = 'column';
-            modalContent.style.justifyItems = 'center';
-
-            const value = document.createElement('p');
-            value.innerHTML = "CONVERSATION RESOLVED";
-            modalContent.appendChild(value);
-            
-            const surveyButton = document.createElement('button');
-            surveyButton.innerHTML = "Post-task Survey";
-            surveyButton.classList.add('surveyButton');
-            modalContent.appendChild(surveyButton);
-
-            surveyButton.onclick = function() {
-                const sessionId = window.location.pathname.split('/')[1];
-                window.location.href = `/${sessionId}/set-survey`;
-            };
-            
-
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
-
-            // surveyButton.onclick = function() {
-            //     modal.style.display = "none";
-            //     document.getElementById('surveyModal').style.display = 'block'; 
-            // };
-
-
-            // const submitButton = document.createElement('button');
-            // submitButton.innerHTML = "submit";
-            // submitButton.classList.add('submitButton');
-            // modalContent.appendChild(submitButton);
-
-            // submitButton.onclick = function() {
-            //     //update pop userQueue  from flask backend
-            //     updateClientQueue()
-            //     modal.style.display = "none";
-            //     document.body.removeChild(modal); 
-            // };
-
-            modal.style.display = "block";
             typing.style.display = 'none';
             input.disabled = true;
         } else {

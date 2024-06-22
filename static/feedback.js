@@ -28,13 +28,17 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         const sessionId = window.location.pathname.split('/')[1];
+        const clientId = sessionStorage.getItem('client_id');
+
+        data = formValues
+        data['client_id'] = clientId
 
         fetch(`/${sessionId}/get-survey`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
             },
-            body: JSON.stringify(formValues)
+            body: JSON.stringify(data)
         })
         .then(response => {
             if (!response.ok) {

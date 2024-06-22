@@ -228,7 +228,8 @@ def getSurvey(session_id):
     if session_id in session:
         data = request.get_json()
         for k in data:  # Convert string values into integers
-            data[k] = int(data[k])
+            if k != "client_id":
+                data[k] = int(data[k])
         if not data:
             return jsonify({"message": "No data received"}), 400
         
