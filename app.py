@@ -47,7 +47,7 @@ Session(app)
 # print(client.list_databases())
 client = MongoClient('localhost', 27017)
 db = client.flask_db
-survey = db['surveyData']
+chat_task_feedback = db.chat_task_feedback
 chat_history_collection = db.chat_history_collection
 chat_client_info = db.chat_client_info
 chat_emo_feedback = db.chat_emo_feedback
@@ -227,6 +227,8 @@ def setSurvey(session_id):
 def getSurvey(session_id):
     if session_id in session:
         data = request.get_json()
+        for k in data:  # Convert string values into integers
+            data[k] = int(data[k])
         if not data:
             return jsonify({"message": "No data received"}), 400
         
@@ -234,7 +236,7 @@ def getSurvey(session_id):
         data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
         
         try:
-            result = survey.insert_one(data)
+            result = chat_task_feedback.insert_one(data)
             if result.inserted_id:
                 return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
             else:
