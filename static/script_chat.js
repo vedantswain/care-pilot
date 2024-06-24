@@ -389,14 +389,13 @@ function retrieveEmoSupport(message, support_type){
     }
 }
 
-
 function retrieveEmoFeedback(support_type) {
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
 
     var input = document.getElementById(`${support_type}-feedback`);
     var rate = input.value;
-    fetch(`/${sessionId}/get-emo-feedback`, {
+    fetch(`/${sessionId}/store-emo-feedback`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -451,19 +450,6 @@ function retrieveTroubleSupport(message){
         .catch((error) => {
             console.error('Error:', error);
         });
-}
-
-function updateClientQueue() {
-    const sessionId = window.location.pathname.split('/')[1];
-
-    fetch(`/${sessionId}/update-clientQueue`)
-    .then(response => response.json())
-    .then(data => {
-        if (data.url) {
-            window.location.href = data.url;
-        }
-    })
-    .catch(error => console.error('Error updating client queue:', error));
 }
 
 function processClientResponse(data){
@@ -526,48 +512,10 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         const isFinish = data.message.includes("FINISH:999");
-        if(isFinish) {
-            const modal = document.createElement('div');
-            modal.id = 'finishModal';
-            modal.style.position = 'fixed';
-            modal.style.display = 'flex';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.alignContent = 'center';
-            modal.style.alignItems = 'center';
-            modal.style.backgroundColor = 'rgba(0,0,0,0.4)';
-            modal.classList.add('modal');
+        if(!isFinish) {
+            const modal = document.querySelector('#finish-modal');
+            modal.classList.add("is-active");
 
-            const modalContent = document.createElement('div');
-            modalContent.classList.add('modal-content');
-            modalContent.style.backgroundColor = 'white'; 
-            modalContent.style.padding = '20px';
-            modalContent.style.borderRadius = '5px';
-            modalContent.style.width = 'fit-content';
-            modalContent.style.flexDirection = 'column';
-            modalContent.style.justifyItems = 'center';
-
-            const value = document.createElement('p');
-            value.innerHTML = "CONVERSATION RESOLVED";
-            modalContent.appendChild(value);
-            
-            const nextButton = document.createElement('button');
-            nextButton.innerHTML = "Next";
-            nextButton.classList.add('next-button');
-            modalContent.appendChild(nextButton);
-
-
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
-
-            nextButton.onclick = function() {
-                //update pop userQueue  from flask backend
-                updateClientQueue()
-                modal.style.display = "none";
-                document.body.removeChild(modal); 
-            };
-
-            modal.style.display = "block";
             typing.style.display = 'none';
             input.disabled = true;
         } else {

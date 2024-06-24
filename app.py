@@ -46,8 +46,8 @@ Session(app)
 # db = client[DB_NAME]
 # print(client.list_databases())
 client = MongoClient('localhost', 27017)
-
 db = client.flask_db
+chat_task_feedback = db.chat_task_feedback
 chat_history_collection = db.chat_history_collection
 chat_client_info = db.chat_client_info
 chat_emo_feedback = db.chat_emo_feedback
@@ -72,8 +72,6 @@ ep_agent = mAgentEP()
 info_agent = mAgentInfo()
 trouble_agent = mAgentTrouble()
 
-#limitation_agent = limitation_sender_zeroshot()
-
 
 @app.route('/')
 def hello():
@@ -92,12 +90,12 @@ def start_chat(scenario):
     # random.shuffle(clientQueue)
     client = clientQueue.pop(0)
     session_id = str(uuid4())   ### unique to each user/participant/representative
-    # 
     current_client = client['name']
     session[session_id] = {}
     session[session_id]['current_client'] = current_client
+    session[session_id]['client_queue'] = clientQueue
     clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
-    # 
+  
     return redirect(url_for('index', session_id=session_id) + clientParam)
 
 
@@ -111,10 +109,9 @@ def index(session_id):
     return render_template('index_chat.html', session_id=session_id, current_client=current_client, common_strings=common.SUPPORT_TYPE_STRINGS)
 
 
-
 @app.route('/<session_id>/get-reply', methods=['GET','POST'])
 def getReply(session_id):
-    global clientQueue
+    clientQueue = session[session_id]['client_queue']
     if request.method == 'GET':
         val_product = request.args.get('product')
         val_grateful = request.args.get('grateful')
@@ -212,17 +209,49 @@ def getReply(session_id):
 
 @app.route('/<session_id>/update-clientQueue')
 def update_client_queue(session_id):
-    global clientQueue
-    if not clientQueue:
-        clientQueue = initQueue.copy()
-    client = clientQueue.pop(0) 
+    clientQueue = session[session_id]['client_queue']
+    client = clientQueue.pop(0)
+    current_client = client['name']
+    session[session_id]['current_client'] = current_client
+    session[session_id]['client_queue'] = clientQueue
+
     clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     new_url = url_for('index', session_id=session_id) + clientParam
 
     return jsonify({"url": new_url})
 
-@app.route('/<session_id>/get-emo-feedback', methods=['POST'])
-def getEmoFeedback(session_id):
+# End-point to test the survey HTML
+@app.route('/<session_id>/post-task-survey')
+def getSurvey(session_id):
+    return render_template('feedback.html', session_id=session_id)
+
+@app.route('/<session_id>/store-survey', methods=['POST'])
+def storePostSurvey(session_id):
+    if session_id in session:
+        data = request.get_json()
+        for k in data:  # Convert string values into integers
+            if k != "client_id":
+                data[k] = int(data[k])
+        if not data:
+            return jsonify({"message": "No data received"}), 400
+        
+        data['session_id'] = session_id
+        data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
+        
+        try:
+            result = chat_task_feedback.insert_one(data)
+            if result.inserted_id:
+                return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+            else:
+                return jsonify({"message": "Failed to save data"}), 500
+        except Exception as e:
+            return jsonify({"message": str(e)}), 500
+    else:
+        return jsonify({"message": "Invalid session or session expired"}), 400
+
+
+@app.route('/<session_id>/store-emo-feedback', methods=['POST'])
+def storeEmoFeedback(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
         rate = request.json.get("rate")

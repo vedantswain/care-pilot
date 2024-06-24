@@ -295,3 +295,37 @@ pre {
   background-color: #FF4500; /* Example green color */
 }
 
+.slider-container {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+}
+
+.slider-container span {
+    width: 8em;
+}
+
+.slider {
+  -webkit-appearance: none;
+  width: 24em;
+  height: 8px;
+  background: #d3d3d3;
+  opacity: 0.7;
+  -webkit-transition: .2s;
+  transition: opacity .2s;
+}
+
+.slider:hover {
+  opacity: 1;
+}
+
+.radio {
+    width: 4em;
+    margin-right: 4px;
+    text-align: -webkit-center;
+    vertical-align: text-top;
+}
+
+.radio input {
+    display: block;
+}
