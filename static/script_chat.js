@@ -77,6 +77,21 @@ function updateQueueDisplay(data) {
 // }
 
 
+// secret button that used to jump into next conversation
+function confirmNextClient(sessionId) {
+    const userConfirmed = confirm("Do you want to go to the next client?");
+    if (userConfirmed) {
+        fetch(`/${sessionId}/update-clientQueue`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.url) {
+                    window.location.href = data.url;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+}
+
 function createMessageElement(messageText, msgClass, messageHeader='') {
   const article = document.createElement('article');
 
