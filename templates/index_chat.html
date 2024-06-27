@@ -215,6 +215,46 @@
     </div>
 </div>
 
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bulma/0.9.3/css/bulma.min.css">
+    <style>
+        body {
+            background-color: #222;
+            color: #fff;
+            font-family: Arial, sans-serif;
+        }
+        .modal-card {
+            background-color: #333;
+        }
+        .slider-container {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 15px;
+        }
+        .slider {
+            margin: 0 10px;
+            width: calc(100% - 160px); /* Adjusted to account for label widths */
+        }
+        .slider-label {
+            width: 80px;
+            text-align: center;
+        }
+        .modal-card-head, .modal-card-foot {
+            border-color: #444;
+        }
+        .modal-card-title {
+            color: #fff;
+        }
+        h5, h6 {
+            color: #fff;
+        }
+    </style>
+    <title>Feedback Survey</title>
+</head>
+<body>
 <div id="finish-modal" class="modal">
     <div class="modal-background"></div>
 
@@ -291,17 +331,17 @@
                         <h5>Q3. How do you feel after the conversation?</h5>
                         <h6>Rate your level of pleasure:</h6>
                         <div class="slider-container">
-                            <span>Negative</span>
-                            <input type="range" name="affect_valence" min="-2" max="2" oninput="updateSlider(this.name, this.value)"  class="slider">
-                            <span>Positive</span>
+                            <span class="slider-label">Negative</span>
+                            <input type="range" name="affect_valence" min="-2" max="2" step="1" value="0" class="slider">
+                            <span class="slider-label">Positive</span>
                         </div>
                     </div>
                     <div class="control content">
                         <h6>Rate your level of energy:</h6>
                         <div class="slider-container">
-                            <span>Calm</span>
-                            <input type="range" name="affect_arousal" min="-2" max="2" oninput="updateSlider(this.name, this.value)"  class="slider">
-                            <span>Excited</span>
+                            <span class="slider-label">Calm</span>
+                            <input type="range" name="affect_arousal" min="-2" max="2" step="1" value="0" class="slider">
+                            <span class="slider-label">Excited</span>
                         </div>
                     </div>
                 </div>
@@ -311,44 +351,44 @@
                     <div class="control content">
                         <h5>Q4. How did you feel after reading the messages from Pro-pilot?</h5>
                         <div class="slider-container">
-                            <span>Effective</span>
-                            <input type="range" name="support_effective" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Ineffective</span>
+                            <span class="slider-label">Effective</span>
+                            <input type="range" name="support_effective" min="-2" max="2" step="1" value="0" class="slider">
+                            <span class="slider-label">Ineffective</span>
                         </div>
                         <div class="slider-container">
-                            <span>Helpful</span>
-                            <input type="range" name="support_helpful" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Unhelpful</span>
+                            <span class="slider-label">Helpful</span>
+                            <input type="range" name="support_helpful" min="-2" max="2" step="1" value="0" class="slider">
+                            <span class="slider-label">Unhelpful</span>
                         </div>
                         <div class="slider-container">
-                            <span>Beneficial</span>
-                            <input type="range" name="support_beneficial" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Not Beneficial</span>
+                            <span class="slider-label">Beneficial</span>
+                            <input type="range" name="support_beneficial" min="-2" max="2" step="1" value="0" class="slider">
+                            <span class="slider-label">Not Beneficial</span>
                         </div>
                         <div class="slider-container">
-                            <span>Adequate</span>
-                            <input type="range" name="support_adequate" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Inadequate</span>
+                            <span class="slider-label">Adequate</span>
+                            <input type="range" name="support_adequate" min="-2" max="2" step="1" value="0" class="slider">
+                            <span class="slider-label">Inadequate</span>
                         </div>
                         <div class="slider-container">
-                            <span>Sensitive</span>
-                            <input type="range" name="support_sensitive" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Insensitive</span>
+                            <span class="slider-label">Sensitive</span>
+                            <input type="range" name="support_sensitive" min="-2" max="2" step="1" value="0" class="slider">
+                            <span class="slider-label">Insensitive</span>
                         </div>
                         <div class="slider-container">
-                            <span>Caring</span>
-                            <input type="range" name="support_caring" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Uncaring</span>
+                            <span class="slider-label">Caring</span>
+                            <input type="range" name="support_caring" min="-2" max="2" step="1" value="0" class="slider">
+                            <span class="slider-label">Uncaring</span>
                         </div>
                         <div class="slider-container">
-                            <span>Understanding</span>
-                            <input type="range" name="support_understanding" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Not Understanding</span>
+                            <span class="slider-label">Understanding</span>
+                            <input type="range" name="support_understanding" min="-2" max="2" step="1" value="0" class="slider">
+                            <span class="slider-label">Not Understanding</span>
                         </div>
                         <div class="slider-container">
-                            <span>Supportive</span>
-                            <input type="range" name="support_supportive" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Unsupportive</span>
+                            <span class="slider-label">Supportive</span>
+                            <input type="range" name="support_supportive" min="-2" max="2" step="1" value="0" class="slider">
+                            <span class="slider-label">Unsupportive</span>
                         </div>
                     </div>
                 </div>
@@ -361,6 +401,7 @@
         </div>
     </form>
 </div>
+
 
 <script src="{{ url_for('static', filename='feedback.js') }}"></script>
 
