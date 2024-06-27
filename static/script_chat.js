@@ -216,24 +216,26 @@ function createSupportPane(messageText, msgClass){
 }
 
 function createFooter(support_type){
-    const footer = document.createElement('p');
+    const footer = document.createElement('div');
     footer.classList.add('card-footer');
 
     const footerItem = document.createElement('div');
     footerItem.classList.add('card-footer-item');
+    footerItem.style.display = 'flex';
+    footerItem.style.alignItems = 'center';
+    footerItem.style.justifyContent = 'space-between';
 
-    const label = document.createElement('label');
-    label.setAttribute('for', 'customRange3');
-    label.classList.add('form-label');
-    label.textContent = 'Rate Response';
-    footerItem.appendChild(label);
+    const leftLabel = document.createElement('span');
+    leftLabel.classList.add('slider-label');
+    leftLabel.textContent = 'Rate Response';
+    footerItem.appendChild(leftLabel);
 
     const input = document.createElement('input');
     input.id = `${support_type}-feedback`;
     input.setAttribute('type', 'range');
     input.classList.add('form-range');
-    input.setAttribute('min', '1');
-    input.setAttribute('max', '5');
+    input.setAttribute('min', '-2');
+    input.setAttribute('max', '2');
     input.setAttribute('step', '1');
     input.style.marginLeft = '5%';
     footerItem.appendChild(input);
