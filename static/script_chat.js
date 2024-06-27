@@ -497,11 +497,44 @@ function processClientResponse(data){
     }
 }
 
+var pageLoaded = false;
+
+function checkAndEnableInput(rateResponseCompleted) {
+    const input = document.getElementById('messageInput');
+    if (input) {
+        input.disabled = !(pageLoaded && rateResponseCompleted);
+        console.log("Input state:", input.disabled ? "disabled" : "enabled");
+    }
+}
+
+function initializeInputState() {
+    const input = document.getElementById('messageInput');
+    if (input) {
+        input.disabled = true;
+    }
+    pageLoaded = false;
+    rateResponseCompleted = false;
+
+    document.addEventListener('change', function(e) {
+        if (e.target && e.target.id === `${TYPE_EMO_REFRAME}-feedback`) {
+            console.log("Rate response completed");
+            rateResponseCompleted = true;
+            checkAndEnableInput(rateResponseCompleted);
+        }
+    });
+
+    pageLoaded = true;
+    checkAndEnableInput(rateResponseCompleted);
+}
+
+
 function sendMessage() {
     var input = document.getElementById('messageInput');
     var message = input.value;
     input.value = '';
     input.disabled = true;
+    pageLoaded = false;
+    rateResponseCompleted = false;
     console.log(message)
 
     if(message.trim() === '') return;
@@ -529,7 +562,7 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         const isFinish = data.message.includes("FINISH:999");
-        if(!isFinish) {
+        if(isFinish) {
             const modal = document.querySelector('#finish-modal');
             modal.classList.add("is-active");
 
@@ -539,18 +572,23 @@ function sendMessage() {
             if (showEmo == '1') {
                 // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
                 // retrieveEmoFeedback(TYPE_EMO_SHOES);
-
                 retrieveEmoFeedback(TYPE_EMO_REFRAME);
-//                retrieveEmoFeedback(TYPE_SENTIMENT);
+               // retrieveEmoFeedback(TYPE_SENTIMENT);
             }
             processClientResponse(data);
-            input.disabled = false;
+            pageLoaded = true;
+            checkAndEnableInput(rateResponseCompleted);
         }
     })
     .catch((error) => {
         console.error('Error:', error);
+        pageLoaded = true;
+        checkAndEnableInput(rateResponseCompleted);
     });
-}
+    }
+
+window.addEventListener('load', initializeInputState);
+
 
 
 // Define a function to execute after the page loads
@@ -574,12 +612,25 @@ function fetchFirstMsg() {
         sessionStorage.setItem("show_emo", data.show_emo);
         updateQueueDisplay(data);
         processClientResponse(data);
+        pageLoaded = true;
+        checkAndEnableInput();
     })
     .catch(error => {
         // Handle any errors that occur during the request
         console.error('Error fetching data:', error);
+        pageLoaded = true;
+        checkAndEnableInput();
     });
 }
 
 // Register the fetchData function to be executed after the page loads
 window.onload = fetchFirstMsg;
+
+
+
+
+
+
+
+
+
