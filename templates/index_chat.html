@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html  class="theme-dark">
 <head>
     <meta charset="utf-8">
 <!--    <meta http-equiv="refresh" content="2;">-->
@@ -291,7 +291,7 @@
                             <h6>Rate your level of pleasure:</h6>
                             <div class="slider-container">
                                 <span class="slider-label">Negative</span>
-                                <input type="range" name="affect_valence" min="-2" max="2" step="1" value="0" class="slider">
+                                <input type="range" name="affect_valence" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
                                 <span class="slider-label">Positive</span>
                             </div>
                         </div>
@@ -299,7 +299,7 @@
                             <h6>Rate your level of energy:</h6>
                             <div class="slider-container">
                                 <span class="slider-label">Calm</span>
-                                <input type="range" name="affect_arousal" min="-2" max="2" step="1" value="0" class="slider">
+                                <input type="range" name="affect_arousal" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
                                 <span class="slider-label">Excited</span>
                             </div>
                         </div>
@@ -311,42 +311,42 @@
                             <h5>Q4. How did you feel after reading the messages from Pro-pilot?</h5>
                             <div class="slider-container">
                                 <span class="slider-label">Effective</span>
-                                <input type="range" name="support_effective" min="-2" max="2" step="1" value="0" class="slider">
+                                <input type="range" name="support_effective" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
                                 <span class="slider-label">Ineffective</span>
                             </div>
                             <div class="slider-container">
                                 <span class="slider-label">Helpful</span>
-                                <input type="range" name="support_helpful" min="-2" max="2" step="1" value="0" class="slider">
+                                <input type="range" name="support_helpful" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
                                 <span class="slider-label">Unhelpful</span>
                             </div>
                             <div class="slider-container">
                                 <span class="slider-label">Beneficial</span>
-                                <input type="range" name="support_beneficial" min="-2" max="2" step="1" value="0" class="slider">
+                                <input type="range" name="support_beneficial" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
                                 <span class="slider-label">Not Beneficial</span>
                             </div>
                             <div class="slider-container">
                                 <span class="slider-label">Adequate</span>
-                                <input type="range" name="support_adequate" min="-2" max="2" step="1" value="0" class="slider">
+                                <input type="range" name="support_adequate" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
                                 <span class="slider-label">Inadequate</span>
                             </div>
                             <div class="slider-container">
                                 <span class="slider-label">Sensitive</span>
-                                <input type="range" name="support_sensitive" min="-2" max="2" step="1" value="0" class="slider">
+                                <input type="range" name="support_sensitive" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
                                 <span class="slider-label">Insensitive</span>
                             </div>
                             <div class="slider-container">
                                 <span class="slider-label">Caring</span>
-                                <input type="range" name="support_caring" min="-2" max="2" step="1" value="0" class="slider">
+                                <input type="range" name="support_caring" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
                                 <span class="slider-label">Uncaring</span>
                             </div>
                             <div class="slider-container">
                                 <span class="slider-label">Understanding</span>
-                                <input type="range" name="support_understanding" min="-2" max="2" step="1" value="0" class="slider">
+                                <input type="range" name="support_understanding" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
                                 <span class="slider-label">Not Understanding</span>
                             </div>
                             <div class="slider-container">
                                 <span class="slider-label">Supportive</span>
-                                <input type="range" name="support_supportive" min="-2" max="2" step="1" value="0" class="slider">
+                                <input type="range" name="support_supportive" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
                                 <span class="slider-label">Unsupportive</span>
                             </div>
                         </div>
