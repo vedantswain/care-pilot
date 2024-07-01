@@ -215,7 +215,14 @@ function createSupportPane(messageText, msgClass){
     return article
 }
 
-function createFooter(support_type){
+// Rate Emopane !
+const helpfulValues = {};
+
+function updateHelpful(helpfulName, helpfulAmount) {
+    helpfulValues[helpfulName] = helpfulAmount;
+}
+
+function createFooter(support_type) {
     const footer = document.createElement('div');
     footer.classList.add('card-footer');
 
@@ -225,24 +232,125 @@ function createFooter(support_type){
     footerItem.style.alignItems = 'center';
     footerItem.style.justifyContent = 'space-between';
 
+    const sliderContainer = document.createElement('div');
+    sliderContainer.classList.add('slider-container');
+    sliderContainer.style.display = 'flex';
+    sliderContainer.style.alignItems = 'center';
+    sliderContainer.style.width = '60%';
+    sliderContainer.style.padding = '0 4px';
+
     const leftLabel = document.createElement('span');
-    leftLabel.classList.add('slider-label');
-    leftLabel.textContent = 'Rate Response';
-    footerItem.appendChild(leftLabel);
+    leftLabel.textContent = 'Helpful';
+    leftLabel.style.marginRight = '4px';
+    sliderContainer.appendChild(leftLabel);
 
     const input = document.createElement('input');
     input.id = `${support_type}-feedback`;
+    input.name = `support_${support_type}`;
     input.setAttribute('type', 'range');
-    input.classList.add('form-range');
+    input.classList.add('slider');
     input.setAttribute('min', '-2');
     input.setAttribute('max', '2');
     input.setAttribute('step', '1');
-    input.style.marginLeft = '5%';
-    footerItem.appendChild(input);
-    footer.appendChild(footerItem)
+    input.style.margin = '0 4px';
+    input.style.flex = '1';
+    input.addEventListener('input', function() {
+        updateHelpful(this.name, this.value);
+    });
+    input.addEventListener('change', function() {
+        sendFeedback(support_type, this.value);
+        this.disabled = true; // only rate once!
+    });
+    sliderContainer.appendChild(input);
 
-    return footer
+    const rightLabel = document.createElement('span');
+    rightLabel.textContent = 'Unhelpful';
+    rightLabel.style.marginLeft = '4px';
+    sliderContainer.appendChild(rightLabel);
+
+    footerItem.appendChild(sliderContainer);
+    footer.appendChild(footerItem);
+
+    // Check if user has already rated
+    checkIfRated(support_type).then(rated => {
+        if (rated) {
+            input.disabled = true;
+        }
+    });
+
+    return footer;
 }
+
+function sendFeedback(support_type, rate) {
+    const sessionId = window.location.pathname.split('/')[1];
+    const clientId = sessionStorage.getItem('client_id');
+
+    fetch(`/${sessionId}/store-emo-feedback`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            client_id: clientId,
+            rate: rate,
+            type: support_type
+        })
+    })
+    .then(response => response.json())
+    .then(data => console.log('Feedback sent:', data))
+    .catch(error => console.error('Error sending feedback:', error));
+}
+
+// only one time to rate!
+function checkIfRated(support_type) {
+    const sessionId = window.location.pathname.split('/')[1];
+    const clientId = sessionStorage.getItem('client_id');
+
+    return fetch(`/${sessionId}/check-emo-feedback`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+            client_id: clientId,
+            type: support_type
+        })
+    })
+    .then(response => response.json())
+    .then(data => data.rated)
+    .catch(error => {
+        console.error('Error checking if rated:', error);
+        return false;
+    });
+}
+// function createFooter(support_type){
+//     const footer = document.createElement('div');
+//     footer.classList.add('card-footer');
+
+//     const footerItem = document.createElement('div');
+//     footerItem.classList.add('card-footer-item');
+//     footerItem.style.display = 'flex';
+//     footerItem.style.alignItems = 'center';
+//     footerItem.style.justifyContent = 'space-between';
+
+//     const leftLabel = document.createElement('span');
+//     leftLabel.classList.add('slider-label');
+//     leftLabel.textContent = 'Rate Response';
+//     footerItem.appendChild(leftLabel);
+
+//     const input = document.createElement('input');
+//     input.id = `${support_type}-feedback`;
+//     input.setAttribute('type', 'range');
+//     input.classList.add('form-range');
+//     input.setAttribute('min', '-2');
+//     input.setAttribute('max', '2');
+//     input.setAttribute('step', '1');
+//     input.style.marginLeft = '5%';
+//     footerItem.appendChild(input);
+//     footer.appendChild(footerItem)
+
+//     return footer
+// }
 
 function designHeader(header, iconClass) {
     const p = document.createElement('p');
