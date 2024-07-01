@@ -153,8 +153,8 @@ def getReply(session_id):
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number,
-            "sender": "representative",
-            "receiver": "client",
+            "sender": "client",
+            "receiver": "representative",
             "message": response.strip(),
             "timestamp": timestamp
         })
@@ -182,8 +182,8 @@ def getReply(session_id):
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number - 1,
-            "sender": "client",
-            "receiver": "representative",
+            "sender": "representative",
+            "receiver": "client",
             "message": prompt.strip(),
             "timestamp": timestamp
         })
@@ -192,8 +192,8 @@ def getReply(session_id):
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number,
-            "sender": "representative",
-            "receiver": "client",
+            "sender": "client",
+            "receiver": "representative",
             "message": response.strip(),
             "timestamp": timestamp
         })
