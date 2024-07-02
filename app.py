@@ -146,7 +146,8 @@ def getReply(session_id):
             "grateful": val_grateful,
             "ranting": val_ranting,
             "expression": val_expression,
-            "civil": val_civil
+            "civil": val_civil,
+            "emo": show_emo
         })
 
         chat_history_collection.insert_one({
