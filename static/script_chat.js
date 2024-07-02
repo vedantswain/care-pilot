@@ -546,15 +546,16 @@ function sendMessage() {
     var input = document.getElementById('messageInput');
     var button = document.getElementById('sendButton');
     var message = input.value;
+
+    console.log(message)
+    if(message.trim() === '') return;
+
     input.value = '';
     input.disabled = true;
     button.disabled = true;
     inTaskValues = {};  // reset all flags
     messageFlags = {};  // reset all flags
 
-    console.log(message)
-
-    if(message.trim() === '') return;
 
     const chatDiv = document.getElementById('chatWindow');
     var userMessage = createMessageElement(message, "out")
