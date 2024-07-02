@@ -512,7 +512,7 @@ function sendMessage() {
     .then(response => response.json())
     .then(data => {
         const isFinish = data.message.includes("FINISH:999");
-        if(!isFinish) {
+        if(isFinish) {
             const modal = document.querySelector('#finish-modal');
             modal.classList.add("is-active");
 
