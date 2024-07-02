@@ -19,11 +19,11 @@ SUPPORT_TYPE_STRINGS = {
 
 ### Only for testing/debugging
 randomQueue = [
-    { "id": 1, "name": "Luis H.", "product": "Airline" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
-    { "id": 2, "name": "Jamal K.", "product": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
-    { "id": 3, "name": "Maria N.", "product": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
-    { "id": 4, "name": "Elijah P.", "product": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0},
-    { "id": 4, "name": "Samantha K.", "product": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 1, "info": 0, "emo": 1}
+    { "id": 1, "name": "Luis H.", "domain": "Airline" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
+    { "id": 2, "name": "Jamal K.", "domain": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
+    { "id": 3, "name": "Maria N.", "domain": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
+    { "id": 4, "name": "Elijah P.", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0},
+    { "id": 4, "name": "Samantha K.", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 1, "info": 0, "emo": 1}
 ]
 
 '''
@@ -53,6 +53,6 @@ def get_study_queue(scenario):
     random.shuffle(complaintTypes)
     for client_id in range(len(studyQueue)):
         studyQueue[client_id]['name'] = names[client_id]
-        studyQueue[client_id]['complaint'] = complaintTypes[client_id]
-        studyQueue[client_id]['product'] = scenario
+        studyQueue[client_id]['category'] = complaintTypes[client_id]
+        studyQueue[client_id]['domain'] = scenario
     return studyQueue

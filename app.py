@@ -46,6 +46,7 @@ Session(app)
 # db = client[DB_NAME]
 # print(client.list_databases())
 client = MongoClient('localhost', 27017)
+
 db = client.flask_db
 chat_task_feedback = db.chat_task_feedback
 chat_history_collection = db.chat_history_collection
@@ -61,7 +62,7 @@ clientQueue = []
 
 
 
-sender_initial = agent_sender_fewshot_twitter()
+sender_initial = agent_sender_fewshot_twitter_categorized()
 sender_agent = mAgentCustomer()
 # perspective / thoughts
 
@@ -71,6 +72,7 @@ emo_agent = mAgentER()
 ep_agent = mAgentEP()
 info_agent = mAgentInfo()
 trouble_agent = mAgentTrouble()
+
 
 
 @app.route('/')
@@ -94,8 +96,9 @@ def start_chat(scenario):
     session[session_id] = {}
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue
-    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
-  
+
+    clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    #
     return redirect(url_for('index', session_id=session_id) + clientParam)
 
 
@@ -113,7 +116,8 @@ def index(session_id):
 def getReply(session_id):
     clientQueue = session[session_id]['client_queue']
     if request.method == 'GET':
-        val_product = request.args.get('product')
+        val_domain = request.args.get('domain')
+        val_category = request.args.get('category')
         val_grateful = request.args.get('grateful')
         val_ranting = request.args.get('ranting')
         val_expression = request.args.get('expression')
@@ -122,7 +126,8 @@ def getReply(session_id):
         show_emo = request.args.get('emo')
 
         complaint_parameters = {
-            "product": val_product,
+            "domain": val_domain,
+            "category": val_category,
             "is_grateful": 'grateful' if val_grateful==0 else 'NOT grateful',
             "is_ranting": 'ranting' if val_ranting==0 else 'NOT ranting',
             "is_expression": 'expression' if val_expression==0 else 'NOT expression'
@@ -132,7 +137,7 @@ def getReply(session_id):
 
         client_id = str(uuid4())
         current_client = session[session_id]['current_client']
-        session[session_id][client_id] = {"current_client": current_client, "product": val_product, "civil": val_civil, "chat_history": []}
+        session[session_id][client_id] = {"current_client": current_client, "domain": val_domain, "category": val_category, "civil": val_civil, "chat_history": []}
         session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
         
 
@@ -142,7 +147,8 @@ def getReply(session_id):
         chat_client_info.insert_one({
             "session_id": session_id,
             "client_id": client_id,
-            "product": val_product,
+            "domain": val_domain,
+            "category": val_category,
             "grateful": val_grateful,
             "ranting": val_ranting,
             "expression": val_expression,
@@ -150,6 +156,7 @@ def getReply(session_id):
             "emo": show_emo
         })
 
+        # Inserting first complaint message
         chat_history_collection.insert_one({
             "session_id": session_id,
             "client_id": client_id,
@@ -179,6 +186,7 @@ def getReply(session_id):
         turn_number = len(chat_history) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
+        # Insert representative response
         chat_history_collection.insert_one({
             "session_id": session_id,
             "client_id": client_id,
@@ -188,7 +196,8 @@ def getReply(session_id):
             "message": prompt.strip(),
             "timestamp": timestamp
         })
-        
+
+        # Insert client reply to the response
         chat_history_collection.insert_one({
             "session_id": session_id,
             "client_id": client_id,
@@ -216,7 +225,7 @@ def update_client_queue(session_id):
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue
 
-    clientParam = f"?product={client['product']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     new_url = url_for('index', session_id=session_id) + clientParam
 
     return jsonify({"url": new_url})
@@ -235,10 +244,10 @@ def storePostSurvey(session_id):
                 data[k] = int(data[k])
         if not data:
             return jsonify({"message": "No data received"}), 400
-        
+
         data['session_id'] = session_id
         data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
-        
+
         try:
             result = chat_task_feedback.insert_one(data)
             if result.inserted_id:
@@ -350,7 +359,7 @@ def sentiment(session_id):
         turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
 
         # Perform sentiment analysis
-        sentiment_category = analyze_sentiment_transformer(reply)
+        # sentiment_category = analyze_sentiment_transformer(reply)
         sentiment_category = analyze_sentiment_decision(reply)
 
         chat_emo_feedback.insert_one({
@@ -379,7 +388,7 @@ def getInfoSupport(session_id):
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        response_cw_info = info_agent.invoke({'product': session[session_id][client_id]["product"],'complaint':reply, "chat_history": chat_history})
+        response_cw_info = info_agent.invoke({'domain': session[session_id][client_id]["domain"],'complaint':reply, "chat_history": chat_history})
         # response = response_cw_info.content
 
         return jsonify({
@@ -396,7 +405,7 @@ def getTroubleSupport(session_id):
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        response_cw_trouble = trouble_agent.invoke({'product': session[session_id][client_id]["product"],'complaint':reply, "chat_history": chat_history})
+        response_cw_trouble = trouble_agent.invoke({'domain': session[session_id][client_id]["domain"],'complaint':reply, "chat_history": chat_history})
         response = "Troubleshooting Guide:\n" + response_cw_trouble
 
         return jsonify({

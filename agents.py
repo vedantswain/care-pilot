@@ -1,4 +1,5 @@
 import os
+import random
 
 from langchain.schema import messages_from_dict, messages_to_dict
 
@@ -64,7 +65,7 @@ llminfo = lcai.AzureChatOpenAI(
 # def agent_coworker_info():
 #     client = mLangChain()
 #     prompt = Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
-#                 The representative is chatting online with a customer complaining about {product}.  \
+#                 The representative is chatting online with a customer complaining about {domain}.  \
                 
 #                 Given the chat history,
 #                 provide 2-3 hints to help the representative's response.\
@@ -84,7 +85,7 @@ llminfo = lcai.AzureChatOpenAI(
 #         [
 #             ("system", prompt),
 #             MessagesPlaceholder(variable_name="chat_history"),
-#             ("user", "{product}: {complaint}"),
+#             ("user", "{domain}: {complaint}"),
 #         ]
 #     )
 #     chain = template | client.client_completion
@@ -109,13 +110,24 @@ llminfo = lcai.AzureChatOpenAI(
 #     chain = chain | extract_cues
 
 #     return chain
-
+categories = {
+    "Service Quality": "Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.",
+    "Product Issues": "Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.",
+    "Pricing and Charges": "Financial discrepancies encountered before, during, or after the service, including overcharging, undisclosed fees, or refund problems.",
+    "Policy": "The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other categories but should have a policy in place.",
+    "Resolution": "The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and response has been received, where the customer still remains dissatisfied with the resolution."
+}
 class mAgentInfo:
     def __init__(self):
         self.info_chain = self.agent_coworker_info()
 
     def invoke(self, user_input):
-        info_cue = self.info_chain.invoke({'product':user_input['product'], 'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+        info_cue = self.info_chain.invoke({
+            'domain':user_input['domain'], 
+            'complaint':user_input['complaint'], 
+            'chat_history':user_input['chat_history'],
+            'categories': ', '.join(categories.keys()) 
+            })
 
         return info_cue
     
@@ -141,7 +153,8 @@ class mAgentInfo:
     def agent_coworker_info(self):
         client = mLangChain()
         prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
-                    The representative is chatting online with a customer complaining about {product}.  \
+                    The representative is chatting online with a customer complaining about {domain}.  \
+                    The INFORMATIONAL SUPPORT should fit into 5 categories: {categories}.\
                     
                     Given the chat history,
                     provide 2-3 hints to help the representative's response.\
@@ -155,13 +168,13 @@ class mAgentInfo:
                     Do NOT number the cues.\
                     
                     Customer message: {complaint}
-                    Hints: 
+                    Hints: {categories}
                 """
         template = ChatPromptTemplate.from_messages(
             [
                 ("system", prompt),
                 MessagesPlaceholder(variable_name="chat_history"),
-                ("user", "{product}: {complaint}"),
+                ("user", "{domain}: {complaint}"),
             ]
         )
         chain = template | client.client_completion
@@ -192,7 +205,7 @@ class mAgentInfo:
 # def agent_coworker_trouble():
 #     client = mLangChain()
 #     prompt = """Your role is to help a service representative by providing PROCEDURAL SUPPORT. \
-#                 The representative is chatting online with a customer complaining about {product}. \
+#                 The representative is chatting online with a customer complaining about {domain}. \
 #                 Given the chat history,
 #                 list 3-7 steps to guide the representative in resolving the customer complaint.\
 #                 Review the similar PROCEDURAL SUPPORT history if exist, then assess the current situation in depth and provide detailed steps for resolution\
@@ -208,7 +221,7 @@ class mAgentInfo:
 #         [
 #             ("system", prompt),
 #             MessagesPlaceholder(variable_name="chat_history"),
-#             ("user", "{product}: {complaint}"),
+#             ("user", "{domain}: {complaint}"),
 #         ]
 #     )
 #     chain = template | client.client_completion
@@ -227,14 +240,20 @@ class mAgentTrouble:
         self.trouble_chain = self.agent_coworker_trouble()
 
     def invoke(self, user_input):
-        trouble_steps = self.trouble_chain.invoke({'product':user_input['product'], 'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+        trouble_steps = self.trouble_chain.invoke({
+            'domain':user_input['domain'], 
+            'complaint':user_input['complaint'], 
+            'chat_history':user_input['chat_history'],
+            'categories': ', '.join(categories.keys()) 
+            })
 
         return trouble_steps
     
     def agent_coworker_trouble(self):
         client = mLangChain()
         prompt = """Your role is to help a service representative by providing PROCEDURAL SUPPORT. \
-                    The representative is chatting online with a customer complaining about {product}. \
+                    The representative is chatting online with a customer complaining about {domain}. \
+                    The PROCEDURAL SUPPORT should fit into 5 categories: {categories}.\
                     Given the chat history,
                     list 3-7 steps to guide the representative in resolving the customer complaint.\
                     Review the similar PROCEDURAL SUPPORT history if exist, then assess the current situation in depth and provide detailed steps for resolution\
@@ -253,13 +272,13 @@ class mAgentTrouble:
                     ... ###
                     
                     Customer message: {complaint}
-                    Troubleshooting Steps: 
+                    Troubleshooting Steps: {categories}
                 """
         template = ChatPromptTemplate.from_messages(
             [
                 ("system", prompt),
                 MessagesPlaceholder(variable_name="chat_history"),
-                ("user", "{product}: {complaint}"),
+                ("user", "{domain}: {complaint}"),
             ]
         )
         chain = template | client.client_completion
@@ -380,60 +399,90 @@ class mAgentEP:
         chain = template | client.client_completion
         return chain
 
-
-def agent_sender_fewshot_twitter():
+def agent_sender_fewshot_twitter_categorized():
     client = mLangChain()
     prompt = """Your role is to act like a customer seeking support. \
                 You are messaging a service representative via the support chat.\
                 You ONLY play the role of the customer. Do NOT play the role of the representative. \
                 Style your complaint based on your feelings. \
-                Initiate the chat with a ONLY ONE complaint message. \
-               
-                Product: Mobile Network               
+                Initiate the chat with a ONLY ONE complaint message.\
+                Ensure the complaint is concise and limited to 2 sentences.\
+                Generate a realistic initial complaint from a customer in a {domain} setting.\
+                
+                Complaints can be of the following types:\
+                - Service Quality: Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.\
+                - Product Issues: Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.\
+                - Pricing and Charges: Financial discrepancies encountered before, during, or after the service, including overcharging, undisclosed fees, or refund problems.\
+                - Policy: The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other categories but should have a policy in place.\
+                - Resolution: The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and response has been received, where the customer still remains dissatisfied with the resolution.\
+                
+                Category: Product Issues
+                Domain: Mobile Network 
                 Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
-                Complaint: O2 I received this a few weeks ago, since then I've been getting 2/3 calls a day from a telemarketer. Is someone using your name?\
-                
-                Product: Air Travel
-                Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
-                Complaint: First flight for long time with British Airways. Now over one 1h delay for the short jump FRA-LCY and NO one here to provide status updates\
-                
-                Product: Mobile Device
-                Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
-                Complaint: You‚ have paralysed my phone with your update grrrrrrrrrr\
-                
-                Product: Mobile Device
-                Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
-                Complaint:  After the 11.0.2 my phone just sucks most of the apps are broken, wifi disconnects frequently apple. Painfulupdate! \
-                
-                Product: Mobile Device
-                Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
-                Complaint:  Apple Support ios11 update - is still killing my battery within 12 hours - phone is 10 months old - it's a disgrace - used to get 2 days \
-                
-                Product: Air Travel
-                Feeling: You are NOT grateful. You are ranting. You are expressive.\
-                Complaint:  I really hope you all change but I'm sure you won't! Because you don't have to! \
-                
-                Product: Mobile Device
-                Feeling: You are NOT grateful. You are ranting. You are expressive.\
-                Complaint:  I just updated my phone and suddenly everything takes ages to load wtf this update sux I hate it fix it bye \
-                  
-                Product: Mobile Device
-                Feeling: You are NOT grateful. You are ranting. You are expressive.\
-                Complaint:  Okay I used my fucking phone for 2 minutes and it drains it down 8 fucking percent \
-                
-                Product: Mobile Device                                                     
-                Feeling: You are grateful. You are NOT ranting. You are NOT expressive.\
-                Complaint: hi #apple, I‚ have a concern about the latest ios is too slow on iphone6 and i am not happy with it. Any solution please? \
+                Complaint: Thank you AppleSupport I updated my phone and now it is even slower and barely works Thank you for ruining my phone.\
 
-                Product: Mobile App
-                Feeling: You are grateful. You are NOT ranting. You are expressive.\
-                Complaint: Please help! Spotify Premium skipping through songs constantly on android tablet  bluetooth speaker. Tried everything! \
+                Category: Product Issues
+                Domain: Airline
+                Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: SouthwestAir Why would we be receiving errors when we try to checkin Our flight takes off at 4 but we keep getting error messages.\
+
+                Categories: Product Issues
+                Domain: Airline             
+                Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: delta this has been my inflight studio experience today Nothing works except Twitter.\
                 
-                Product: Convenience Store                
+                Category: Service Quality
+                Domain: Airline            
+                Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: I really hadthe WORST experience ever from start to finish with SouthwestAir will never fly internationally again with them.\
+                
+                Category: Service Quality
+                Domain: Hotel
+                Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
+                Complaint: Fsomebody from VerizonSupport please help meeeeee  Im having the worst luck with your customer service.\
+                
+                Category: Service Quality
+                Domain: Trains
+                Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
+                Complaint: VirginTrains so i wait almost 3 hours and then they are rude and arrogant amp unhelpful after which she is raising a technical case.\
+                
+                Category: Pricing and Charges
+                Domain: Airline
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
-                Complaint: Got id'd Tesco for buying one Adnams Broadside. Is being blind part of the job-spec? I am 35 and 99 kilos. \
+                Complaint:  DELTA i booked my flight using delta amex card Checking in now amp was being charged for baggage. \
                 
-                Product: {product}
+                Category: Pricing and Charges
+                Domain: Airline 
+                Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
+                Complaint:  Im sorry what Its going to COST me 50 to transfer 4000 AA Advantage points to my spouse AmericanAir this is ridiculous.\
+                
+                Category: Pricing and Charges
+                Domain: Airline
+                Feeling: You are NOT grateful. You are ranting. You are expressive.\
+                Complaint: Categories: Pricing and Charges. \
+                
+                Category: Policy
+                Domain: Hotel
+                Feeling: You are NOT grateful. You are ranting. You are expressive.\
+                Complaint: Hey  were gonna need to talk about all these pending charges that keep going through my account 5 days after the transaction was made Im getting real irritated \
+                
+                Category: Resolution
+                Domain: Airline
+                Feeling: You are NOT grateful. You are ranting. You are expressive.\
+                Complaint:  delta  moves you to  the moment you have a  with no results Just got some   but no real reason why they changed our. \
+                
+                Category: Resolution
+                Domain: Airline                                                    
+                Feeling: You are grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: Delta why wasnt earlier flight offered when I tried to rebook not cool at all Just happened to look at moniter after deplaning.\
+
+                Category: Resolution
+                Domain: Airline   
+                Feeling: You are grateful. You are NOT ranting. You are expressive.\
+                Complaint: Hi British_Airways My flight from MANLHRBWI for Nov 3 was canceled I was excited to try your Club 787 product Only available flight is now to IAD which is a hassle but rebooked anywaymy only option Any availability in first class on BA293 for the troubles please \
+                
+                Category: {category}
+                Domain: {domain}
                 Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expression}.\
                 Complaint:
             """
@@ -444,6 +493,74 @@ def agent_sender_fewshot_twitter():
     )
     chain = template | client.client_completion
     return chain
+
+def agent_sender_fewshot_twitter():
+    client = mLangChain()
+    prompt = """Your role is to act like a customer seeking support. \
+                You are messaging a service representative via the support chat.\
+                You ONLY play the role of the customer. Do NOT play the role of the representative. \
+                Style your complaint based on your feelings. \
+                Initiate the chat with a ONLY ONE complaint message. \
+                Ensure the complaint is concise and limited to 2 sentences.\
+                Generate a realistic initial complaint from a customer in a {domain} setting.\
+                The complaint should fit into 5 categories: {categories}.\
+               
+                Domain: Mobile Network               
+                Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: O2 I received this a few weeks ago, since then I've been getting 2/3 calls a day from a telemarketer. Is someone using your name?\
+                
+                Domain: Air Travel
+                Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
+                Complaint: First flight for long time with British Airways. Now over one 1h delay for the short jump FRA-LCY and NO one here to provide status updates\
+                
+                Domain: Mobile Device
+                Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
+                Complaint: You‚ have paralysed my phone with your update grrrrrrrrrr\
+                
+                Domain: Mobile Device
+                Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
+                Complaint:  After the 11.0.2 my phone just sucks most of the apps are broken, wifi disconnects frequently apple. Painfulupdate! \
+                
+                Domain: Mobile Device
+                Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
+                Complaint:  Apple Support ios11 update - is still killing my battery within 12 hours - phone is 10 months old - it's a disgrace - used to get 2 days \
+                
+                Domain: Air Travel
+                Feeling: You are NOT grateful. You are ranting. You are expressive.\
+                Complaint:  I really hope you all change but I'm sure you won't! Because you don't have to! \
+                
+                Domain: Mobile Device
+                Feeling: You are NOT grateful. You are ranting. You are expressive.\
+                Complaint:  I just updated my phone and suddenly everything takes ages to load wtf this update sux I hate it fix it bye \
+                  
+                Domain: Mobile Device
+                Feeling: You are NOT grateful. You are ranting. You are expressive.\
+                Complaint:  Okay I used my fucking phone for 2 minutes and it drains it down 8 fucking percent \
+                
+                Domain: Mobile Device                                                     
+                Feeling: You are grateful. You are NOT ranting. You are NOT expressive.\
+                Complaint: hi #apple, I‚ have a concern about the latest ios is too slow on iphone6 and i am not happy with it. Any solution please? \
+
+                Domain: Mobile App
+                Feeling: You are grateful. You are NOT ranting. You are expressive.\
+                Complaint: Please help! Spotify Premium skipping through songs constantly on android tablet  bluetooth speaker. Tried everything! \
+                
+                Domain: Convenience Store                
+                Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
+                Complaint: Got id'd Tesco for buying one Adnams Broadside. Is being blind part of the job-spec? I am 35 and 99 kilos. \
+                
+                Domain: {domain}
+                Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expression}.\
+                Complaint:
+            """
+    template = ChatPromptTemplate.from_messages(
+        [
+            ("system", prompt),
+        ]
+    )
+    chain = template | client.client_completion
+    return chain
+
 
 class mAgentER:
     def __init__(self):
