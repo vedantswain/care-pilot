@@ -67,7 +67,7 @@ TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"
 TYPE_SENTIMENT = "Client's Sentiment"
 
 
-sender_initial = new_agent_sender_fewshot_twitter()
+sender_initial = agent_sender_fewshot_twitter_categorized()
 sender_agent = mAgentCustomer()
 # perspective / thoughts
 
@@ -104,7 +104,7 @@ def start_chat():
     current_client = client['name']
     session[session_id] = {}
     session[session_id]['current_client'] = current_client
-    clientParam = f"?domain={client['domain']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     # 
     return redirect(url_for('index', session_id=session_id) + clientParam)
 
@@ -125,6 +125,7 @@ def getReply(session_id):
     global clientQueue
     if request.method == 'GET':
         val_domain = request.args.get('domain')
+        val_category = request.args.get('category')
         val_grateful = request.args.get('grateful')
         val_ranting = request.args.get('ranting')
         val_expression = request.args.get('expression')
@@ -134,17 +135,17 @@ def getReply(session_id):
 
         complaint_parameters = {
             "domain": val_domain,
+            "category": val_category,
             "is_grateful": 'grateful' if val_grateful==0 else 'NOT grateful',
             "is_ranting": 'ranting' if val_ranting==0 else 'NOT ranting',
             "is_expression": 'expression' if val_expression==0 else 'NOT expression',
-            "categories": ', '.join(categories.keys()) 
         }
 
         response = sender_initial.invoke(complaint_parameters)
 
         client_id = str(uuid4())
         current_client = session[session_id]['current_client']
-        session[session_id][client_id] = {"current_client": current_client, "domain": val_domain, "civil": val_civil, "chat_history": []}
+        session[session_id][client_id] = {"current_client": current_client, "domain": val_domain, "category": val_category, "civil": val_civil, "chat_history": []}
         session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
         
 
@@ -155,6 +156,7 @@ def getReply(session_id):
             "session_id": session_id,
             "client_id": client_id,
             "domain": val_domain,
+            "category": val_category,
             "grateful": val_grateful,
             "ranting": val_ranting,
             "expression": val_expression,

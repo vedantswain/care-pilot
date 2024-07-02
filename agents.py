@@ -399,7 +399,7 @@ class mAgentEP:
         chain = template | client.client_completion
         return chain
 
-def new_agent_sender_fewshot_twitter():
+def agent_sender_fewshot_twitter_categorized():
     client = mLangChain()
     prompt = """Your role is to act like a customer seeking support. \
                 You are messaging a service representative via the support chat.\
@@ -408,14 +408,20 @@ def new_agent_sender_fewshot_twitter():
                 Initiate the chat with a ONLY ONE complaint message.\
                 Ensure the complaint is concise and limited to 2 sentences.\
                 Generate a realistic initial complaint from a customer in a {domain} setting.\
-                The complaint should fit into 5 categories: {categories}.\
                 
-                Categories: Product Issues
+                Complaints can be of the following types:\
+                - Service Quality: Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.\
+                - Product Issues: Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.\
+                - Pricing and Charges: Financial discrepancies encountered before, during, or after the service, including overcharging, undisclosed fees, or refund problems.\
+                - Policy: The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other categories but should have a policy in place.\
+                - Resolution: The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and response has been received, where the customer still remains dissatisfied with the resolution.\
+                
+                Category: Product Issues
                 Domain: Mobile Network 
                 Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
                 Complaint: Thank you AppleSupport I updated my phone and now it is even slower and barely works Thank you for ruining my phone.\
 
-                Categories: Product Issues
+                Category: Product Issues
                 Domain: Airline
                 Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
                 Complaint: SouthwestAir Why would we be receiving errors when we try to checkin Our flight takes off at 4 but we keep getting error messages.\
@@ -425,57 +431,57 @@ def new_agent_sender_fewshot_twitter():
                 Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
                 Complaint: delta this has been my inflight studio experience today Nothing works except Twitter.\
                 
-                Categories: Service Quality
+                Category: Service Quality
                 Domain: Airline            
                 Feeling: You are NOT grateful. You are NOT ranting. You are NOT expressive.\
                 Complaint: I really hadthe WORST experience ever from start to finish with SouthwestAir will never fly internationally again with them.\
                 
-                Categories: Service Quality
+                Category: Service Quality
                 Domain: Hotel
                 Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
                 Complaint: Fsomebody from VerizonSupport please help meeeeee  Im having the worst luck with your customer service.\
                 
-                Categories: Service Quality
+                Category: Service Quality
                 Domain: Trains
                 Feeling: You are NOT grateful. You are NOT ranting. You are expressive.\
                 Complaint: VirginTrains so i wait almost 3 hours and then they are rude and arrogant amp unhelpful after which she is raising a technical case.\
                 
-                Categories: Pricing and Charges
+                Category: Pricing and Charges
                 Domain: Airline
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
                 Complaint:  DELTA i booked my flight using delta amex card Checking in now amp was being charged for baggage. \
                 
-                Categories: Pricing and Charges
+                Category: Pricing and Charges
                 Domain: Airline 
                 Feeling: You are NOT grateful. You are ranting. You are NOT expressive.\
                 Complaint:  Im sorry what Its going to COST me 50 to transfer 4000 AA Advantage points to my spouse AmericanAir this is ridiculous.\
                 
-                Categories: Pricing and Charges
+                Category: Pricing and Charges
                 Domain: Airline
                 Feeling: You are NOT grateful. You are ranting. You are expressive.\
                 Complaint: Categories: Pricing and Charges. \
                 
-                Categories: Policy
+                Category: Policy
                 Domain: Hotel
                 Feeling: You are NOT grateful. You are ranting. You are expressive.\
                 Complaint: Hey  were gonna need to talk about all these pending charges that keep going through my account 5 days after the transaction was made Im getting real irritated \
                 
-                Categories: Resolution
+                Category: Resolution
                 Domain: Airline
                 Feeling: You are NOT grateful. You are ranting. You are expressive.\
                 Complaint:  delta  moves you to  the moment you have a  with no results Just got some   but no real reason why they changed our. \
                 
-                Categories: Resolution
+                Category: Resolution
                 Domain: Airline                                                    
                 Feeling: You are grateful. You are NOT ranting. You are NOT expressive.\
                 Complaint: Delta why wasnt earlier flight offered when I tried to rebook not cool at all Just happened to look at moniter after deplaning.\
 
-                Categories: Resolution
+                Category: Resolution
                 Domain: Airline   
                 Feeling: You are grateful. You are NOT ranting. You are expressive.\
                 Complaint: Hi British_Airways My flight from MANLHRBWI for Nov 3 was canceled I was excited to try your Club 787 product Only available flight is now to IAD which is a hassle but rebooked anywaymy only option Any availability in first class on BA293 for the troubles please \
                 
-                Categories: {categories}
+                Category: {category}
                 Domain: {domain}
                 Feeling: You are {is_grateful}. You are {is_ranting}. You are {is_expression}.\
                 Complaint:
@@ -486,7 +492,7 @@ def new_agent_sender_fewshot_twitter():
         ]
     )
     chain = template | client.client_completion
-    return chain   
+    return chain
 
 def agent_sender_fewshot_twitter():
     client = mLangChain()
