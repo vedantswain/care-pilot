@@ -1,44 +1,18 @@
-const TYPE_EMO_THOUGHT = "You might be thinking";
-const TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
-const TYPE_EMO_REFRAME = "Be Mindful of Your Emotions";
-const TYPE_SENTIMENT = "Client's Sentiment";
+const TYPE_EMO_THOUGHT = common_strings["TYPE_EMO_THOUGHT"]
+const TYPE_EMO_SHOES = common_strings["TYPE_EMO_SHOES"]
+const TYPE_EMO_REFRAME = common_strings["TYPE_EMO_REFRAME"]
+const TYPE_SENTIMENT = common_strings["TYPE_SENTIMENT"]
 
-// let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
-//     { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 1, info: 1, emo: 1},
-//     { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1, civil: 1, info: 1, emo: 0},
-//     { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1, civil: 0, info: 0, emo: 1},
-//     { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0, civil: 0, info: 0, emo: 0}
-// ];
 
-// function resetQueueToInitialState() {
-//     let initialState = [
-//         { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 1 , info: 1, emo: 1},
-//         { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1, civil: 1 , info: 1, emo: 0},
-//         { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1, civil: 0 , info: 0, emo: 1},
-//         { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0, civil: 1 , info: 1, emo: 1}
-//     ];
-
-//     userQueue = initialState;
-
-//     localStorage.setItem('userQueue', JSON.stringify(initialState));
-
-//     updateQueueDisplay();
-// }
-
-// function updateQueueBackend() {
-//     userQueue.shift();
-//     localStorage.setItem('userQueue', JSON.stringify(userQueue));
-//     updateQueueDisplay();
-// }
 
 function updateQueueDisplay(data) {
-    const queueContainer = document.querySelector('.list');
+    const queueContainer = document.querySelector('#client-queue');
     queueContainer.innerHTML = '';
 
     data.clientQueue.forEach(client => {
         const clientElement = document.createElement('div');
         clientElement.className = 'list-item box';
-        // userElement.href = `../?domain=${user.domain}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
+        // userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
         clientElement.innerHTML = `
             <div class="media">
                 <div class="media-left">
@@ -52,7 +26,7 @@ function updateQueueDisplay(data) {
                     <div class="content">
                         <p>
                             <strong>${client.name}</strong>
-                            <br><small class="has-text-weight-semibold">${client.domain}</small>
+                            <br><small class="has-text-weight-semibold">${client.complaint}</small>
                         </p>
                     </div>
                 </div>
@@ -76,6 +50,21 @@ function updateQueueDisplay(data) {
 //     }
 // }
 
+
+// secret button that used to jump into next conversation
+function confirmNextClient(sessionId) {
+    const userConfirmed = confirm("Do you want to go to the next client?");
+    if (userConfirmed) {
+        fetch(`/${sessionId}/update-clientQueue`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.url) {
+                    window.location.href = data.url;
+                }
+            })
+            .catch(error => console.error('Error:', error));
+    }
+}
 
 function createMessageElement(messageText, msgClass, messageHeader='') {
   const article = document.createElement('article');
@@ -200,32 +189,92 @@ function createSupportPane(messageText, msgClass){
     return article
 }
 
-function createFooter(support_type){
-    const footer = document.createElement('p');
+// Rate Emopane !
+var inTaskValues = {};
+var messageFlags = {};
+
+function updateInTask(inTaskName, inTaskAmount) {
+    inTaskValues[inTaskName] = inTaskAmount;
+    validateInput();
+}
+function updateFlag(flagName) {
+    messageFlags[flagName] = 1;
+    validateInput();
+}
+
+function validateInput() {
+    sliderKeysValidation = ["helpful_unhelpful"]
+    allKeysExist = sliderKeysValidation.every(key => Object.keys(inTaskValues).includes(key));
+
+    if (sessionStorage.getItem('show_emo') == 0) {
+        allKeysExist = true;    // if emo pane is not visible, then this flag should be true
+        messageFlagsValidation = ['client_response','support_trouble','support_info']
+    }
+    else{
+        messageFlagsValidation = ['client_response','support_emo_sentiment','support_emo_reframe','support_trouble','support_info']
+    }
+    allFlagsExist = messageFlagsValidation.every(key => Object.keys(messageFlags).includes(key));
+
+    if (allKeysExist && allFlagsExist){
+        var input = document.getElementById('messageInput');
+        var button = document.getElementById('sendButton');
+        input.disabled = false;
+        button.disabled = false;
+    }
+}
+
+function createFooter(support_type) {
+    const footer = document.createElement('div');
     footer.classList.add('card-footer');
 
     const footerItem = document.createElement('div');
     footerItem.classList.add('card-footer-item');
+    footerItem.style.display = 'flex';
+    footerItem.style.alignItems = 'center';
+    footerItem.style.justifyContent = 'space-between';
 
-    const label = document.createElement('label');
-    label.setAttribute('for', 'customRange3');
-    label.classList.add('form-label');
-    label.textContent = 'Rate Response';
-    footerItem.appendChild(label);
+    const sliderContainer = document.createElement('div');
+    sliderContainer.classList.add('slider-container');
+    sliderContainer.style.display = 'flex';
+    sliderContainer.style.alignItems = 'center';
+    sliderContainer.style.width = '72%';
+    sliderContainer.style.padding = '0 4px';
+
+    const leftLabel = document.createElement('span');
+    leftLabel.textContent = 'Helpful';
+    leftLabel.style.marginRight = '4px';
+    leftLabel.style.width = '4em';
+    sliderContainer.appendChild(leftLabel);
 
     const input = document.createElement('input');
     input.id = `${support_type}-feedback`;
     input.setAttribute('type', 'range');
-    input.classList.add('form-range');
-    input.setAttribute('min', '1');
-    input.setAttribute('max', '5');
+    input.classList.add('slider');
+    input.setAttribute('name','helpful_unhelpful');
+    input.setAttribute('min', '-2');
+    input.setAttribute('max', '2');
+    input.setAttribute('value', '0');
     input.setAttribute('step', '1');
-    input.style.marginLeft = '5%';
-    footerItem.appendChild(input);
-    footer.appendChild(footerItem)
+    input.style.margin = '0 4px';
+    input.style.width = '32em';
+    input.style.flex = '1';
+    input.addEventListener('input', function() {
+        updateInTask(this.name, this.value);
+    });
+    sliderContainer.appendChild(input);
 
-    return footer
+    const rightLabel = document.createElement('span');
+    rightLabel.textContent = 'Unhelpful';
+    rightLabel.style.marginLeft = '4px';
+    rightLabel.style.width = '4em';
+    sliderContainer.appendChild(rightLabel);
+
+    footerItem.appendChild(sliderContainer);
+    footer.appendChild(footerItem);
+
+    return footer;
 }
+
 
 function designHeader(header, iconClass) {
     const p = document.createElement('p');
@@ -286,6 +335,9 @@ function retrieveInfoSupport(message){
             // console.log(infoMessage);
             // infoDiv.appendChild(infoMessage);
             // document.getElementById('info-loader').remove();
+
+
+            updateFlag('support_info')
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -343,6 +395,9 @@ function retrieveEmoSupport(message, support_type){
             const sentimentPane = createSupportPane(data.message, "senti");
             card.appendChild(sentimentPane);
             designHeader(header, 'fa-people-arrows');
+
+
+            updateFlag('support_emo_sentiment')
         })
         .catch(error => console.error('Error:', error));
     }
@@ -362,26 +417,28 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
 
-        if (support_type == TYPE_EMO_SHOES) {
-                const shoesPane = createSupportPane(data.message, "emo");
-                card.appendChild(shoesPane);
+            if (support_type == TYPE_EMO_SHOES) {
+                    const shoesPane = createSupportPane(data.message, "emo");
+                    card.appendChild(shoesPane);
 
-                designHeader(header, 'fa-people-arrows');
+                    designHeader(header, 'fa-people-arrows');
 
-                footer = createFooter(support_type)
+                    footer = createFooter(support_type)
+                    card.appendChild(footer);
+                }
+            else if (support_type == TYPE_EMO_REFRAME) {
+                const thoughtPane = createSupportPane(data.message.thought, "emo");
+                const reframePane = createSupportPane(data.message.reframe, "emo");
+                card.appendChild(thoughtPane);
+                card.appendChild(reframePane);
+
+                designHeader(header, 'fa-spa');
+
+                footer = createFooter(support_type);
                 card.appendChild(footer);
+
+                updateFlag('support_emo_reframe')
             }
-        else if (support_type == TYPE_EMO_REFRAME) {
-            const thoughtPane = createSupportPane(data.message.thought, "emo");
-            const reframePane = createSupportPane(data.message.reframe, "emo");
-            card.appendChild(thoughtPane);
-            card.appendChild(reframePane);
-
-            designHeader(header, 'fa-spa');
-
-            footer = createFooter(support_type);
-            card.appendChild(footer);
-        }
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -389,14 +446,13 @@ function retrieveEmoSupport(message, support_type){
     }
 }
 
-
-function retrieveEmoFeedback(support_type) {
+function sendEmoFeedback(support_type) {
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
 
     var input = document.getElementById(`${support_type}-feedback`);
     var rate = input.value;
-    fetch(`/${sessionId}/get-emo-feedback`, {
+    fetch(`/${sessionId}/store-emo-feedback`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -447,23 +503,12 @@ function retrieveTroubleSupport(message){
             span.appendChild(icon);
             p.appendChild(span);
             header.appendChild(p);
+
+            updateFlag('support_trouble')
         })
         .catch((error) => {
             console.error('Error:', error);
         });
-}
-
-function updateClientQueue() {
-    const sessionId = window.location.pathname.split('/')[1];
-
-    fetch(`/${sessionId}/update-clientQueue`)
-    .then(response => response.json())
-    .then(data => {
-        if (data.url) {
-            window.location.href = data.url;
-        }
-    })
-    .catch(error => console.error('Error updating client queue:', error));
 }
 
 function processClientResponse(data){
@@ -473,6 +518,8 @@ function processClientResponse(data){
     chatDiv.appendChild(aiMessage);
     chatDiv.scrollTop = chatDiv.scrollHeight;
     typing.style.display = 'none';
+
+    updateFlag('client_response');
 
     if (data.show_info == '1') {
         const infoDiv = document.getElementById('co-pilot');
@@ -494,14 +541,21 @@ function processClientResponse(data){
     }
 }
 
+
 function sendMessage() {
     var input = document.getElementById('messageInput');
+    var button = document.getElementById('sendButton');
     var message = input.value;
+
+    console.log(message)
+    if(message.trim() === '') return;
+
     input.value = '';
     input.disabled = true;
-    console.log(message)
+    button.disabled = true;
+    inTaskValues = {};  // reset all flags
+    messageFlags = {};  // reset all flags
 
-    if(message.trim() === '') return;
 
     const chatDiv = document.getElementById('chatWindow');
     var userMessage = createMessageElement(message, "out")
@@ -516,6 +570,13 @@ function sendMessage() {
     const showInfo = sessionStorage.getItem('show_info');
     const showEmo = sessionStorage.getItem('show_emo');
 
+    if (showEmo == '1') {
+        // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
+        // retrieveEmoFeedback(TYPE_EMO_SHOES);
+        sendEmoFeedback(TYPE_EMO_REFRAME);
+       // retrieveEmoFeedback(TYPE_SENTIMENT);
+    }
+
     fetch(`/${sessionId}/get-reply`, {
         method: 'POST',
         headers: {
@@ -527,69 +588,29 @@ function sendMessage() {
     .then(data => {
         const isFinish = data.message.includes("FINISH:999");
         if(isFinish) {
-            const modal = document.createElement('div');
-            modal.id = 'finishModal';
-            modal.style.position = 'fixed';
-            modal.style.display = 'flex';
-            modal.style.width = '100%';
-            modal.style.height = '100%';
-            modal.style.alignContent = 'center';
-            modal.style.alignItems = 'center';
-            modal.style.backgroundColor = 'rgba(0,0,0,0.4)';
-            modal.classList.add('modal');
+            const modal = document.querySelector('#finish-modal');
+            modal.classList.add("is-active");
 
-            const modalContent = document.createElement('div');
-            modalContent.classList.add('modal-content');
-            modalContent.style.backgroundColor = 'white'; 
-            modalContent.style.padding = '20px';
-            modalContent.style.borderRadius = '5px';
-            modalContent.style.width = 'fit-content';
-            modalContent.style.flexDirection = 'column';
-            modalContent.style.justifyItems = 'center';
-
-            const value = document.createElement('p');
-            value.innerHTML = "CONVERSATION RESOLVED";
-            modalContent.appendChild(value);
-            
-            const nextButton = document.createElement('button');
-            nextButton.innerHTML = "Next";
-            nextButton.classList.add('next-button');
-            modalContent.appendChild(nextButton);
-
-
-            modal.appendChild(modalContent);
-            document.body.appendChild(modal);
-
-            nextButton.onclick = function() {
-                //update pop userQueue  from flask backend
-                updateClientQueue()
-                modal.style.display = "none";
-                document.body.removeChild(modal); 
-            };
-
-            modal.style.display = "block";
             typing.style.display = 'none';
             input.disabled = true;
         } else {
-            if (showEmo == '1') {
-                // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
-                // retrieveEmoFeedback(TYPE_EMO_SHOES);
-
-                retrieveEmoFeedback(TYPE_EMO_REFRAME);
-//                retrieveEmoFeedback(TYPE_SENTIMENT);
-            }
             processClientResponse(data);
-            input.disabled = false;
         }
     })
     .catch((error) => {
         console.error('Error:', error);
     });
-}
+    }
+
 
 
 // Define a function to execute after the page loads
 function fetchFirstMsg() {
+    var input = document.getElementById('messageInput');
+    var button = document.getElementById('sendButton');
+    input.disabled = true;
+    button.disabled = true;
+
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = window.location.pathname.split('/')[1];
 
@@ -618,3 +639,12 @@ function fetchFirstMsg() {
 
 // Register the fetchData function to be executed after the page loads
 window.onload = fetchFirstMsg;
+
+
+
+
+
+
+
+
+

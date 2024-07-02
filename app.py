@@ -16,7 +16,9 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
-from sentiment import analyze_sentiment_transformer
+from sentiment import analyze_sentiment_transformer, analyze_sentiment_decision
+
+import config as common
 
 from dotenv import load_dotenv
 from uuid import uuid4
@@ -46,6 +48,7 @@ Session(app)
 client = MongoClient('localhost', 27017)
 
 db = client.flask_db
+chat_task_feedback = db.chat_task_feedback
 chat_history_collection = db.chat_history_collection
 chat_client_info = db.chat_client_info
 chat_emo_feedback = db.chat_emo_feedback
@@ -53,18 +56,10 @@ chat_emo_feedback = db.chat_emo_feedback
 sender_agent = None
 chat_history = [
 ]
-initQueue = [
-    { "id": 1, "name": "Lucy", "domain": "Airline" , "grateful": 0, "ranting": 0, "expression":0, "civil": 0, "info": 1, "emo": 1},
-    { "id": 2, "name": "Esther", "domain": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
-    { "id": 3, "name": "Peter", "domain": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
-    { "id": 4, "name": "Joseph", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0}
-]
-clientQueue = initQueue.copy()
 
-TYPE_EMO_THOUGHT = "You might be thinking"
-TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
-TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"
-TYPE_SENTIMENT = "Client's Sentiment"
+# clientQueue = common.randomQueue.copy()
+clientQueue = []
+
 
 
 sender_initial = agent_sender_fewshot_twitter_categorized()
@@ -78,34 +73,32 @@ ep_agent = mAgentEP()
 info_agent = mAgentInfo()
 trouble_agent = mAgentTrouble()
 
-#limitation_agent = limitation_sender_zeroshot()
 
-categories = {
-    "Service Quality": "Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.",
-    "Product Issues": "Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.",
-    "Pricing and Charges": "Financial discrepancies encountered before, during, or after the service, including overcharging, undisclosed fees, or refund problems.",
-    "Policy": "The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other categories but should have a policy in place.",
-    "Resolution": "The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and response has been received, where the customer still remains dissatisfied with the resolution."
-}
 
 @app.route('/')
 def hello():
     return render_template('landing.html')
 
-@app.route('/chat')
-def start_chat(): 
+@app.route('/launch')
+def launch():
+    return render_template('launch.html')
+
+@app.route('/chat/<scenario>/')
+def start_chat(scenario):
     global clientQueue
     if not clientQueue:
-        clientQueue = initQueue
-    random.shuffle(clientQueue)
+        # clientQueue = common.randomQueue
+        clientQueue = common.get_study_queue(scenario)
+    # random.shuffle(clientQueue)
     client = clientQueue.pop(0)
     session_id = str(uuid4())   ### unique to each user/participant/representative
-    # 
     current_client = client['name']
     session[session_id] = {}
     session[session_id]['current_client'] = current_client
+    session[session_id]['client_queue'] = clientQueue
+
     clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
-    # 
+    #
     return redirect(url_for('index', session_id=session_id) + clientParam)
 
 
@@ -116,13 +109,12 @@ def index(session_id):
     else:
         current_client = 'Guest'
 
-    return render_template('index_chat.html', session_id=session_id, current_client=current_client)
-
+    return render_template('index_chat.html', session_id=session_id, current_client=current_client, common_strings=common.SUPPORT_TYPE_STRINGS)
 
 
 @app.route('/<session_id>/get-reply', methods=['GET','POST'])
 def getReply(session_id):
-    global clientQueue
+    clientQueue = session[session_id]['client_queue']
     if request.method == 'GET':
         val_domain = request.args.get('domain')
         val_category = request.args.get('category')
@@ -138,7 +130,7 @@ def getReply(session_id):
             "category": val_category,
             "is_grateful": 'grateful' if val_grateful==0 else 'NOT grateful',
             "is_ranting": 'ranting' if val_ranting==0 else 'NOT ranting',
-            "is_expression": 'expression' if val_expression==0 else 'NOT expression',
+            "is_expression": 'expression' if val_expression==0 else 'NOT expression'
         }
 
         response = sender_initial.invoke(complaint_parameters)
@@ -160,15 +152,17 @@ def getReply(session_id):
             "grateful": val_grateful,
             "ranting": val_ranting,
             "expression": val_expression,
-            "civil": val_civil
+            "civil": val_civil,
+            "emo": show_emo
         })
 
+        # Inserting first complaint message
         chat_history_collection.insert_one({
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number,
-            "sender": "representative",
-            "receiver": "client",
+            "sender": "client",
+            "receiver": "representative",
             "message": response.strip(),
             "timestamp": timestamp
         })
@@ -192,22 +186,24 @@ def getReply(session_id):
         turn_number = len(chat_history) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
+        # Insert representative response
         chat_history_collection.insert_one({
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number - 1,
-            "sender": "client",
-            "receiver": "representative",
+            "sender": "representative",
+            "receiver": "client",
             "message": prompt.strip(),
             "timestamp": timestamp
         })
-        
+
+        # Insert client reply to the response
         chat_history_collection.insert_one({
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number,
-            "sender": "representative",
-            "receiver": "client",
+            "sender": "client",
+            "receiver": "representative",
             "message": response.strip(),
             "timestamp": timestamp
         })
@@ -223,23 +219,55 @@ def getReply(session_id):
 
 @app.route('/<session_id>/update-clientQueue')
 def update_client_queue(session_id):
-    global clientQueue
-    if not clientQueue:
-        clientQueue = initQueue.copy()
-    client = clientQueue.pop(0) 
-    clientParam = f"?domain={client['domain']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientQueue = session[session_id]['client_queue']
+    client = clientQueue.pop(0)
+    current_client = client['name']
+    session[session_id]['current_client'] = current_client
+    session[session_id]['client_queue'] = clientQueue
+
+    clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     new_url = url_for('index', session_id=session_id) + clientParam
 
     return jsonify({"url": new_url})
 
-@app.route('/<session_id>/get-emo-feedback', methods=['POST'])
-def getEmoFeedback(session_id):
+# End-point to test the survey HTML
+@app.route('/<session_id>/post-task-survey')
+def getSurvey(session_id):
+    return render_template('feedback.html', session_id=session_id)
+
+@app.route('/<session_id>/store-survey', methods=['POST'])
+def storePostSurvey(session_id):
+    if session_id in session:
+        data = request.get_json()
+        for k in data:  # Convert string values into integers
+            if k != "client_id":
+                data[k] = int(data[k])
+        if not data:
+            return jsonify({"message": "No data received"}), 400
+
+        data['session_id'] = session_id
+        data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
+
+        try:
+            result = chat_task_feedback.insert_one(data)
+            if result.inserted_id:
+                return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+            else:
+                return jsonify({"message": "Failed to save data"}), 500
+        except Exception as e:
+            return jsonify({"message": str(e)}), 500
+    else:
+        return jsonify({"message": "Invalid session or session expired"}), 400
+
+
+@app.route('/<session_id>/store-emo-feedback', methods=['POST'])
+def storeEmoFeedback(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
         rate = request.json.get("rate")
         support_type = request.json.get("type")
 
-        turn_number = len(session[session_id][client_id]["chat_history"]) // 2
+        turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
         query = {
@@ -275,7 +303,7 @@ def getEmoSupport(session_id):
         turn_number = len(chat_history) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-        if support_type==TYPE_EMO_REFRAME:
+        if support_type==common.TYPE_EMO_REFRAME:
             response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
             thought = response_cw_emo['thought']
             reframe = response_cw_emo['reframe']
@@ -303,7 +331,7 @@ def getEmoSupport(session_id):
                     'reframe': reframe
                 }
             })
-        elif support_type==TYPE_EMO_SHOES:
+        elif support_type==common.TYPE_EMO_SHOES:
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
             chat_emo_feedback.insert_one({
@@ -331,7 +359,8 @@ def sentiment(session_id):
         turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
 
         # Perform sentiment analysis
-        sentiment_category = analyze_sentiment_transformer(reply)
+        # sentiment_category = analyze_sentiment_transformer(reply)
+        sentiment_category = analyze_sentiment_decision(reply)
 
         chat_emo_feedback.insert_one({
             "session_id": session_id,
