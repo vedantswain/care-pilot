@@ -190,10 +190,37 @@ function createSupportPane(messageText, msgClass){
 }
 
 // Rate Emopane !
-const inTaskValues = {};
+var inTaskValues = {};
+var messageFlags = {};
 
 function updateInTask(inTaskName, inTaskAmount) {
     inTaskValues[inTaskName] = inTaskAmount;
+    validateInput();
+}
+function updateFlag(flagName) {
+    messageFlags[flagName] = 1;
+    validateInput();
+}
+
+function validateInput() {
+    sliderKeysValidation = ["helpful_unhelpful"]
+    allKeysExist = sliderKeysValidation.every(key => Object.keys(inTaskValues).includes(key));
+
+    if (sessionStorage.getItem('show_emo') == 0) {
+        allKeysExist = true;    // if emo pane is not visible, then this flag should be true
+        messageFlagsValidation = ['client_response','support_trouble','support_info']
+    }
+    else{
+        messageFlagsValidation = ['client_response','support_emo_sentiment','support_emo_reframe','support_trouble','support_info']
+    }
+    allFlagsExist = messageFlagsValidation.every(key => Object.keys(messageFlags).includes(key));
+
+    if (allKeysExist && allFlagsExist){
+        var input = document.getElementById('messageInput');
+        var button = document.getElementById('sendButton');
+        input.disabled = false;
+        button.disabled = false;
+    }
 }
 
 function createFooter(support_type) {
@@ -221,9 +248,9 @@ function createFooter(support_type) {
 
     const input = document.createElement('input');
     input.id = `${support_type}-feedback`;
-    input.name = `support_${support_type}`;
     input.setAttribute('type', 'range');
     input.classList.add('slider');
+    input.setAttribute('name','helpful_unhelpful');
     input.setAttribute('min', '-2');
     input.setAttribute('max', '2');
     input.setAttribute('value', '0');
@@ -308,6 +335,9 @@ function retrieveInfoSupport(message){
             // console.log(infoMessage);
             // infoDiv.appendChild(infoMessage);
             // document.getElementById('info-loader').remove();
+
+
+            updateFlag('support_info')
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -365,6 +395,9 @@ function retrieveEmoSupport(message, support_type){
             const sentimentPane = createSupportPane(data.message, "senti");
             card.appendChild(sentimentPane);
             designHeader(header, 'fa-people-arrows');
+
+
+            updateFlag('support_emo_sentiment')
         })
         .catch(error => console.error('Error:', error));
     }
@@ -384,26 +417,28 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
 
-        if (support_type == TYPE_EMO_SHOES) {
-                const shoesPane = createSupportPane(data.message, "emo");
-                card.appendChild(shoesPane);
+            if (support_type == TYPE_EMO_SHOES) {
+                    const shoesPane = createSupportPane(data.message, "emo");
+                    card.appendChild(shoesPane);
 
-                designHeader(header, 'fa-people-arrows');
+                    designHeader(header, 'fa-people-arrows');
 
-                footer = createFooter(support_type)
+                    footer = createFooter(support_type)
+                    card.appendChild(footer);
+                }
+            else if (support_type == TYPE_EMO_REFRAME) {
+                const thoughtPane = createSupportPane(data.message.thought, "emo");
+                const reframePane = createSupportPane(data.message.reframe, "emo");
+                card.appendChild(thoughtPane);
+                card.appendChild(reframePane);
+
+                designHeader(header, 'fa-spa');
+
+                footer = createFooter(support_type);
                 card.appendChild(footer);
+
+                updateFlag('support_emo_reframe')
             }
-        else if (support_type == TYPE_EMO_REFRAME) {
-            const thoughtPane = createSupportPane(data.message.thought, "emo");
-            const reframePane = createSupportPane(data.message.reframe, "emo");
-            card.appendChild(thoughtPane);
-            card.appendChild(reframePane);
-
-            designHeader(header, 'fa-spa');
-
-            footer = createFooter(support_type);
-            card.appendChild(footer);
-        }
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -468,6 +503,8 @@ function retrieveTroubleSupport(message){
             span.appendChild(icon);
             p.appendChild(span);
             header.appendChild(p);
+
+            updateFlag('support_trouble')
         })
         .catch((error) => {
             console.error('Error:', error);
@@ -481,6 +518,8 @@ function processClientResponse(data){
     chatDiv.appendChild(aiMessage);
     chatDiv.scrollTop = chatDiv.scrollHeight;
     typing.style.display = 'none';
+
+    updateFlag('client_response');
 
     if (data.show_info == '1') {
         const infoDiv = document.getElementById('co-pilot');
@@ -502,44 +541,17 @@ function processClientResponse(data){
     }
 }
 
-var pageLoaded = false;
-
-function checkAndEnableInput(rateResponseCompleted) {
-    const input = document.getElementById('messageInput');
-    if (input) {
-        input.disabled = !(pageLoaded && rateResponseCompleted);
-        console.log("Input state:", input.disabled ? "disabled" : "enabled");
-    }
-}
-
-function initializeInputState() {
-    const input = document.getElementById('messageInput');
-    if (input) {
-        input.disabled = true;
-    }
-    pageLoaded = false;
-    rateResponseCompleted = false;
-
-    document.addEventListener('change', function(e) {
-        if (e.target && e.target.id === `${TYPE_EMO_REFRAME}-feedback`) {
-            console.log("Rate response completed");
-            rateResponseCompleted = true;
-            checkAndEnableInput(rateResponseCompleted);
-        }
-    });
-
-    pageLoaded = true;
-    checkAndEnableInput(rateResponseCompleted);
-}
-
 
 function sendMessage() {
     var input = document.getElementById('messageInput');
+    var button = document.getElementById('sendButton');
     var message = input.value;
     input.value = '';
     input.disabled = true;
-    pageLoaded = false;
-    rateResponseCompleted = false;
+    button.disabled = true;
+    inTaskValues = {};  // reset all flags
+    messageFlags = {};  // reset all flags
+
     console.log(message)
 
     if(message.trim() === '') return;
@@ -560,7 +572,7 @@ function sendMessage() {
     if (showEmo == '1') {
         // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
         // retrieveEmoFeedback(TYPE_EMO_SHOES);
-        retrieveEmoFeedback(TYPE_EMO_REFRAME);
+        sendEmoFeedback(TYPE_EMO_REFRAME);
        // retrieveEmoFeedback(TYPE_SENTIMENT);
     }
 
@@ -582,23 +594,22 @@ function sendMessage() {
             input.disabled = true;
         } else {
             processClientResponse(data);
-            pageLoaded = true;
-            checkAndEnableInput(rateResponseCompleted);
         }
     })
     .catch((error) => {
         console.error('Error:', error);
-        pageLoaded = true;
-        checkAndEnableInput(rateResponseCompleted);
     });
     }
-
-window.addEventListener('load', initializeInputState);
 
 
 
 // Define a function to execute after the page loads
 function fetchFirstMsg() {
+    var input = document.getElementById('messageInput');
+    var button = document.getElementById('sendButton');
+    input.disabled = true;
+    button.disabled = true;
+
     const urlParams = new URLSearchParams(window.location.search);
     const sessionId = window.location.pathname.split('/')[1];
 
@@ -618,14 +629,10 @@ function fetchFirstMsg() {
         sessionStorage.setItem("show_emo", data.show_emo);
         updateQueueDisplay(data);
         processClientResponse(data);
-        pageLoaded = true;
-        checkAndEnableInput();
     })
     .catch(error => {
         // Handle any errors that occur during the request
         console.error('Error fetching data:', error);
-        pageLoaded = true;
-        checkAndEnableInput();
     });
 }
 
