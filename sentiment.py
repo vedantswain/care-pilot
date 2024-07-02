@@ -111,15 +111,29 @@ To increase the diversity of my evaluation, I added the following code:
 '''
 def analyze_sentiment_decision(client_latest_response):
     """Analyze sentiment and decide based on conditions."""
+    nltk_result = analyze_sentiment_nltk(client_latest_response)
     textblob_result = analyze_sentiment_textblob(client_latest_response)
     transformers_result = analyze_sentiment_transformer(client_latest_response)
 
-    if "Negative" in textblob_result and "Negative" in transformers_result:
-        return textblob_result
-    elif "Neutral" in textblob_result:
-        return textblob_result
-    else:
-        return transformers_result
+    sentiment_dict = {
+        "Very Positive": 3,
+        "Positive": 2,
+        "Slightly Positive": 1,
+        "Neutral": 0,
+        "Slightly Negative": -1,
+        "Negative": -2,
+        "Very Negative": -3
+    }
+
+    average_score = (sentiment_dict[nltk_result] + sentiment_dict[textblob_result] + sentiment_dict[transformers_result])/3
+    label_score = round(average_score)
+
+    for key in sentiment_dict:
+        print(key)
+        if sentiment_dict[key] == label_score:
+            return key
+    return label_score
+
 
 # if __name__ == "__main__":
 #     test_queries = [

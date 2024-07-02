@@ -288,7 +288,7 @@ pre {
 
 
 .negative {
-  background-color: #F6347; /* Example green color */
+  background-color: #f67b52; /* Example green color */
 }
 
 .very-negative {
@@ -304,6 +304,7 @@ pre {
 .slider-container span {
     width: 8em;
 }
+
 
 .slider {
   -webkit-appearance: none;

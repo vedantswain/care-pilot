@@ -16,7 +16,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
-from sentiment import analyze_sentiment_transformer
+from sentiment import analyze_sentiment_transformer, analyze_sentiment_decision
 
 import config as common
 
@@ -146,15 +146,16 @@ def getReply(session_id):
             "grateful": val_grateful,
             "ranting": val_ranting,
             "expression": val_expression,
-            "civil": val_civil
+            "civil": val_civil,
+            "emo": show_emo
         })
 
         chat_history_collection.insert_one({
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number,
-            "sender": "representative",
-            "receiver": "client",
+            "sender": "client",
+            "receiver": "representative",
             "message": response.strip(),
             "timestamp": timestamp
         })
@@ -182,8 +183,8 @@ def getReply(session_id):
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number - 1,
-            "sender": "client",
-            "receiver": "representative",
+            "sender": "representative",
+            "receiver": "client",
             "message": prompt.strip(),
             "timestamp": timestamp
         })
@@ -192,8 +193,8 @@ def getReply(session_id):
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number,
-            "sender": "representative",
-            "receiver": "client",
+            "sender": "client",
+            "receiver": "representative",
             "message": response.strip(),
             "timestamp": timestamp
         })
@@ -257,7 +258,7 @@ def storeEmoFeedback(session_id):
         rate = request.json.get("rate")
         support_type = request.json.get("type")
 
-        turn_number = len(session[session_id][client_id]["chat_history"]) // 2
+        turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
         query = {
@@ -350,6 +351,7 @@ def sentiment(session_id):
 
         # Perform sentiment analysis
         sentiment_category = analyze_sentiment_transformer(reply)
+        sentiment_category = analyze_sentiment_decision(reply)
 
         chat_emo_feedback.insert_one({
             "session_id": session_id,

@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html>
+<html  class="theme-dark">
 <head>
     <meta charset="utf-8">
 <!--    <meta http-equiv="refresh" content="2;">-->
@@ -16,6 +16,7 @@
             width: 32em;
             align-self: flex-end;
         }
+
     </style>
     <script src="https://cdn.jsdelivr.net/npm/marked@12.0.1/lib/marked.umd.min.js"></script>
     <script type="text/javascript">
@@ -23,304 +24,326 @@
         console.log(common_strings)
     </script>
     <script src="{{ url_for('static', filename='script_chat.js') }}"></script>
+    <script>
+        function confirmNextClient(sessionId) {
+            const userConfirmed = confirm("Do you want to go to the next client?");
+            if (userConfirmed) {
+                fetch(`/${sessionId}/update-clientQueue`)
+                    .then(response => response.json())
+                    .then(data => {
+                        if (data.url) {
+                            window.location.href = data.url;
+                        }
+                    })
+                    .catch(error => console.error('Error:', error));
+            }
+        }
+    </script>
 </head>
 <body>
 
-<!--sidebar-left-->
-<div class="columns is-mobile">
-    <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-user hero is-fullheight">
+    <button class="button is-danger is-light" onclick="confirmNextClient('{{ session_id }}')">
+        Red Sun
+    </button>
 
-        <div>
-            <div style="margin-top: 8%; margin-left: 5%;">
-                <p>
-                    <strong>Queue</strong>
-                </p>
+
+
+    <!--sidebar-left-->
+    <div class="columns is-mobile">
+        <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-user hero is-fullheight">
+
+            <div>
+                <div style="margin-top: 8%; margin-left: 5%;">
+                    <p>
+                        <strong>Queue</strong>
+                    </p>
+                </div>
             </div>
-        </div>
 
-       <div class="list" id="client-queue">
-            <!-- <a class="list-item box" href="../?product=pizza&grateful=0&ranting=0&expression=0">
-                <div class="media">
-                    <div class="media-left">
-                        <figure class="image is-48x48 is-32x32-mobile">
-                            <img src="https://via.placeholder.com/150" alt="Image" class="is-rounded">
-                        </figure>
-                    </div>
-                    <div class="media-content is-hidden-mobile">
-                        <div class="content">
-                            <p>
-                                <strong>User's Name</strong>
-                                <br><small class="has-text-weight-semibold">1 new message</small>
-                                <br><small>Pizza</small>
-                            </p>
+           <div class="list" id="client-queue">
+                <!-- <a class="list-item box" href="../?product=pizza&grateful=0&ranting=0&expression=0">
+                    <div class="media">
+                        <div class="media-left">
+                            <figure class="image is-48x48 is-32x32-mobile">
+                                <img src="https://via.placeholder.com/150" alt="Image" class="is-rounded">
+                            </figure>
+                        </div>
+                        <div class="media-content is-hidden-mobile">
+                            <div class="content">
+                                <p>
+                                    <strong>User's Name</strong>
+                                    <br><small class="has-text-weight-semibold">1 new message</small>
+                                    <br><small>Pizza</small>
+                                </p>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </a> -->
-       </div>
-       <div id="troubleWindow" style="padding: 32px 32px 16px 16px;">
-       </div>
-    </div>
+                </a> -->
+           </div>
+           <div id="troubleWindow" style="padding: 32px 32px 16px 16px;">
+           </div>
+        </div>
 
 
-    <div class="column is-6-desktop is-4-tablet is-8-mobile is-paddingless">
-        <nav class="navbar has-shadow user-nav">
-            <div class="navbar-start">
-                <div class="media">
-                    <div class="media-left">
-                        <p>
-                            <span class="icon is-medium">
-                                <i class="fa-solid fa-headset"></i>
-                            </span>
-                        </p>
+        <div class="column is-6-desktop is-4-tablet is-8-mobile is-paddingless">
+            <nav class="navbar has-shadow user-nav">
+                <div class="navbar-start">
+                    <div class="media">
+                        <div class="media-left">
+                            <p>
+                                <span class="icon is-medium">
+                                    <i class="fa-solid fa-headset"></i>
+                                </span>
+                            </p>
+                        </div>
+                        <div class="media-content">
+                            <div class="content">
+                                <p>
+                                    <strong>{{current_client}}</strong>
+                                    <br>
+                                    <small>online</small>
+                                </p>
+                            </div>
+                        </div>
+                        <span id="typing" class="typing"></span>
                     </div>
+                </div>
+                <!-- <div class="navbar-end">
                     <div class="media-content">
                         <div class="content">
-                            <p>
-                                <strong>{{current_client}}</strong>
-                                <br>
-                                <small>online</small>
-                            </p>
-                        </div>
-                    </div>
-                    <span id="typing" class="typing"></span>
-                </div>
-            </div>
-            <!-- <div class="navbar-end">
-                <div class="media-content">
-                    <div class="content">
-                        <div style="display: flex"> 
-                        </div>
-                    </div>
-                </div>
-            </div> -->
-<!--            <div class="navbar-end">-->
-<!--                <a class="navbar-item">-->
-<!--						<span class="icon is-size-2">-->
-<!--							<svg class="bi bi-gear-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">-->
-<!--								<path fill-rule="evenodd" d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 01-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 01.872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 012.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 012.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 01.872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 01-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 01-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 100-5.86 2.929 2.929 0 000 5.858z" clip-rule="evenodd"/>-->
-<!--							</svg>-->
-<!--						</span>-->
-<!--                </a>-->
-<!--                <a class="navbar-item">-->
-<!--						<span class="icon is-size-2">-->
-<!--							<svg class="bi bi-info-circle-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">-->
-<!--								<path fill-rule="evenodd" d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>-->
-<!--							</svg>-->
-<!--						</span>-->
-<!--                </a>-->
-<!--            </div>-->
-        </nav>
-
-        <!-- Main Content columns: One for chat window another for profile -->
-        <div class="columns">
-            <div class="column is-12 is-12-mobile is-flex hero is-fullheight message-window">
-
-                    <div class="flex-item-1" id="chatWindow" style=" width: 100%; display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 55vh;">
-                        <!--                    <article class="message is-warning msg-incoming">-->
-                        <!--                        <div class="message-body">-->
-                        <!--                            {{ initial_msg }}-->
-                        <!--                        </div>-->
-                        <!--                    </article>-->
-                        <!--                    <article class="message is-dark msg-outgoing">-->
-                        <!--                        <div class="message-body">-->
-                        <!--                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.-->
-                        <!--                        </div>-->
-                        <!--                    </article>-->
-                    </div>
-                    <div class="flex-item-2">
-                        <div id="co-pilot">
-                        </div>
-
-                        <form onsubmit="sendMessage(); return false;">
-                            <div class="field has-addons">
-                                <div class="control">
-                                    <textarea class="textarea" type="text" placeholder="Type your message..." id="messageInput"></textarea>
-                                </div>
-                                <div class="control">
-                                    <button type="submit" class="button" id="sendButton" onclick="sendMessage()">
-                                        <svg height="36px" width="36px" viewBox="0 0 36 36"><g fill="none" fill-rule="evenodd"><g><polygon points="0 36 36 36 36 0 0 0"></polygon><path d="M31.1059281,19.4468693 L10.3449666,29.8224462 C8.94594087,30.5217547 7.49043432,29.0215929 8.17420251,27.6529892 C8.17420251,27.6529892 10.7473302,22.456697 11.4550902,21.0955966 C12.1628503,19.7344961 12.9730756,19.4988922 20.4970248,18.5264632 C20.7754304,18.4904474 21.0033531,18.2803547 21.0033531,17.9997309 C21.0033531,17.7196073 20.7754304,17.5095146 20.4970248,17.4734988 C12.9730756,16.5010698 12.1628503,16.2654659 11.4550902,14.9043654 C10.7473302,13.5437652 8.17420251,8.34697281 8.17420251,8.34697281 C7.49043432,6.9788693 8.94594087,5.47820732 10.3449666,6.1775158 L31.1059281,16.553593 C32.298024,17.1488555 32.298024,18.8511065 31.1059281,19.4468693" fill="#363636"></path></g></g></svg>
-                                    </button>
-                                </div>
+                            <div style="display: flex">
                             </div>
-                        </form>
+                        </div>
                     </div>
+                </div> -->
+    <!--            <div class="navbar-end">-->
+    <!--                <a class="navbar-item">-->
+    <!--						<span class="icon is-size-2">-->
+    <!--							<svg class="bi bi-gear-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">-->
+    <!--								<path fill-rule="evenodd" d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 01-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311c.446.82.023 1.841-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 01.872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 012.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 012.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 01.872-2.105l.34-.1c1.4-.413 1.4-2.397 0-2.81l-.34-.1a1.464 1.464 0 01-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 01-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 100-5.86 2.929 2.929 0 000 5.858z" clip-rule="evenodd"/>-->
+    <!--							</svg>-->
+    <!--						</span>-->
+    <!--                </a>-->
+    <!--                <a class="navbar-item">-->
+    <!--						<span class="icon is-size-2">-->
+    <!--							<svg class="bi bi-info-circle-fill" width="1em" height="1em" viewBox="0 0 16 16" fill="currentColor" xmlns="http://www.w3.org/2000/svg">-->
+    <!--								<path fill-rule="evenodd" d="M8 16A8 8 0 108 0a8 8 0 000 16zm.93-9.412l-2.29.287-.082.38.45.083c.294.07.352.176.288.469l-.738 3.468c-.194.897.105 1.319.808 1.319.545 0 1.178-.252 1.465-.598l.088-.416c-.2.176-.492.246-.686.246-.275 0-.375-.193-.304-.533L8.93 6.588zM8 5.5a1 1 0 100-2 1 1 0 000 2z" clip-rule="evenodd"/>-->
+    <!--							</svg>-->
+    <!--						</span>-->
+    <!--                </a>-->
+    <!--            </div>-->
+            </nav>
 
+            <!-- Main Content columns: One for chat window another for profile -->
+            <div class="columns">
+                <div class="column is-12 is-12-mobile is-flex hero is-fullheight message-window">
+
+                        <div class="flex-item-1" id="chatWindow" style=" width: 100%; display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 55vh;">
+                            <!--                    <article class="message is-warning msg-incoming">-->
+                            <!--                        <div class="message-body">-->
+                            <!--                            {{ initial_msg }}-->
+                            <!--                        </div>-->
+                            <!--                    </article>-->
+                            <!--                    <article class="message is-dark msg-outgoing">-->
+                            <!--                        <div class="message-body">-->
+                            <!--                            Lorem ipsum dolor sit amet, consectetur adipiscing elit. <strong>Pellentesque risus mi</strong>, tempus quis placerat ut, porta nec nulla. Vestibulum rhoncus ac ex sit amet fringilla. Nullam gravida purus diam, et dictum <a>felis venenatis</a> efficitur. Aenean ac <em>eleifend lacus</em>, in mollis lectus. Donec sodales, arcu et sollicitudin porttitor, tortor urna tempor ligula, id porttitor mi magna a neque. Donec dui urna, vehicula et sem eget, facilisis sodales sem.-->
+                            <!--                        </div>-->
+                            <!--                    </article>-->
+                        </div>
+                        <div class="flex-item-2">
+                            <div id="co-pilot">
+                            </div>
+
+                            <form onsubmit="sendMessage(); return false;">
+                                <div class="field has-addons">
+                                    <div class="control">
+                                        <textarea class="textarea" type="text" placeholder="Type your message..." id="messageInput"></textarea>
+                                    </div>
+                                    <div class="control">
+                                        <button type="submit" class="button" id="sendButton" onclick="sendMessage()">
+                                            <svg height="36px" width="36px" viewBox="0 0 36 36"><g fill="none" fill-rule="evenodd"><g><polygon points="0 36 36 36 36 0 0 0"></polygon><path d="M31.1059281,19.4468693 L10.3449666,29.8224462 C8.94594087,30.5217547 7.49043432,29.0215929 8.17420251,27.6529892 C8.17420251,27.6529892 10.7473302,22.456697 11.4550902,21.0955966 C12.1628503,19.7344961 12.9730756,19.4988922 20.4970248,18.5264632 C20.7754304,18.4904474 21.0033531,18.2803547 21.0033531,17.9997309 C21.0033531,17.7196073 20.7754304,17.5095146 20.4970248,17.4734988 C12.9730756,16.5010698 12.1628503,16.2654659 11.4550902,14.9043654 C10.7473302,13.5437652 8.17420251,8.34697281 8.17420251,8.34697281 C7.49043432,6.9788693 8.94594087,5.47820732 10.3449666,6.1775158 L31.1059281,16.553593 C32.298024,17.1488555 32.298024,18.8511065 31.1059281,19.4468693" fill="#363636"></path></g></g></svg>
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+
+                </div>
             </div>
         </div>
+
+        <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-profile is-fullheight" style="display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 100vh; margin-right: 4em;">
+
+            <div id="supportWindow" style="padding: 32px 32px 16px 16px;">
+    <!--            <article class="message is-primary msg-primary">-->
+    <!--                <div class="message-header">-->
+    <!--                    REFRAME CLIENT-->
+    <!--                </div>-->
+    <!--                <pre class="message-body">-->
+    <!--                                    {{ initial_emo_reframe }}-->
+    <!--                                </pre>-->
+    <!--            </article>-->
+    <!--            <article class="message is-primary msg-primary">-->
+    <!--                <div class="message-header">-->
+    <!--                    REFLECT ON YOURSELF-->
+    <!--                </div>-->
+    <!--                <pre class="message-body">-->
+    <!--                                    {{ initial_emo }}-->
+    <!--                                </pre>-->
+    <!--            </article>-->
+    <!--            <span class="sloader" id="sloader" style="display: block; order: 9999; padding: 2%;"></span>-->
+            </div>
+
+        </div>
     </div>
 
-    <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-profile is-fullheight" style="display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 100vh; margin-right: 4em;">
+    <div id="finish-modal" class="modal">
+        <div class="modal-background"></div>
 
-        <div id="supportWindow" style="padding: 32px 32px 16px 16px;">
-<!--            <article class="message is-primary msg-primary">-->
-<!--                <div class="message-header">-->
-<!--                    REFRAME CLIENT-->
-<!--                </div>-->
-<!--                <pre class="message-body">-->
-<!--                                    {{ initial_emo_reframe }}-->
-<!--                                </pre>-->
-<!--            </article>-->
-<!--            <article class="message is-primary msg-primary">-->
-<!--                <div class="message-header">-->
-<!--                    REFLECT ON YOURSELF-->
-<!--                </div>-->
-<!--                <pre class="message-body">-->
-<!--                                    {{ initial_emo }}-->
-<!--                                </pre>-->
-<!--            </article>-->
-<!--            <span class="sloader" id="sloader" style="display: block; order: 9999; padding: 2%;"></span>-->
-        </div>
+        <form id="feedbackForm">
+            <div class="modal-card">
+                <header class="modal-card-head">
+                    <p class="modal-card-title">Conversation Ended: Complete the Survey</p>
+                </header>
+                <section class="modal-card-body">
+                    <!-- Content ... -->
+                    <!-- Interaction -->
+                    <div class="block survey-section">
+                        <div class="control content">
+                            <h5>Q1. To what extent do you agree with the following statements about the client you conversed with ？</h5>
+                            <h6>The client treated me in a polite manner:</h6>
+                            <label class="radio"><input type="radio" name="interaction_polite" value="-3"> Strongly disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_polite" value="-2"> Disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_polite" value="-1"> Somewhat disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_polite" value="0"> Neither agree nor disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_polite" value="1"> Somewhat agree</label>
+                            <label class="radio"><input type="radio" name="interaction_polite" value="2"> Agree</label>
+                            <label class="radio"><input type="radio" name="interaction_polite" value="3"> Strongly agree</label>
 
+                        </div>
+                        <div class="control content">
+
+                            <h6>The client treated me with dignity:</h6>
+                            <label class="radio"><input type="radio" name="interaction_dignity" value="-3"> Strongly disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_dignity" value="-2"> Disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_dignity" value="-1"> Somewhat disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_dignity" value="0"> Neither agree nor disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_dignity" value="1"> Somewhat agree</label>
+                            <label class="radio"><input type="radio" name="interaction_dignity" value="2"> Agree</label>
+                            <label class="radio"><input type="radio" name="interaction_dignity" value="3"> Strongly agree</label>
+
+                        </div>
+                        <div class="control content">
+
+                            <h6>The client treated me with respect:</h6>
+                            <label class="radio"><input type="radio" name="interaction_respect" value="-3"> Strongly disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_respect" value="-2"> Disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_respect" value="-1"> Somewhat disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_respect" value="0"> Neither agree nor disagree</label>
+                            <label class="radio"><input type="radio" name="interaction_respect" value="1"> Somewhat agree</label>
+                            <label class="radio"><input type="radio" name="interaction_respect" value="2"> Agree</label>
+                            <label class="radio"><input type="radio" name="interaction_respect" value="3"> Strongly agree</label>
+                        </div>
+                    </div>
+
+                    <!-- Cognitive Demands/Resources -->
+                    <div class="block survey-section">
+                        <div class="control content">
+                            <h5>Q2. In the context of your last conversation...?</h5>
+                            <h6>How would you rate the demands on you:</h6>
+                            <label class="radio"><input type="radio" name="cognitive_demands" value="1"> Very low</label>
+                            <label class="radio"><input type="radio" name="cognitive_demands" value="2"> Low</label>
+                            <label class="radio"><input type="radio" name="cognitive_demands" value="3"> Moderate</label>
+                            <label class="radio"><input type="radio" name="cognitive_demands" value="4"> High</label>
+                            <label class="radio"><input type="radio" name="cognitive_demands" value="5"> Very high</label>
+                        </div>
+                        <div class="control content">
+                            <h6>How would you rate the resources available to you:</h6>
+                            <label class="radio"><input type="radio" name="cognitive_resources" value="1"> Very low</label>
+                            <label class="radio"><input type="radio" name="cognitive_resources" value="2"> Low</label>
+                            <label class="radio"><input type="radio" name="cognitive_resources" value="3"> Moderate</label>
+                            <label class="radio"><input type="radio" name="cognitive_resources" value="4"> High</label>
+                            <label class="radio"><input type="radio" name="cognitive_resources" value="5"> Very high</label>
+                        </div>
+                    </div>
+
+                    <!-- Valence/Arousal -->
+                    <div class="block survey-section">
+                        <div class="control content">
+                            <h5>Q3. How do you feel after the conversation?</h5>
+                            <h6>Rate your level of pleasure:</h6>
+                            <div class="slider-container">
+                                <span class="slider-label">Negative</span>
+                                <input type="range" name="affect_valence" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
+                                <span class="slider-label">Positive</span>
+                            </div>
+                        </div>
+                        <div class="control content">
+                            <h6>Rate your level of energy:</h6>
+                            <div class="slider-container">
+                                <span class="slider-label">Calm</span>
+                                <input type="range" name="affect_arousal" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
+                                <span class="slider-label">Excited</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Support -->
+                    <div class="block survey-section">
+                        <div class="control content">
+                            <h5>Q4. How did you feel after reading the messages from Pro-pilot?</h5>
+                            <div class="slider-container">
+                                <span class="slider-label">Effective</span>
+                                <input type="range" name="support_effective" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
+                                <span class="slider-label">Ineffective</span>
+                            </div>
+                            <div class="slider-container">
+                                <span class="slider-label">Helpful</span>
+                                <input type="range" name="support_helpful" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
+                                <span class="slider-label">Unhelpful</span>
+                            </div>
+                            <div class="slider-container">
+                                <span class="slider-label">Beneficial</span>
+                                <input type="range" name="support_beneficial" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
+                                <span class="slider-label">Not Beneficial</span>
+                            </div>
+                            <div class="slider-container">
+                                <span class="slider-label">Adequate</span>
+                                <input type="range" name="support_adequate" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
+                                <span class="slider-label">Inadequate</span>
+                            </div>
+                            <div class="slider-container">
+                                <span class="slider-label">Sensitive</span>
+                                <input type="range" name="support_sensitive" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
+                                <span class="slider-label">Insensitive</span>
+                            </div>
+                            <div class="slider-container">
+                                <span class="slider-label">Caring</span>
+                                <input type="range" name="support_caring" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
+                                <span class="slider-label">Uncaring</span>
+                            </div>
+                            <div class="slider-container">
+                                <span class="slider-label">Understanding</span>
+                                <input type="range" name="support_understanding" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
+                                <span class="slider-label">Not Understanding</span>
+                            </div>
+                            <div class="slider-container">
+                                <span class="slider-label">Supportive</span>
+                                <input type="range" name="support_supportive" min="-2" max="2" step="1" oninput="updateSlider(this.name, this.value)" class="slider">
+                                <span class="slider-label">Unsupportive</span>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+                <footer class="modal-card-foot">
+                    <div class="buttons">
+                        <button class="button is-success" type="submit">Next Client</button>
+                    </div>
+                </footer>
+            </div>
+        </form>
     </div>
-</div>
 
-<div id="finish-modal" class="modal">
-    <div class="modal-background"></div>
-
-    <form id="feedbackForm">
-        <div class="modal-card">
-            <header class="modal-card-head">
-                <p class="modal-card-title">Conversation Ended: Complete the Survey</p>
-            </header>
-            <section class="modal-card-body">
-                <!-- Content ... -->
-                <!-- Interaction -->
-                <div class="block survey-section">
-                    <div class="control content">
-                        <h5>Q1. To what extent do you agree with the following statements about the client you conversed with ？</h5>
-                        <h6>The client treated me in a polite manner:</h6>
-                        <label class="radio"><input type="radio" name="interaction_polite" value="-3"> Strongly disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_polite" value="-2"> Disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_polite" value="-1"> Somewhat disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_polite" value="0"> Neither agree nor disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_polite" value="1"> Somewhat agree</label>
-                        <label class="radio"><input type="radio" name="interaction_polite" value="2"> Agree</label>
-                        <label class="radio"><input type="radio" name="interaction_polite" value="3"> Strongly agree</label>
-
-                    </div>
-                    <div class="control content">
-
-                        <h6>The client treated me with dignity:</h6>
-                        <label class="radio"><input type="radio" name="interaction_dignity" value="-3"> Strongly disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_dignity" value="-2"> Disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_dignity" value="-1"> Somewhat disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_dignity" value="0"> Neither agree nor disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_dignity" value="1"> Somewhat agree</label>
-                        <label class="radio"><input type="radio" name="interaction_dignity" value="2"> Agree</label>
-                        <label class="radio"><input type="radio" name="interaction_dignity" value="3"> Strongly agree</label>
-
-                    </div>
-                    <div class="control content">
-
-                        <h6>The client treated me with respect:</h6>
-                        <label class="radio"><input type="radio" name="interaction_respect" value="-3"> Strongly disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_respect" value="-2"> Disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_respect" value="-1"> Somewhat disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_respect" value="0"> Neither agree nor disagree</label>
-                        <label class="radio"><input type="radio" name="interaction_respect" value="1"> Somewhat agree</label>
-                        <label class="radio"><input type="radio" name="interaction_respect" value="2"> Agree</label>
-                        <label class="radio"><input type="radio" name="interaction_respect" value="3"> Strongly agree</label>
-                    </div>
-                </div>
-
-                <!-- Cognitive Demands/Resources -->
-                <div class="block survey-section">
-                    <div class="control content">
-                        <h5>Q2. In the context of your last conversation...?</h5>
-                        <h6>How would you rate the demands on you:</h6>
-                        <label class="radio"><input type="radio" name="cognitive_demands" value="1"> Very low</label>
-                        <label class="radio"><input type="radio" name="cognitive_demands" value="2"> Low</label>
-                        <label class="radio"><input type="radio" name="cognitive_demands" value="3"> Moderate</label>
-                        <label class="radio"><input type="radio" name="cognitive_demands" value="4"> High</label>
-                        <label class="radio"><input type="radio" name="cognitive_demands" value="5"> Very high</label>
-                    </div>
-                    <div class="control content">
-                        <h6>How would you rate the resources available to you:</h6>
-                        <label class="radio"><input type="radio" name="cognitive_resources" value="1"> Very low</label>
-                        <label class="radio"><input type="radio" name="cognitive_resources" value="2"> Low</label>
-                        <label class="radio"><input type="radio" name="cognitive_resources" value="3"> Moderate</label>
-                        <label class="radio"><input type="radio" name="cognitive_resources" value="4"> High</label>
-                        <label class="radio"><input type="radio" name="cognitive_resources" value="5"> Very high</label>
-                    </div>
-                </div>
-
-                <!-- Valence/Arousal -->
-                <div class="block survey-section">
-                    <div class="control content">
-                        <h5>Q3. How do you feel after the conversation?</h5>
-                        <h6>Rate your level of pleasure:</h6>
-                        <div class="slider-container">
-                            <span>Negative</span>
-                            <input type="range" name="affect_valence" min="-2" max="2" oninput="updateSlider(this.name, this.value)"  class="slider">
-                            <span>Positive</span>
-                        </div>
-                    </div>
-                    <div class="control content">
-                        <h6>Rate your level of energy:</h6>
-                        <div class="slider-container">
-                            <span>Calm</span>
-                            <input type="range" name="affect_arousal" min="-2" max="2" oninput="updateSlider(this.name, this.value)"  class="slider">
-                            <span>Excited</span>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Support -->
-                <div class="block survey-section">
-                    <div class="control content">
-                        <h5>Q4. How did you feel after reading the messages from Pro-pilot?</h5>
-                        <div class="slider-container">
-                            <span>Effective</span>
-                            <input type="range" name="support_effective" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Ineffective</span>
-                        </div>
-                        <div class="slider-container">
-                            <span>Helpful</span>
-                            <input type="range" name="support_helpful" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Unhelpful</span>
-                        </div>
-                        <div class="slider-container">
-                            <span>Beneficial</span>
-                            <input type="range" name="support_beneficial" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Not Beneficial</span>
-                        </div>
-                        <div class="slider-container">
-                            <span>Adequate</span>
-                            <input type="range" name="support_adequate" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Inadequate</span>
-                        </div>
-                        <div class="slider-container">
-                            <span>Sensitive</span>
-                            <input type="range" name="support_sensitive" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Insensitive</span>
-                        </div>
-                        <div class="slider-container">
-                            <span>Caring</span>
-                            <input type="range" name="support_caring" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Uncaring</span>
-                        </div>
-                        <div class="slider-container">
-                            <span>Understanding</span>
-                            <input type="range" name="support_understanding" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Not Understanding</span>
-                        </div>
-                        <div class="slider-container">
-                            <span>Supportive</span>
-                            <input type="range" name="support_supportive" min="-2" max="2" oninput="updateSlider(this.name, this.value)" class="slider">
-                            <span>Unsupportive</span>
-                        </div>
-                    </div>
-                </div>
-            </section>
-            <footer class="modal-card-foot">
-                <div class="buttons">
-                    <button class="button is-success" type="submit">Next Client</button>
-                </div>
-            </footer>
-        </div>
-    </form>
-</div>
 
 <script src="{{ url_for('static', filename='feedback.js') }}"></script>
 
