@@ -236,12 +236,13 @@ function createFooter(support_type) {
     sliderContainer.classList.add('slider-container');
     sliderContainer.style.display = 'flex';
     sliderContainer.style.alignItems = 'center';
-    sliderContainer.style.width = '60%';
+    sliderContainer.style.width = '72%';
     sliderContainer.style.padding = '0 4px';
 
     const leftLabel = document.createElement('span');
     leftLabel.textContent = 'Helpful';
     leftLabel.style.marginRight = '4px';
+    leftLabel.style.width = '4em';
     sliderContainer.appendChild(leftLabel);
 
     const input = document.createElement('input');
@@ -251,8 +252,10 @@ function createFooter(support_type) {
     input.classList.add('slider');
     input.setAttribute('min', '-2');
     input.setAttribute('max', '2');
+    input.setAttribute('value', '0');
     input.setAttribute('step', '1');
     input.style.margin = '0 4px';
+    input.style.width = '32em';
     input.style.flex = '1';
     input.addEventListener('input', function() {
         updateHelpful(this.name, this.value);
@@ -266,6 +269,7 @@ function createFooter(support_type) {
     const rightLabel = document.createElement('span');
     rightLabel.textContent = 'Unhelpful';
     rightLabel.style.marginLeft = '4px';
+    rightLabel.style.width = '4em';
     sliderContainer.appendChild(rightLabel);
 
     footerItem.appendChild(sliderContainer);
