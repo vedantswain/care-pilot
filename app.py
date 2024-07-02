@@ -242,6 +242,13 @@ def storePostSurvey(session_id):
         for k in data:  # Convert string values into integers
             if k != "client_id":
                 data[k] = int(data[k])
+
+            supportDate = ["support_effective", "support_helpful", "support_beneficial",
+                          "support_adequate", "support_sensitive", "support_caring",
+                          "support_understanding", "support_supportive"]
+            if k in supportDate:
+                data[k] = int(data[k]) *-1
+                
         if not data:
             return jsonify({"message": "No data received"}), 400
 
@@ -278,7 +285,7 @@ def storeEmoFeedback(session_id):
         }
         update = {
             "$set": {
-                "client_feedback": rate,
+                "client_feedback": int(rate) * -1 ,
                 "timestamp_feedback": timestamp,
             }
         }
