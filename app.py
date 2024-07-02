@@ -257,7 +257,7 @@ def storeEmoFeedback(session_id):
         rate = request.json.get("rate")
         support_type = request.json.get("type")
 
-        turn_number = len(session[session_id][client_id]["chat_history"]) // 2
+        turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
         query = {

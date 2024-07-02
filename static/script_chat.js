@@ -3,33 +3,7 @@ const TYPE_EMO_SHOES = common_strings["TYPE_EMO_SHOES"]
 const TYPE_EMO_REFRAME = common_strings["TYPE_EMO_REFRAME"]
 const TYPE_SENTIMENT = common_strings["TYPE_SENTIMENT"]
 
-// let userQueue = JSON.parse(localStorage.getItem('userQueue')) || [
-//     { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 1, info: 1, emo: 1},
-//     { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1, civil: 1, info: 1, emo: 0},
-//     { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1, civil: 0, info: 0, emo: 1},
-//     { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0, civil: 0, info: 0, emo: 0}
-// ];
 
-// function resetQueueToInitialState() {
-//     let initialState = [
-//         { id: 1, name: "User1", product: "Pizza" , grateful: 0, ranting: 0, expression:0, civil: 1 , info: 1, emo: 1},
-//         { id: 2, name: "User2", product: "Speaker", grateful: 1, ranting: 0, expression: 1, civil: 1 , info: 1, emo: 0},
-//         { id: 3, name: "User3", product: "Book",  grateful: 1, ranting: 1, expression: 1, civil: 0 , info: 0, emo: 1},
-//         { id: 4, name: "User4", product: "Cup" , grateful: 0, ranting: 1, expression:0, civil: 1 , info: 1, emo: 1}
-//     ];
-
-//     userQueue = initialState;
-
-//     localStorage.setItem('userQueue', JSON.stringify(initialState));
-
-//     updateQueueDisplay();
-// }
-
-// function updateQueueBackend() {
-//     userQueue.shift();
-//     localStorage.setItem('userQueue', JSON.stringify(userQueue));
-//     updateQueueDisplay();
-// }
 
 function updateQueueDisplay(data) {
     const queueContainer = document.querySelector('#client-queue');
@@ -216,10 +190,10 @@ function createSupportPane(messageText, msgClass){
 }
 
 // Rate Emopane !
-const helpfulValues = {};
+const inTaskValues = {};
 
-function updateHelpful(helpfulName, helpfulAmount) {
-    helpfulValues[helpfulName] = helpfulAmount;
+function updateInTask(inTaskName, inTaskAmount) {
+    inTaskValues[inTaskName] = inTaskAmount;
 }
 
 function createFooter(support_type) {
@@ -258,11 +232,7 @@ function createFooter(support_type) {
     input.style.width = '32em';
     input.style.flex = '1';
     input.addEventListener('input', function() {
-        updateHelpful(this.name, this.value);
-    });
-    input.addEventListener('change', function() {
-        sendFeedback(support_type, this.value);
-        this.disabled = true; // only rate once!
+        updateInTask(this.name, this.value);
     });
     sliderContainer.appendChild(input);
 
@@ -275,86 +245,9 @@ function createFooter(support_type) {
     footerItem.appendChild(sliderContainer);
     footer.appendChild(footerItem);
 
-    // Check if user has already rated
-    checkIfRated(support_type).then(rated => {
-        if (rated) {
-            input.disabled = true;
-        }
-    });
-
     return footer;
 }
 
-function sendFeedback(support_type, rate) {
-    const sessionId = window.location.pathname.split('/')[1];
-    const clientId = sessionStorage.getItem('client_id');
-
-    fetch(`/${sessionId}/store-emo-feedback`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            client_id: clientId,
-            rate: rate,
-            type: support_type
-        })
-    })
-    .then(response => response.json())
-    .then(data => console.log('Feedback sent:', data))
-    .catch(error => console.error('Error sending feedback:', error));
-}
-
-// only one time to rate!
-function checkIfRated(support_type) {
-    const sessionId = window.location.pathname.split('/')[1];
-    const clientId = sessionStorage.getItem('client_id');
-
-    return fetch(`/${sessionId}/check-emo-feedback`, {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            client_id: clientId,
-            type: support_type
-        })
-    })
-    .then(response => response.json())
-    .then(data => data.rated)
-    .catch(error => {
-        console.error('Error checking if rated:', error);
-        return false;
-    });
-}
-// function createFooter(support_type){
-//     const footer = document.createElement('div');
-//     footer.classList.add('card-footer');
-
-//     const footerItem = document.createElement('div');
-//     footerItem.classList.add('card-footer-item');
-//     footerItem.style.display = 'flex';
-//     footerItem.style.alignItems = 'center';
-//     footerItem.style.justifyContent = 'space-between';
-
-//     const leftLabel = document.createElement('span');
-//     leftLabel.classList.add('slider-label');
-//     leftLabel.textContent = 'Rate Response';
-//     footerItem.appendChild(leftLabel);
-
-//     const input = document.createElement('input');
-//     input.id = `${support_type}-feedback`;
-//     input.setAttribute('type', 'range');
-//     input.classList.add('form-range');
-//     input.setAttribute('min', '-2');
-//     input.setAttribute('max', '2');
-//     input.setAttribute('step', '1');
-//     input.style.marginLeft = '5%';
-//     footerItem.appendChild(input);
-//     footer.appendChild(footerItem)
-
-//     return footer
-// }
 
 function designHeader(header, iconClass) {
     const p = document.createElement('p');
@@ -518,7 +411,7 @@ function retrieveEmoSupport(message, support_type){
     }
 }
 
-function retrieveEmoFeedback(support_type) {
+function sendEmoFeedback(support_type) {
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
 
@@ -664,6 +557,13 @@ function sendMessage() {
     const showInfo = sessionStorage.getItem('show_info');
     const showEmo = sessionStorage.getItem('show_emo');
 
+    if (showEmo == '1') {
+        // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
+        // retrieveEmoFeedback(TYPE_EMO_SHOES);
+        retrieveEmoFeedback(TYPE_EMO_REFRAME);
+       // retrieveEmoFeedback(TYPE_SENTIMENT);
+    }
+
     fetch(`/${sessionId}/get-reply`, {
         method: 'POST',
         headers: {
@@ -681,12 +581,6 @@ function sendMessage() {
             typing.style.display = 'none';
             input.disabled = true;
         } else {
-            if (showEmo == '1') {
-                // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
-                // retrieveEmoFeedback(TYPE_EMO_SHOES);
-                retrieveEmoFeedback(TYPE_EMO_REFRAME);
-               // retrieveEmoFeedback(TYPE_SENTIMENT);
-            }
             processClientResponse(data);
             pageLoaded = true;
             checkAndEnableInput(rateResponseCompleted);
