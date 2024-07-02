@@ -16,7 +16,7 @@ from langchain_core.messages import AIMessage, HumanMessage
 from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.runnables import RunnablePassthrough
 
-from sentiment import analyze_sentiment_transformer
+from sentiment import analyze_sentiment_transformer, analyze_sentiment_decision
 
 import config as common
 
@@ -257,7 +257,7 @@ def storeEmoFeedback(session_id):
         rate = request.json.get("rate")
         support_type = request.json.get("type")
 
-        turn_number = len(session[session_id][client_id]["chat_history"]) // 2
+        turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
         query = {
@@ -350,6 +350,7 @@ def sentiment(session_id):
 
         # Perform sentiment analysis
         sentiment_category = analyze_sentiment_transformer(reply)
+        sentiment_category = analyze_sentiment_decision(reply)
 
         chat_emo_feedback.insert_one({
             "session_id": session_id,
