@@ -298,6 +298,8 @@ pre {
 .slider-container {
   display: flex;
   justify-content: space-between;
+  margin: 16px 0px 16px 0px;
+  align-items: center;
   width: 100%;
 }
 
