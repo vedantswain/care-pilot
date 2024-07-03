@@ -52,7 +52,9 @@ def get_study_queue(scenario):
     random.shuffle(names)
     random.shuffle(complaintTypes)
     for client_id in range(len(studyQueue)):
-        studyQueue[client_id]['name'] = names[client_id]
+        client_name = names[client_id]
+        studyQueue[client_id]['name'] = client_name
         studyQueue[client_id]['category'] = complaintTypes[client_id]
         studyQueue[client_id]['domain'] = scenario
+        studyQueue[client_id]['avatar'] = "https://avatar.iran.liara.run/username?username="+client_name.replace(' ','+')
     return studyQueue

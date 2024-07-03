@@ -17,16 +17,16 @@ function updateQueueDisplay(data) {
             <div class="media">
                 <div class="media-left">
                     <p>
-                        <span class="icon is-large">
-                            <i class="fas fa-2x fa-circle-user"></i>
-                        </span>
+                        <figure class="image is-64x64">
+                          <img class="is-rounded" src=${client.avatar} />
+                        </figure>
                     </p>
                 </div>
                 <div class="media-content is-hidden-mobile">
                     <div class="content">
                         <p>
                             <strong>${client.name}</strong>
-                            <br><small class="has-text-weight-semibold">${client.complaint}</small>
+                            <br><small class="has-text-weight-semibold">${client.category}</small>
                         </p>
                     </div>
                 </div>
