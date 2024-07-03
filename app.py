@@ -286,7 +286,7 @@ def storeEmoFeedback(session_id):
         }
         update = {
             "$set": {
-                "client_feedback": rating,
+                "user_feedback": rating,
                 "timestamp_feedback": timestamp,
             }
         }
@@ -311,25 +311,25 @@ def getEmoSupport(session_id):
         turn_number = len(chat_history) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-        if support_type==common.TYPE_EMO_REFRAME:
+        if support_type=="TYPE_EMO_REFRAME":
             response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
             thought = response_cw_emo['thought']
             reframe = response_cw_emo['reframe']
-        # Thought
+            # Thought
             chat_emo_feedback.insert_one({
                 "session_id": session_id,
                 "client_id": client_id,
                 "turn_number": turn_number,
-                "support_type": "You might be thinking",
+                "support_type": "TYPE_EMO_THOUGHT",
                 "support_content": thought.strip(),
                 "timestamp_arrival":timestamp
             })
-        # Reframe
+            # Reframe
             chat_emo_feedback.insert_one({
                 "session_id": session_id,
                 "client_id": client_id,
                 "turn_number": turn_number,
-                "support_type": "Be Mindful of Your Emotions",
+                "support_type": "TYPE_EMO_REFRAME",
                 "support_content": reframe.strip(),
                 "timestamp_arrival": timestamp
             })
@@ -339,7 +339,7 @@ def getEmoSupport(session_id):
                     'reframe': reframe
                 }
             })
-        elif support_type==common.TYPE_EMO_SHOES:
+        elif support_type=="TYPE_EMO_SHOES":
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
             chat_emo_feedback.insert_one({
