@@ -239,15 +239,16 @@ def getSurvey(session_id):
 def storePostSurvey(session_id):
     if session_id in session:
         data = request.get_json()
+        reverseLabels = ["support_effective", "support_helpful", "support_beneficial",
+                         "support_adequate", "support_sensitive", "support_caring",
+                         "support_understanding", "support_supportive"]
         for k in data:  # Convert string values into integers
+
             if k != "client_id":
                 data[k] = int(data[k])
 
-            supportDate = ["support_effective", "support_helpful", "support_beneficial",
-                          "support_adequate", "support_sensitive", "support_caring",
-                          "support_understanding", "support_supportive"]
-            if k in supportDate:
-                data[k] = int(data[k]) *-1
+            if k in reverseLabels:
+                data[k] = data[k] * (-1)
                 
         if not data:
             return jsonify({"message": "No data received"}), 400
@@ -271,7 +272,7 @@ def storePostSurvey(session_id):
 def storeEmoFeedback(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
-        rate = request.json.get("rate")
+        rating = int(request.json.get("rate")) * -1    # helpful-unhelpful scale is reversed
         support_type = request.json.get("type")
 
         turn_number = len(session[session_id][client_id]["chat_history"]) // 2 + 1
@@ -285,7 +286,7 @@ def storeEmoFeedback(session_id):
         }
         update = {
             "$set": {
-                "client_feedback": int(rate) * -1 ,
+                "client_feedback": rating,
                 "timestamp_feedback": timestamp,
             }
         }
