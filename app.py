@@ -374,7 +374,7 @@ def sentiment(session_id):
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number,
-            "support_type": "Sentiment Analysis",
+            "support_type": "TYPE_SENTIMENT",
             "support_content": sentiment_category,
             "timestamp_arrival": timestamp
         })
