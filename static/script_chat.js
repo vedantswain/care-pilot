@@ -378,7 +378,7 @@ function retrieveEmoSupport(message, support_type){
 
     const headerTitle = document.createElement('p');
     headerTitle.classList.add('card-header-title');
-    headerTitle.textContent = support_type.toUpperCase();
+    headerTitle.textContent = common_strings[support_type].toUpperCase();
 
     header.appendChild(headerTitle);
     header.appendChild(loader);
@@ -389,7 +389,7 @@ function retrieveEmoSupport(message, support_type){
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
 
-    if (support_type == TYPE_SENTIMENT) {
+    if (support_type == "TYPE_SENTIMENT") {
         fetch(`/${sessionId}/sentiment`, {
             method: 'POST',
             headers: {
@@ -426,7 +426,7 @@ function retrieveEmoSupport(message, support_type){
             // supportDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
 
-            if (support_type == TYPE_EMO_SHOES) {
+            if (support_type == "TYPE_EMO_SHOES") {
                     const shoesPane = createSupportPane(data.message, "emo");
                     card.appendChild(shoesPane);
 
@@ -435,7 +435,7 @@ function retrieveEmoSupport(message, support_type){
                     footer = createFooter(support_type)
                     card.appendChild(footer);
                 }
-            else if (support_type == TYPE_EMO_REFRAME) {
+            else if (support_type == "TYPE_EMO_REFRAME") {
                 const thoughtPane = createSupportPane(data.message.thought, "emo");
                 const reframePane = createSupportPane(data.message.reframe, "emo");
                 card.appendChild(thoughtPane);
@@ -545,8 +545,8 @@ function processClientResponse(data){
         supportDiv.innerHTML = '';
 //        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
 //        retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
-        retrieveEmoSupport(data.message, TYPE_SENTIMENT);
-        retrieveEmoSupport(data.message,TYPE_EMO_REFRAME);
+        retrieveEmoSupport(data.message, "TYPE_SENTIMENT");
+        retrieveEmoSupport(data.message,"TYPE_EMO_REFRAME");
     }
 }
 
@@ -582,7 +582,7 @@ function sendMessage() {
     if (showEmo == '1') {
         // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
         // retrieveEmoFeedback(TYPE_EMO_SHOES);
-        sendEmoFeedback(TYPE_EMO_REFRAME);
+        sendEmoFeedback("TYPE_EMO_REFRAME");
        // retrieveEmoFeedback(TYPE_SENTIMENT);
     }
 
