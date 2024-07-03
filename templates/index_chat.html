@@ -24,54 +24,22 @@
         console.log(common_strings)
     </script>
     <script src="{{ url_for('static', filename='script_chat.js') }}"></script>
-    <script>
-        function confirmNextClient(sessionId) {
-            const userConfirmed = confirm("Do you want to go to the next client?");
-            if (userConfirmed) {
-                fetch(`/${sessionId}/update-clientQueue`)
-                    .then(response => response.json())
-                    .then(data => {
-                        if (data.url) {
-                            window.location.href = data.url;
-                        }
-                    })
-                    .catch(error => console.error('Error:', error));
-            }
-        }
-    </script>
 </head>
 <body>
 
     <button class="button is-danger is-light" onclick="confirmNextClient('{{ session_id }}')">
-        Red Sun
+         <span class="icon">
+            <i class="fas fa-dog"></i>
+         </span>
     </button>
 
-<!-- button link to survey -->
+    <!-- button link to survey -->
 
-<script>
-    function showSurveyModal() {
-        const goSurvey = confirm("Do you want to end up the conversation and go to survey?");
-        if (goSurvey) {
-            var modal = document.getElementById("finish-modal");
-            modal.classList.add("is-active");
-        }
-    }
-
-    window.onclick = function(event) {
-        var modal = document.getElementById("finish-modal");
-        if (event.target == modal) {
-            modal.classList.remove("is-active");
-        }
-    }
-
-</script>
-</head>
-<body>
-<button class="button is-warning is-light is-hovered" onclick="showSurveyModal()">
-    <span class="icon">
-        <i class="fas fa-cat"></i>
-    </span>
-</button>
+    <button class="button is-warning is-light is-hovered" onclick="showSurveyModal()">
+        <span class="icon">
+            <i class="fas fa-cat"></i>
+        </span>
+    </button>
 
 
     <!--sidebar-left-->
