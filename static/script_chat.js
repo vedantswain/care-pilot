@@ -66,6 +66,15 @@ function confirmNextClient(sessionId) {
     }
 }
 
+function showSurveyModal() {
+    const goSurvey = confirm("Do you want to end the conversation and go to survey?");
+    if (goSurvey) {
+        var modal = document.getElementById("finish-modal");
+        modal.classList.add("is-active");
+    }
+}
+
+
 function createMessageElement(messageText, msgClass, messageHeader='') {
   const article = document.createElement('article');
 
