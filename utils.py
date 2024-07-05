@@ -41,13 +41,6 @@ class mLangChain:
             deployment_name="TEST",
             model_name="gpt-3.5-turbo-instruct",
         )
-        # self.client_agent = lcai.AzureChatOpenAI(
-        #     openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
-        #     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-        #     azure_deployment="TEST-Chat-0613",
-        #     openai_api_version="2023-12-01-preview",
-        #     model_name="gpt-3.5-turbo",
-        # )
         self.client_agent = lcai.AzureChatOpenAI(
             openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
             azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),

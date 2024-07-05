@@ -39,77 +39,7 @@ llminfo = lcai.AzureChatOpenAI(
     temperature=0.1
 )
 
-# def get_historical_info_context_chain():
-#     contextualize_q_system_prompt = """Given a chat history and the latest user input \
-#         which might reference context in the chat history, formulate a standalone statement \
-#         which can be understood without the chat history. Do NOT respond to the statement, \
-#         just reformulate it if needed and otherwise return it as is.\
-#
-#         Think it step by step:
-#         First, read through the chat history carefully to understand the context.\
-#         Then, read the latest user input and identify any references to the previous context.\
-#         Next, rephrase the user input into a clear, standalone statement that captures the intent and can be understood independently without the chat history.\
-#         Respond only with the rephrased standalone query.\
-#         Do not provide any additional explanations or commentary.\
-#         If the user input does not reference any context, simply return it as is.\""""
-#     contextualize_q_prompt = ChatPromptTemplate.from_messages(
-#         [
-#             ("system", contextualize_q_system_prompt),
-#             MessagesPlaceholder(variable_name="chat_history"),
-#             ("user", "{complaint}"),
-#         ]
-#     )
-#     contextualize_q_chain = contextualize_q_prompt | llmchat | StrOutputParser()
-#     return contextualize_q_chain
 
-# def agent_coworker_info():
-#     client = mLangChain()
-#     prompt = Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
-#                 The representative is chatting online with a customer complaining about {domain}.  \
-                
-#                 Given the chat history,
-#                 provide 2-3 hints to help the representative's response.\
-#                 The hints should direct the representative to do ONLY ONE of the following:\
-                
-#                 1) Inquire more details about the problem. OR \
-#                 2) Request the customer to troubleshoot. OR \
-#                 3) Provide a solution to resolve the customer's need. \
-                
-#                 Each cue should be a single phrase of less than 10 words.\
-#                 Do NOT number the cues.\
-                
-#                 Customer message: {complaint}
-#                 Hints: 
-#             """
-#     template = ChatPromptTemplate.from_messages(
-#         [
-#             ("system", prompt),
-#             MessagesPlaceholder(variable_name="chat_history"),
-#             ("user", "{domain}: {complaint}"),
-#         ]
-#     )
-#     chain = template | client.client_completion
-
-#     chain = (RunnablePassthrough.assign(
-#         context=get_historical_info_context_chain()
-#     )
-#              | template
-#              | llminfo
-#              )
-    
-#     def extract_cues(chain_output):
-#         cues_text = chain_output.content
-#         # Assuming each cue is separated by a newline in the chain_output.
-#         cues = cues_text.split('\n')
-#         # Filter out any empty strings or whitespace-only strings
-#         cues = [cue.strip() for cue in cues if cue.strip()]
-#         # Return the first 2 - 3 cues
-#         processed_cues = [re.sub(r'^\d+\.\s*', '', cue) for cue in cues]
-#         return processed_cues[:3]
-    
-#     chain = chain | extract_cues
-
-#     return chain
 categories = {
     "Service Quality": "Issues related to the immediate experience of human-to-human service interactions, such as delays, staff behavior, and communication errors.",
     "Product Issues": "Concerns related to physical or functional aspects of a product or service, including defects, mismatches between expectation and reality, safety, and accessibility.",
@@ -202,39 +132,6 @@ class mAgentInfo:
         return chain
 
 
-# def agent_coworker_trouble():
-#     client = mLangChain()
-#     prompt = """Your role is to help a service representative by providing PROCEDURAL SUPPORT. \
-#                 The representative is chatting online with a customer complaining about {domain}. \
-#                 Given the chat history,
-#                 list 3-7 steps to guide the representative in resolving the customer complaint.\
-#                 Review the similar PROCEDURAL SUPPORT history if exist, then assess the current situation in depth and provide detailed steps for resolution\
-#                 if not exist, offer an alternative solution that can solve current solution as detail as possible\
-
-#                 Do NOT include steps that have already been tried.\
-#                 Every step should be less than 10 words.\
-                
-#                 Customer message: {complaint}
-#                 Troubleshooting Steps: 
-#             """
-#     template = ChatPromptTemplate.from_messages(
-#         [
-#             ("system", prompt),
-#             MessagesPlaceholder(variable_name="chat_history"),
-#             ("user", "{domain}: {complaint}"),
-#         ]
-#     )
-#     chain = template | client.client_completion
-
-#     chain = (RunnablePassthrough.assign(
-#         context=get_historical_info_context_chain()
-#     )
-#              | template
-#              | client.client_completion
-#              )
-
-#     return chain
-
 class mAgentTrouble:
     def __init__(self):
         self.trouble_chain = self.agent_coworker_trouble()
@@ -292,54 +189,6 @@ class mAgentTrouble:
 
         return chain
 
-def agent_coworker_emo():
-    client = mLangChain()
-    prompt = """Your role is to help a service representative by providing EMOTIONAL SUPPORT. \
-                The representative received a {complaint}. \
-                Describe how the representative might feel after reading the tonality of this {complaint}. \
-                
-                Mood:\
-                Stress-level:\
-                Work-load:\
-            """
-    template = ChatPromptTemplate.from_messages(
-        [
-            ("system", prompt),
-        ]
-    )
-    chain = template | client.client_completion
-    return chain
-
-# def agent_coworker_emo_perspective():
-#     client = mLangChain()
-
-#     prompt = """Your role is to provide the customer's perspective of the conversation.
-#                 Summarize this for the representative.\
-#                 Describe how the customer might feel.\
-#                 Describe how the customer might view the problem.\
-                
-#                 Limit your response to 2 sentences.
-#                 Write sentence using 2nd person pronouns as subject
-                
-#                 Customer perspective:
-#             """
-#     template = ChatPromptTemplate.from_messages(
-#         [
-#             ("system", prompt),
-#             MessagesPlaceholder(variable_name="chat_history"),
-#             ("user", "{complaint}"),
-#         ]
-#     )
-#     # chain = template | client.client_completion
-
-#     chain = (RunnablePassthrough.assign(
-#         context=get_historical_info_context_chain()
-#     )
-#              | template
-#              | client.client_completion
-#              )
-
-#     return chain
 
 class mAgentEP:
     def __init__(self):
