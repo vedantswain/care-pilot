@@ -48,10 +48,10 @@ Session(app)
 client = MongoClient('localhost', 27017)
 
 db = client.flask_db
-chat_task_feedback = db.chat_task_feedback
-chat_history_collection = db.chat_history_collection
+chat_post_task = db.chat_post_task
+chat_history_collection = db.chat_history
 chat_client_info = db.chat_client_info
-chat_emo_feedback = db.chat_emo_feedback
+chat_in_task = db.chat_in_task
 
 sender_agent = None
 chat_history = [
@@ -257,7 +257,7 @@ def storePostSurvey(session_id):
         data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
 
         try:
-            result = chat_task_feedback.insert_one(data)
+            result = chat_post_task.insert_one(data)
             if result.inserted_id:
                 return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
             else:
@@ -291,7 +291,7 @@ def storeEmoFeedback(session_id):
             }
         }
 
-        res = chat_emo_feedback.update_one(query, update)
+        res = chat_in_task.update_one(query, update)
         if res == 0:
             return jsonify({"message": "No existing record found to update"}), 404
         return jsonify({"message": "Feedback received"}), 200
@@ -316,7 +316,7 @@ def getEmoSupport(session_id):
             thought = response_cw_emo['thought']
             reframe = response_cw_emo['reframe']
             # Thought
-            chat_emo_feedback.insert_one({
+            chat_in_task.insert_one({
                 "session_id": session_id,
                 "client_id": client_id,
                 "turn_number": turn_number,
@@ -325,7 +325,7 @@ def getEmoSupport(session_id):
                 "timestamp_arrival":timestamp
             })
             # Reframe
-            chat_emo_feedback.insert_one({
+            chat_in_task.insert_one({
                 "session_id": session_id,
                 "client_id": client_id,
                 "turn_number": turn_number,
@@ -342,7 +342,7 @@ def getEmoSupport(session_id):
         elif support_type=="TYPE_EMO_SHOES":
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
-            chat_emo_feedback.insert_one({
+            chat_in_task.insert_one({
                 "session_id": session_id,
                 "client_id": client_id,
                 "turn_number": turn_number,
@@ -370,7 +370,7 @@ def sentiment(session_id):
         # sentiment_category = analyze_sentiment_transformer(reply)
         sentiment_category = analyze_sentiment_decision(reply)
 
-        chat_emo_feedback.insert_one({
+        chat_in_task.insert_one({
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number,
