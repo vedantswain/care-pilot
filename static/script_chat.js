@@ -1,8 +1,3 @@
-const TYPE_EMO_THOUGHT = common_strings["TYPE_EMO_THOUGHT"]
-const TYPE_EMO_SHOES = common_strings["TYPE_EMO_SHOES"]
-const TYPE_EMO_REFRAME = common_strings["TYPE_EMO_REFRAME"]
-const TYPE_SENTIMENT = common_strings["TYPE_SENTIMENT"]
-
 
 
 function updateQueueDisplay(data) {
@@ -212,7 +207,7 @@ function updateFlag(flagName) {
 }
 
 function validateInput() {
-    sliderKeysValidation = ["helpful_unhelpful"]
+    sliderKeysValidation = ["TYPE_EMO_REFRAME-helpful_unhelpful"]   // list of keys to validate
     allKeysExist = sliderKeysValidation.every(key => Object.keys(inTaskValues).includes(key));
 
     if (sessionStorage.getItem('show_emo') == 0) {
@@ -259,7 +254,7 @@ function createFooter(support_type) {
     input.id = `${support_type}-feedback`;
     input.setAttribute('type', 'range');
     input.classList.add('slider');
-    input.setAttribute('name','helpful_unhelpful');
+    input.setAttribute('name',`${support_type}-helpful_unhelpful`);
     input.setAttribute('min', '-2');
     input.setAttribute('max', '2');
     input.setAttribute('value', '0');
@@ -474,7 +469,7 @@ function sendEmoFeedback(support_type) {
     });
 }
 
-function retrieveTroubleSupport(message){
+function retrieveTroubleSupport(message,support_type){
     const troubleDiv = document.getElementById('troubleWindow');
 
     const header = document.createElement('div');
@@ -499,7 +494,7 @@ function retrieveTroubleSupport(message){
         })
         .then(response => response.json())
         .then(data => {
-            var troubleMessage = createSupportPane(data.message, "trouble")
+            var troubleMessage = createSupportPane(data.message, "support_trouble")
             troubleDiv.appendChild(troubleMessage);
             //troubleDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
