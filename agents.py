@@ -26,9 +26,9 @@ embeddings = lcai.AzureOpenAIEmbeddings(
 llmchat = lcai.AzureChatOpenAI(
     openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-    azure_deployment="NUHAI-GPT4",
-    openai_api_version="2024-02-15-preview",
-    model_name="gpt-4",
+    azure_deployment="PROPILOT",
+    openai_api_version="2024-05-01-preview",
+    model_name="gpt-4o",
 )
 llminfo = lcai.AzureChatOpenAI(
     openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
@@ -63,7 +63,7 @@ class mAgentInfo:
     
     def get_historical_info_context_chain(self):
         contextualize_q_system_prompt = """
-            Think it step by step:
+            Think step by step:\
             First, read through the chat history carefully to understand the context.\
             Then, read the latest user input and identify any references to the previous context.\
             Next, rephrase the user input into a clear, standalone statement that captures the intent and can be understood independently without the chat history.\
