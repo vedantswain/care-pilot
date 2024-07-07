@@ -314,6 +314,7 @@ function retrieveInfoSupport(message){
 
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
+    
 
     fetch(`/${sessionId}/get-info-support`, {
             method: 'POST',
@@ -508,12 +509,17 @@ function retrieveTroubleSupport(message,support_type){
             p.appendChild(span);
             header.appendChild(p);
 
+            footer = createFooter(support_type);
+            troubleDiv.appendChild(footer);
+
             updateFlag('support_trouble')
         })
         .catch((error) => {
             console.error('Error:', error);
         });
 }
+
+
 
 function processClientResponse(data){
     const chatDiv = document.getElementById('chatWindow');
@@ -532,7 +538,7 @@ function processClientResponse(data){
 
         const troubleDiv = document.getElementById('troubleWindow');
         troubleDiv.innerHTML = '';
-        retrieveTroubleSupport(data.message);
+        retrieveTroubleSupport(data.message,"TYPE_TROUBLE");
     }
 
     if (data.show_emo == '1') {
@@ -542,6 +548,7 @@ function processClientResponse(data){
 //        retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
         retrieveEmoSupport(data.message, "TYPE_SENTIMENT");
         retrieveEmoSupport(data.message,"TYPE_EMO_REFRAME");
+
     }
 }
 
@@ -574,6 +581,12 @@ function sendMessage() {
     const showInfo = sessionStorage.getItem('show_info');
     const showEmo = sessionStorage.getItem('show_emo');
 
+
+    if(showInfo == '1'){
+
+        sendTroubleFeedback()
+
+    }
     if (showEmo == '1') {
         // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
         // retrieveEmoFeedback(TYPE_EMO_SHOES);
@@ -606,6 +619,9 @@ function sendMessage() {
     });
     }
 
+function sendTroubleFeedback(){
+    
+}
 
 
 // Define a function to execute after the page loads
