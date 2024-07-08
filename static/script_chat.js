@@ -207,7 +207,7 @@ function updateFlag(flagName) {
 }
 
 function validateInput() {
-    sliderKeysValidation = ["TYPE_EMO_REFRAME-helpful_unhelpful"]   // list of keys to validate
+    sliderKeysValidation = ["TYPE_EMO_REFRAME-helpful_unhelpful","TYPE_TROUBLE-helpful_unhelpful"]   // list of keys to validate
     allKeysExist = sliderKeysValidation.every(key => Object.keys(inTaskValues).includes(key));
 
     if (sessionStorage.getItem('show_emo') == 0) {
