@@ -267,6 +267,35 @@ def storePostSurvey(session_id):
     else:
         return jsonify({"message": "Invalid session or session expired"}), 400
 
+@app.route('/<session_id>/store-trouble-feedback',methods=['POST'])
+def storeTroubleFeedback(session_id):
+    if session_id in session:
+        client_id = request.json.get("client_id")
+        rating = int(request.json.get("rate")) * -1
+        support_type = request.json.get ("type")
+
+        turn_number = len(session[session_id][client_id]["chat_history"])//2+1
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+    
+        query = {
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": support_type
+        }
+        update = {
+            "$set":{
+                "user_feedback": rating,
+                "timestamp_feedback": timestamp,
+            }
+        }
+        res = chat_in_task.update_one(query, update)
+        if res == 0:
+            return jsonify({"message": "No existing record found to update"}), 404
+        return jsonify({"message": "Trouble feedback received"}), 200
+    return jsonify({"message": "Invalid session or session expired"}), 400
+   
+    
 
 @app.route('/<session_id>/store-emo-feedback', methods=['POST'])
 def storeEmoFeedback(session_id):
@@ -389,7 +418,6 @@ def sentiment(session_id):
 def getInfoSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
-
         reply = request.json.get("client_reply")
         # support_type = request.json.get("type")
 
@@ -399,9 +427,23 @@ def getInfoSupport(session_id):
         response_cw_info = info_agent.invoke({'domain': session[session_id][client_id]["domain"],'complaint':reply, "chat_history": chat_history})
         # response = response_cw_info.content
 
+        turn_number = len(chat_history) // 2 + 1
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+
+
+        chat_in_task.insert_one({
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": "TYPE_INFO_CUE",
+            "support_content": response_cw_info,
+            "timestamp_arrival": timestamp
+        })
         return jsonify({
             "message": response_cw_info
         })
+    return jsonify({"message": "Invalid session or session expired"}), 400
+
 
 @app.route('/<session_id>/get-trouble-support', methods=['POST'])
 def getTroubleSupport(session_id):
@@ -416,9 +458,23 @@ def getTroubleSupport(session_id):
         response_cw_trouble = trouble_agent.invoke({'domain': session[session_id][client_id]["domain"],'complaint':reply, "chat_history": chat_history})
         response = "Troubleshooting Guide:\n" + response_cw_trouble
 
+        turn_number = len(chat_history) // 2 + 1
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+
+        chat_in_task.insert_one({
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": "TYPE_INFO_GUIDE",
+            "support_content": response,
+            "timestamp_arrival": timestamp
+        })
+
         return jsonify({
             "message": response
         })
+    return jsonify({"message": "Invalid session or session expired"}), 400
+
 
 
 
@@ -426,3 +482,11 @@ def getTroubleSupport(session_id):
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, threaded=True)
 #%%
+
+
+
+
+
+
+
+
