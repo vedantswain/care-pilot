@@ -206,26 +206,45 @@ function updateFlag(flagName) {
     validateInput();
 }
 
-function validateInput() {
-    sliderKeysValidation = ["TYPE_EMO_REFRAME-helpful_unhelpful","TYPE_TROUBLE-helpful_unhelpful"]   // list of keys to validate
-    allKeysExist = sliderKeysValidation.every(key => Object.keys(inTaskValues).includes(key));
+function validateInput() {	
+    sliderKeysValidation = []
+    messageFlagsValidation = ['client_response']
+    // sliderKeysValidation = ["TYPE_EMO_REFRAME-helpful_unhelpful"]   // list of keys to validate	   
+    // allKeysExist = sliderKeysValidation.every(key => Object.keys(inTaskValues).includes(key));	    
 
-    if (sessionStorage.getItem('show_emo') == 0) {
-        allKeysExist = true;    // if emo pane is not visible, then this flag should be true
-        messageFlagsValidation = ['client_response','support_trouble','support_info']
+    showEmo = sessionStorage.getItem('show_emo') == '1'
+    showInfo = sessionStorage.getItem('show_info') == '1'
+
+    if (showEmo) {
+        sliderKeysValidation.push("TYPE_EMO_REFRAME-helpful_unhelpful");
+        messageFlagsValidation.push('support_emo_reframe');
     }
-    else{
-        messageFlagsValidation = ['client_response','support_emo_sentiment','support_emo_reframe','support_trouble','support_info']
+
+    if (showInfo) {
+        sliderKeysValidation.push("TYPE_TROUBLE-helpful_unhelpful");
+        messageFlagsValidation.push('support_trouble', 'support_info');
     }
+
+    // if (sessionStorage.getItem('show_emo') == 0) {	    
+    //     messageFlagsValidation = ['client_response','support_trouble','support_info']	       
+    // }	    
+    // else{	   
+    //     messageFlagsValidation = ['client_response','support_emo_sentiment','support_emo_reframe','support_trouble','support_info']	       
+    // }	    
+    // allFlagsExist = messageFlagsValidation.every(key => Object.keys(messageFlags).includes(key));	    
+
+    allKeysExist = sliderKeysValidation.every(key => Object.keys(inTaskValues).includes(key));
     allFlagsExist = messageFlagsValidation.every(key => Object.keys(messageFlags).includes(key));
     
-    if (allKeysExist && allFlagsExist){
-        var input = document.getElementById('messageInput');
-        var button = document.getElementById('sendButton');
-        input.disabled = false;
-        button.disabled = false;
-    }
+    if (allKeysExist && allFlagsExist){	    
+        var input = document.getElementById('messageInput');	       
+        var button = document.getElementById('sendButton');	        
+        input.disabled = false;	        
+        button.disabled = false;	        
+    }	    
 }
+
+
 
 function createFooter(support_type) {
     const footer = document.createElement('div');
