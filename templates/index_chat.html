@@ -85,21 +85,26 @@
         </div>
 
 
+
         <div class="column is-6-desktop is-4-tablet is-8-mobile is-paddingless">
             <nav class="navbar has-shadow user-nav">
                 <div class="navbar-start">
                     <div class="media">
                         <div class="media-left">
                             <p>
-                                <span class="icon is-medium">
+                                <!-- <span class="icon is-medium">
                                     <i class="fa-solid fa-headset"></i>
-                                </span>
+                                </span> -->
+                                <figure class="image is-48x48">
+                                    <img class="is-rounded" src="{{current_client.avatar}}" />
+                                </figure>
+
                             </p>
                         </div>
                         <div class="media-content">
                             <div class="content">
                                 <p>
-                                    <strong>{{current_client}}</strong>
+                                    <strong>{{current_client.name}}</strong>
                                     <br>
                                     <small>online</small>
                                 </p>
@@ -108,6 +113,13 @@
                         <span id="typing" class="typing"></span>
                     </div>
                 </div>
+
+
+
+
+
+
+
                 <!-- <div class="navbar-end">
                     <div class="media-content">
                         <div class="content">

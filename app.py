@@ -92,7 +92,7 @@ def start_chat(scenario):
     # random.shuffle(clientQueue)
     client = clientQueue.pop(0)
     session_id = str(uuid4())   ### unique to each user/participant/representative
-    current_client = client['name']
+    current_client = client
     session[session_id] = {}
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue

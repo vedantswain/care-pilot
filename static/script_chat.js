@@ -17,7 +17,7 @@ function updateQueueDisplay(data) {
             <div class="media">
                 <div class="media-left">
                     <p>
-                        <figure class="image is-64x64">
+                        <figure class="image is-24x24">
                           <img class="is-rounded" src=${client.avatar} />
                         </figure>
                     </p>
@@ -35,6 +35,7 @@ function updateQueueDisplay(data) {
         queueContainer.appendChild(clientElement);
     });
 }
+
 
 // function endChatSession() {
  
