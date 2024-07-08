@@ -451,18 +451,18 @@ function retrieveEmoSupport(message, support_type){
     }
 }
 
-function sendTroubleFeedback(){
+function sendTroubleFeedback(support_type){
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
 
-    var input = document.getElementById(`${support_type}-helpful_unhelpful`);
+    var input = document.getElementById(`${support_type}-feedback`);
     var rate = input.value;
     fetch(`${sessionId}/store-touble-feedback`,{
         method: 'POST',
         headers:{
             'Content-Type': 'application/json',
         },
-        body: JSON.stringify({rate: rate, type:'TYPE_TROUBLE', client_id: clientId}),
+        body: JSON.stringify({rate: rate, type:support_type, client_id: clientId}),
     })
     .then(response => response.json())
     .catch((error)=>{
@@ -603,7 +603,7 @@ function sendMessage() {
     const showEmo = sessionStorage.getItem('show_emo');
 
     if(showInfo == '1'){
-        sendTroubleFeedback()
+        sendTroubleFeedback("TYPE_TROUBLE")
     }
 
     if (showEmo == '1') {
