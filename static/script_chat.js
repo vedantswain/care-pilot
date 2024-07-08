@@ -470,7 +470,7 @@ function sendTroubleFeedback(support_type) {
 
   var input = document.getElementById(`${support_type}-feedback`);
   var rate = input.value;
-  fetch(`${sessionId}/store-touble-feedback`, {
+  fetch(`/${sessionId}/store-trouble-feedback`, { 
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
