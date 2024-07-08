@@ -52,6 +52,7 @@ chat_post_task = db.chat_post_task
 chat_history_collection = db.chat_history
 chat_client_info = db.chat_client_info
 chat_in_task = db.chat_in_task
+chat_pre_task = db.chat_pre_task
 
 sender_agent = None
 chat_history = [
@@ -98,8 +99,48 @@ def start_chat(scenario):
     session[session_id]['client_queue'] = clientQueue
 
     clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
-    #
-    return redirect(url_for('index', session_id=session_id) + clientParam)
+
+    return redirect(url_for('getPreSurvey', session_id=session_id) + clientParam)
+
+# End-point to test the pre-survey HTML
+@app.route('/<session_id>/pre-task-survey')
+def getPreSurvey(session_id):
+    return render_template('pre_task_survey.html', session_id=session_id)
+ 
+@app.route('/<session_id>/store-pre-task-survey', methods=['POST'])
+def storePreSurvey(session_id):
+
+
+    if session_id in session:
+        
+        data = request.get_json()
+        clientParam = "?"+data['client_param']
+
+        for k in data:  # Convert string values into integers
+
+            if k != "client_param":
+                data[k] = int(data[k])
+
+        if not data:
+            return jsonify({"message": "No data received"}), 400
+
+        data['session_id'] = session_id
+        data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
+
+        try:
+            result = chat_pre_task.insert_one(data)
+            if result.inserted_id:
+                jsoninfo = {
+                    "message": "Survey data saved successfully", 
+                    "id": str(result.inserted_id)
+                }
+                return redirect(url_for('index', session_id=session_id) + clientParam, 302, jsoninfo)
+            else:
+                return jsonify({"message": "Failed to save data"}), 500
+        except Exception as e:
+            return jsonify({"message": str(e)}), 500
+    else:
+        return jsonify({"message": "Invalid session or session expired"}), 400
 
 
 @app.route('/<session_id>/')

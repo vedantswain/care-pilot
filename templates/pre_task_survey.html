@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Post-task Survey</title>
+    <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_chat.css') }}">
+</head>
+<body>
+
+<form id="preFeedbackForm">
+    <div class="modal" id="start-modal">
+        <div class="modal-content">
+
+            <!-- Interaction -->
+            <div class="block survey-section">
+                <div class="control content">
+                    <h5>Q1. To what extent do you agree with the following statements about the client you conversed with ？</h5>
+                    <h6>The client treated me in a polite manner:</h6>
+                        <label class="radio"><input type="radio" name="interaction_polite" value="-3"> Strongly disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_polite" value="-2"> Disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_polite" value="-1"> Somewhat disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_polite" value="0"> Neither agree nor disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_polite" value="1"> Somewhat agree</label>
+                        <label class="radio"><input type="radio" name="interaction_polite" value="2"> Agree</label>
+                        <label class="radio"><input type="radio" name="interaction_polite" value="3"> Strongly agree</label>
+
+                </div>
+                <div class="control content">
+
+                    <h6>The client treated me with dignity:</h6>
+                        <label class="radio"><input type="radio" name="interaction_dignity" value="-3"> Strongly disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_dignity" value="-2"> Disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_dignity" value="-1"> Somewhat disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_dignity" value="0"> Neither agree nor disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_dignity" value="1"> Somewhat agree</label>
+                        <label class="radio"><input type="radio" name="interaction_dignity" value="2"> Agree</label>
+                        <label class="radio"><input type="radio" name="interaction_dignity" value="3"> Strongly agree</label>
+
+                </div>
+                <div class="control content">
+
+                    <h6>The client treated me with respect:</h6>
+                        <label class="radio"><input type="radio" name="interaction_respect" value="-3"> Strongly disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_respect" value="-2"> Disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_respect" value="-1"> Somewhat disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_respect" value="0"> Neither agree nor disagree</label>
+                        <label class="radio"><input type="radio" name="interaction_respect" value="1"> Somewhat agree</label>
+                        <label class="radio"><input type="radio" name="interaction_respect" value="2"> Agree</label>
+                        <label class="radio"><input type="radio" name="interaction_respect" value="3"> Strongly agree</label>
+                </div>
+            </div>
+
+            <!-- Cognitive Demands/Resources -->
+            <div class="block survey-section">
+                <div class="control content">
+                    <h5>Q2. In the context of your last conversation...?</h5>
+                    <h6>How would you rate the demands on you:</h6>
+                        <label class="radio"><input type="radio" name="cognitive_demands" value="1"> Very low</label>
+                        <label class="radio"><input type="radio" name="cognitive_demands" value="2"> Low</label>
+                        <label class="radio"><input type="radio" name="cognitive_demands" value="3"> Moderate</label>
+                        <label class="radio"><input type="radio" name="cognitive_demands" value="4"> High</label>
+                        <label class="radio"><input type="radio" name="cognitive_demands" value="5"> Very high</label>
+                </div>
+                <div class="control content">
+                    <h6>How would you rate the resources available to you:</h6>
+                        <label class="radio"><input type="radio" name="cognitive_resources" value="1"> Very low</label>
+                        <label class="radio"><input type="radio" name="cognitive_resources" value="2"> Low</label>
+                        <label class="radio"><input type="radio" name="cognitive_resources" value="3"> Moderate</label>
+                        <label class="radio"><input type="radio" name="cognitive_resources" value="4"> High</label>
+                        <label class="radio"><input type="radio" name="cognitive_resources" value="5"> Very high</label>
+                </div>
+            </div>                
+
+            <!-- Valence/Arousal -->
+            <div class="block survey-section">
+                <div class="control content">
+                    <h5>Q3. How do you feel after the conversation?</h5>
+                    <h6>Rate your level of pleasure:</h6>
+                    <div class="slider-container">
+                        <span>Negative</span>
+                        <input type="range" name="affect_valence" min="-2" max="2" oninput="updateSlider(this.name, this.value)"  class="slider">
+                        <span>Positive</span>
+                    </div>
+                </div>
+                <div class="control content">
+                    <h6>Rate your level of energy:</h6>
+                    <div class="slider-container">
+                        <span>Calm</span>
+                        <input type="range" name="affect_arousal" min="-2" max="2" oninput="updateSlider(this.name, this.value)"  class="slider">
+                        <span>Excited</span>
+                    </div>
+                </div>
+            </div>
+
+            
+            <button class="button is-success" type="submit">Submit Survey and Start Next Chat</button>
+        </div>
+    </div>
+</form>
+
+<script src="{{ url_for('static', filename='pre_task_survey.js') }}"></script>
+
+</body>
+</html>
