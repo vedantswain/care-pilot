@@ -557,7 +557,7 @@ class mAgentCustomer:
     
     def get_civil_chain(self):
         qa_info_prompt = """
-            Your role is to act like a CUSTOMER seeking support. \
+            Your role is to act like a CLIENT seeking support. \
             You are speaking to a support REPRESENTATIVE. \
             Respond to the question as if you were the customer. \
             Do NOT reveal your role.\
