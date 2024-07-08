@@ -435,7 +435,7 @@ def getInfoSupport(session_id):
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number,
-            "support_type": "TYPE_CUE",
+            "support_type": "TYPE_INFO_CUE",
             "support_content": response_cw_info,
             "timestamp_arrival": timestamp
         })
@@ -465,7 +465,7 @@ def getTroubleSupport(session_id):
             "session_id": session_id,
             "client_id": client_id,
             "turn_number": turn_number,
-            "support_type": "TYPE_TROUBLE",
+            "support_type": "TYPE_INFO_GUIDE",
             "support_content": response,
             "timestamp_arrival": timestamp
         })
@@ -482,3 +482,11 @@ def getTroubleSupport(session_id):
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, threaded=True)
 #%%
+
+
+
+
+
+
+
+

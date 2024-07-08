@@ -212,11 +212,11 @@ function validateInput() {
 
   if (showEmo) {
     sliderKeysValidation.push('TYPE_EMO_REFRAME-helpful_unhelpful');
-    messageFlagsValidation.push('support_emo_reframe');
+    messageFlagsValidation.push('support_emo_reframe', 'support_emo_sentiment');
   }
 
   if (showInfo) {
-    sliderKeysValidation.push('TYPE_TROUBLE-helpful_unhelpful');
+    sliderKeysValidation.push('TYPE_INFO_GUIDE-helpful_unhelpful');
     messageFlagsValidation.push('support_trouble', 'support_info');
   }
 
@@ -314,14 +314,14 @@ function createLoader(loaderId = 'info-loader') {
   return loader;
 }
 
-function retrieveInfoSupport(message) {
+function retrieveInfoSupport(message,support_type) {
   const infoDiv = document.getElementById('co-pilot');
 
   const header = document.createElement('div');
   header.classList.add('card-header');
   const headerTitle = document.createElement('div');
   headerTitle.classList.add('card-header-title');
-  headerTitle.textContent = 'Ways to Continue the Conversation'.toUpperCase();
+  headerTitle.textContent = common_strings[support_type].toUpperCase();
   let loader = createLoader();
   header.appendChild(headerTitle);
   header.appendChild(loader);
@@ -517,7 +517,7 @@ function retrieveTroubleSupport(message, support_type) {
   header.classList.add('card-header');
   const headerTitle = document.createElement('div');
   headerTitle.classList.add('card-header-title');
-  headerTitle.textContent = 'Ways to Help Your Customers'.toUpperCase();
+  headerTitle.textContent = common_strings[support_type].toUpperCase();
   let loaderId = 'trouble-loader';
   let loader = createLoader(loaderId);
   header.appendChild(headerTitle);
@@ -573,11 +573,11 @@ function processClientResponse(data) {
   if (data.show_info == '1') {
     const infoDiv = document.getElementById('co-pilot');
     infoDiv.innerHTML = '';
-    retrieveInfoSupport(data.message);
+    retrieveInfoSupport(data.message, "TYPE_INFO_CUE");
 
     const troubleDiv = document.getElementById('troubleWindow');
     troubleDiv.innerHTML = '';
-    retrieveTroubleSupport(data.message, 'TYPE_TROUBLE');
+    retrieveTroubleSupport(data.message, 'TYPE_INFO_GUIDE');
   }
 
   if (data.show_emo == '1') {
@@ -618,7 +618,7 @@ function sendMessage() {
   const showEmo = sessionStorage.getItem('show_emo');
 
   if (showInfo == '1') {
-    sendTroubleFeedback('TYPE_TROUBLE');
+    sendTroubleFeedback('TYPE_INFO_GUIDE');
   }
 
   if (showEmo == '1') {
