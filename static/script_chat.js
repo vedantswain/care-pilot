@@ -193,7 +193,7 @@ function createSupportPane(messageText, msgClass){
     return article
 }
 
-// Rate Emopane !
+// Rate Emopane & trouble pane!
 var inTaskValues = {};
 var messageFlags = {};
 
@@ -218,7 +218,7 @@ function validateInput() {
         messageFlagsValidation = ['client_response','support_emo_sentiment','support_emo_reframe','support_trouble','support_info']
     }
     allFlagsExist = messageFlagsValidation.every(key => Object.keys(messageFlags).includes(key));
-
+    
     if (allKeysExist && allFlagsExist){
         var input = document.getElementById('messageInput');
         var button = document.getElementById('sendButton');
@@ -451,6 +451,26 @@ function retrieveEmoSupport(message, support_type){
     }
 }
 
+function sendTroubleFeedback(){
+    const sessionId = window.location.pathname.split('/')[1];
+    const clientId = sessionStorage.getItem('client_id');
+
+    var input = document.getElementById(`${support_type}-helpful_unhelpful`);
+    var rate = input.value;
+    fetch(`${sessionId}/store-touble-feedback`,{
+        method: 'POST',
+        headers:{
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({rate: rate, type:'TYPE_TROUBLE', client_id: clientId}),
+    })
+    .then(response => response.json())
+    .catch((error)=>{
+        console.error('error:',error);
+    });
+}
+
+
 function sendEmoFeedback(support_type) {
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
@@ -509,6 +529,7 @@ function retrieveTroubleSupport(message,support_type){
             p.appendChild(span);
             header.appendChild(p);
 
+            // support_type == "TYPE_TROUBLE"
             footer = createFooter(support_type);
             troubleDiv.appendChild(footer);
 
@@ -581,12 +602,10 @@ function sendMessage() {
     const showInfo = sessionStorage.getItem('show_info');
     const showEmo = sessionStorage.getItem('show_emo');
 
-
     if(showInfo == '1'){
-
         sendTroubleFeedback()
-
     }
+
     if (showEmo == '1') {
         // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
         // retrieveEmoFeedback(TYPE_EMO_SHOES);
@@ -618,10 +637,6 @@ function sendMessage() {
         console.error('Error:', error);
     });
     }
-
-function sendTroubleFeedback(){
-    
-}
 
 
 // Define a function to execute after the page loads

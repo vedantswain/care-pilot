@@ -267,6 +267,35 @@ def storePostSurvey(session_id):
     else:
         return jsonify({"message": "Invalid session or session expired"}), 400
 
+@app.route('/<session_id>/store-trouble-feedback',methods=['POST'])
+def storeTroubleFeedback(session_id):
+    if session_id in session:
+        client_id = request.json.get("client_id")
+        rating = int(request.json.get("rate")) * -1
+        support_type = request.json.get ("type")
+
+        turn_number = len(session[session_id][client_id]["chat_hostory"])//2+1
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+    
+        query = {
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": support_type
+        }
+        update = {
+            "$set":{
+                "user_feedback": rating,
+                "timestamp_feedback": timestamp,
+            }
+        }
+        res = chat_in_task.update_one(query, update)
+        if res.modified_count  == 0:
+            return jsonify({"message": "No existing record found to update"}), 404
+        return jsonify({"message": "Trouble feedback received"}), 200
+    return jsonify({"message": "Invalid session or session expired"}), 400
+   
+    
 
 @app.route('/<session_id>/store-emo-feedback', methods=['POST'])
 def storeEmoFeedback(session_id):
