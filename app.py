@@ -418,7 +418,6 @@ def sentiment(session_id):
 def getInfoSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
-
         reply = request.json.get("client_reply")
         # support_type = request.json.get("type")
 
@@ -428,9 +427,23 @@ def getInfoSupport(session_id):
         response_cw_info = info_agent.invoke({'domain': session[session_id][client_id]["domain"],'complaint':reply, "chat_history": chat_history})
         # response = response_cw_info.content
 
+        turn_number = len(chat_history) // 2 + 1
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+
+
+        chat_in_task.insert_one({
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": "TYPE_SENTIMENT",
+            "support_content": response_cw_info,
+            "timestamp_arrival": timestamp
+        })
         return jsonify({
             "message": response_cw_info
         })
+    return jsonify({"message": "Invalid session or session expired"}), 400
+
 
 @app.route('/<session_id>/get-trouble-support', methods=['POST'])
 def getTroubleSupport(session_id):
@@ -445,9 +458,23 @@ def getTroubleSupport(session_id):
         response_cw_trouble = trouble_agent.invoke({'domain': session[session_id][client_id]["domain"],'complaint':reply, "chat_history": chat_history})
         response = "Troubleshooting Guide:\n" + response_cw_trouble
 
+        turn_number = len(chat_history) // 2 + 1
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+
+        chat_in_task.insert_one({
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": "TYPE_SENTIMENT",
+            "support_content": response,
+            "timestamp_arrival": timestamp
+        })
+
         return jsonify({
             "message": response
         })
+    return jsonify({"message": "Invalid session or session expired"}), 400
+
 
 
 
