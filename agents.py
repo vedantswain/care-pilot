@@ -164,6 +164,7 @@ class mAgentTrouble:
             
             ONLY list actionable items.\
             AVOID vague or general suggestions.\
+            DO NOT list action items that the representative has already taken.\
             Every item should be less than 10 words.\
                             
             Every item should be in a newline.\
