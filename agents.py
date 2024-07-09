@@ -33,9 +33,17 @@ llmchat = lcai.AzureChatOpenAI(
 llminfo = lcai.AzureChatOpenAI(
     openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
     azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
-    azure_deployment="NUHAI-GPT4",
-    openai_api_version="2024-02-15-preview",
-    model_name="gpt-4",
+    azure_deployment="PROPILOT",
+    openai_api_version="2024-05-01-preview",
+    model_name="gpt-4o",
+    temperature=0.1
+)
+llmemo = lcai.AzureChatOpenAI(
+    openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
+    azure_endpoint=os.getenv("AZURE_OPENAI_ENDPOINT"),
+    azure_deployment="PROPILOT",
+    openai_api_version="2024-05-01-preview",
+    model_name="gpt-4o",
     temperature=0.1
 )
 
