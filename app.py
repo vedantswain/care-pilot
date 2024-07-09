@@ -396,7 +396,7 @@ def getInfoSupport(session_id):
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        response_cw_info = info_agent.invoke({'domain': session[session_id][client_id]["domain"],'complaint':reply, "chat_history": chat_history})
+        response_cw_info = info_agent.invoke({'domain': session[session_id][client_id]["domain"],'message':reply, 'sender':'client', "chat_history": chat_history})
         # response = response_cw_info.content
 
         return jsonify({
@@ -413,7 +413,7 @@ def getTroubleSupport(session_id):
         retrieve_from_session = json.loads(json.dumps(session[session_id][client_id]["chat_history"]))
         chat_history = messages_from_dict(retrieve_from_session)
 
-        response_cw_trouble = trouble_agent.invoke({'domain': session[session_id][client_id]["domain"],'complaint':reply, "chat_history": chat_history})
+        response_cw_trouble = trouble_agent.invoke({'domain': session[session_id][client_id]["domain"],'message':reply, 'sender':'client', "chat_history": chat_history})
         response = "Troubleshooting Guide:\n" + response_cw_trouble
 
         return jsonify({

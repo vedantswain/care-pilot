@@ -55,86 +55,85 @@ categories = {
     "Policy": "The rules and guidelines set by the company that impact customer experiences, especially when these policies lead to grievances due to perceived unfairness or inflexibility. This category encompasses non-price-related issues that don't fit under other categories but should have a policy in place.",
     "Resolution": "The actions taken by a company to address and resolve complaints, focusing on the effectiveness and customer satisfaction with the solutions provided. This should mainly include responses made after a complaint has been submitted, and response has been received, where the customer still remains dissatisfied with the resolution."
 }
+
+def extract_cues(chain_output):
+    cues_text = chain_output.content
+    # Assuming each cue is separated by a newline in the chain_output.
+    cues = cues_text.split('\n')
+    # Filter out any empty strings or whitespace-only strings
+    cues = [cue.strip() for cue in cues if cue.strip()]
+    # Return the first 2 - 3 cues
+    processed_cues = [re.sub(r'^\d+\.\s*', '', cue) for cue in cues]
+
+    return processed_cues
+
+def get_historical_context_chain():
+    contextualize_q_system_prompt = """
+    Your role is to ensure that {message} can be understood without the chat history.\
+    
+    The chat history contains an online conversation between a customer and a support representative.\
+    The {message} is {sender}'s latest response in the chat.\
+    
+    Summarize the chat history in a way that provides context for the {message}.\
+    """
+    contextualize_q_prompt = ChatPromptTemplate.from_messages(
+        [
+            ("system", contextualize_q_system_prompt),
+            MessagesPlaceholder(variable_name="chat_history"),
+            ("human", "{sender}:{message}"),
+        ]
+    )
+    contextualize_q_chain = contextualize_q_prompt | llminfo | StrOutputParser()
+    return contextualize_q_chain
+
 class mAgentInfo:
     def __init__(self):
         self.info_chain = self.agent_coworker_info()
 
-    def invoke(self, user_input):
+    def invoke(self, input_params):
         info_cue = self.info_chain.invoke({
-            'domain':user_input['domain'], 
-            'complaint':user_input['complaint'], 
-            'chat_history':user_input['chat_history'],
-            'categories': ', '.join(categories.keys()) 
+            'domain':input_params['domain'],
+            'message':input_params['message'],
+            'sender': input_params['sender'],
+            'chat_history':input_params['chat_history']
             })
 
         return info_cue
     
-    def get_historical_info_context_chain(self):
-        contextualize_q_system_prompt = """
-            Think step by step:\
-            First, read through the chat history carefully to understand the context.\
-            Then, read the latest user input and identify any references to the previous context.\
-            Next, rephrase the user input into a clear, standalone statement that captures the intent and can be understood independently without the chat history.\
-            Respond only with the rephrased standalone query.\
-            Do NOT provide any additional explanations or commentary.\
-            If the user input does not reference any context, simply return it as is."""
-        contextualize_q_prompt = ChatPromptTemplate.from_messages(
-            [
-                ("system", contextualize_q_system_prompt),
-                MessagesPlaceholder(variable_name="chat_history"),
-                ("user", "{complaint}"),
-            ]
-        )
-        contextualize_q_chain = contextualize_q_prompt | llmchat | StrOutputParser()
-        return contextualize_q_chain
-    
+
     def agent_coworker_info(self):
-        client = mLangChain()
-        prompt = """Your role is to help a service representative by providing INFORMATIONAL SUPPORT. \
-                    The representative is chatting online with a customer complaining about {domain}.  \
-                    The INFORMATIONAL SUPPORT should fit into 5 categories: {categories}.\
-                    
-                    Given the chat history,
-                    provide 2-3 hints to help the representative's response.\
-                    The hints should direct the representative to do ONLY ONE of the following:\
-                    
-                    1) Inquire more details about the problem. OR \
-                    2) Request the customer to troubleshoot. OR \
-                    3) Provide a solution to resolve the customer's need. \
-                    
-                    Each cue should be a single phrase of less than 10 words.\
-                    Do NOT number the cues.\
-                    
-                    Customer message: {complaint}
-                    Hints: {categories}
-                """
+        prompt = """Your role is to help a service representative write a response to a customer they are chatting with online. \
+
+            The representative needs to address the customer's complaint without escalating the issue to a supervisor.\
+            The representatives response should have ONE of the following goals:
+            1) Inquire more details about the problem. OR \
+            2) Request the customer to troubleshoot. OR \
+            3) Provide a solution to resolve the customer's need. \
+            
+            Given the chat history,
+            provide 3 hints to help the representative's response.\
+            
+            Each hint should be a short phrase in a new line.\
+            Do NOT number the cues.\
+            Do NOT provide the representative with a full response,\
+            ONLY provide hints to guide the representative's response.\
+            """
+
         template = ChatPromptTemplate.from_messages(
             [
                 ("system", prompt),
                 MessagesPlaceholder(variable_name="chat_history"),
-                ("user", "{domain}: {complaint}"),
+                ("user", "{domain}: {message}"),
             ]
         )
-        chain = template | client.client_completion
 
         chain = (RunnablePassthrough.assign(
-            context=self.get_historical_info_context_chain()
+            context=get_historical_context_chain()
         )
-                | template
-                | llminfo
-                )
-        
-        def extract_cues(chain_output):
-            cues_text = chain_output.content
-            # Assuming each cue is separated by a newline in the chain_output.
-            cues = cues_text.split('\n')
-            # Filter out any empty strings or whitespace-only strings
-            cues = [cue.strip() for cue in cues if cue.strip()]
-            # Return the first 2 - 3 cues
-            processed_cues = [re.sub(r'^\d+\.\s*', '', cue) for cue in cues]
+                 | template
+                 | llminfo
+                 )
 
-            return processed_cues[:3]
-        
         chain = chain | extract_cues
 
         return chain
@@ -144,56 +143,49 @@ class mAgentTrouble:
     def __init__(self):
         self.trouble_chain = self.agent_coworker_trouble()
 
-    def invoke(self, user_input):
+    def invoke(self, input_params):
         trouble_steps = self.trouble_chain.invoke({
-            'domain':user_input['domain'], 
-            'complaint':user_input['complaint'], 
-            'chat_history':user_input['chat_history'],
-            'categories': ', '.join(categories.keys()) 
-            })
+            'domain':input_params['domain'],
+            'message':input_params['message'],
+            'sender': input_params['sender'],
+            'chat_history':input_params['chat_history']
+        })
 
         return trouble_steps
     
     def agent_coworker_trouble(self):
-        client = mLangChain()
-        prompt = """Your role is to help a service representative by providing PROCEDURAL SUPPORT. \
-                    The representative is chatting online with a customer complaining about {domain}. \
-                    The PROCEDURAL SUPPORT should fit into 5 categories: {categories}.\
-                    Given the chat history,
-                    list 3-7 steps to guide the representative in resolving the customer complaint.\
-                    Review the similar PROCEDURAL SUPPORT history if exist, then assess the current situation in depth and provide detailed steps for resolution\
-                    if not exist, offer an alternative solution that can solve current solution as detail as possible\
+        prompt = """Your role is to guide a service representative to  resolve the complaint of a customer, to whom they are chatting with online. \
 
-                    Do NOT include steps that have already been tried.\
-                    Every step should be less than 10 words.\
-                                    
-                    ###Format every step in a newline:\
-                    Step 1: \n
-                    step 2: \n
-                    step 3: \n
-                    step 4: \n
-                    step 5: \n
+            The representative needs to address the customer's complaint without escalating the issue to a supervisor.\
+            
+            Review the chat history to understand the steps the representative has taken in response to the complaint. \
+            
+            List 3-7 items of procedure the representative needs to consider to best service the complaint.\
+            
+            ONLY list actionable items.\
+            AVOID vague or general suggestions.\
+            Every item should be less than 10 words.\
+                            
+            Every item should be in a newline in this format:\
+            1: \n
                     
-                    ... ###
-                    
-                    Customer message: {complaint}
-                    Troubleshooting Steps: {categories}
                 """
         template = ChatPromptTemplate.from_messages(
             [
                 ("system", prompt),
                 MessagesPlaceholder(variable_name="chat_history"),
-                ("user", "{domain}: {complaint}"),
+                ("user", "{domain}: {message}"),
             ]
         )
-        chain = template | client.client_completion
 
-        # chain = (RunnablePassthrough.assign(
-        #     context=get_historical_info_context_chain()
-        # )
-        #         | template
-        #         | client.client_completion
-        #         )
+        chain = (RunnablePassthrough.assign(
+            context=get_historical_context_chain()
+        )
+                 | template
+                 | llminfo
+                 )
+
+        chain = chain | extract_cues
 
         return chain
 
@@ -205,7 +197,7 @@ class mAgentEP:
 
     def invoke(self, user_input):
 
-        # emo_perspec = self.ep_chain.invoke({'complaint':user_input['complaint'], 'chat_history':user_input['chat_history']})
+        # emo_perspec = self.ep_chain.invoke({'complaint':input_params['complaint'], 'chat_history':input_params['chat_history']})
         emo_perspec = self.ep_chain.invoke({'complaint':user_input['complaint']})
         final_res = self.rephrase.invoke({'response': emo_perspec})
 
@@ -436,7 +428,7 @@ class mAgentER:
             'reframe': reframe.strip(),
         }
     
-# delete    def invokeThought(self, user_input):
+# delete    def invokeThought(self, input_params):
 
     def agent_coworker_emo_situation(self):
         client = mLangChain()
