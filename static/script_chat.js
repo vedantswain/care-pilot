@@ -101,8 +101,7 @@ function createSupportPane(messageText, msgClass){
 
     const body = document.createElement('div');
     innerContent = document.createElement('div');
-    markedmsgText = marked.parse(messageText);
-    innerContent.innerHTML = markedmsgText;
+    innerContent.innerHTML = messageText;
 
     if (msgClass === "senti"){
         const span = document.createElement('span');
@@ -156,33 +155,6 @@ function createSupportPane(messageText, msgClass){
     body.appendChild(innerContent);
 
     if (msgClass === "info"){
-        // let header = body.querySelector('.card-header');
-        // if (!header) {
-        //     header = document.createElement('div');
-        //     header.classList.add('card-header');
-        //     body.insertBefore(header, body.firstChild); // Insert at the top
-        // }
-
-        // const button = document.createElement('button');
-        // button.classList.add('card-header-icon');
-        // const span = document.createElement('span');
-        // span.classList.add('icon', 'is-small');
-        // const icon = document.createElement('i');
-        // icon.classList.add('fas', 'fa-copy');
-        // span.appendChild(icon);
-        // button.appendChild(span);
-        // header.appendChild(button);
-        // //article.appendChild(header);
-        // button.addEventListener('click', () => {
-        //     navigator.clipboard.writeText(messageText)
-        //         .then(() => {
-        //             const textarea = document.getElementById('messageInput');
-        //             textarea.value = messageText;
-        //         })
-        //         .catch(err => {
-        //             console.error('Could not copy text: ', err);
-        //         });
-        // });
 
         article.classList.add('is-info')
     }
@@ -190,6 +162,8 @@ function createSupportPane(messageText, msgClass){
         article.classList.add('is-emo')
     }
     if (msgClass === "trouble"){
+        innerContent.innerHTML = "";
+        innerContent.appendChild(messageText);
         article.classList.add('is-trouble')
     }
     //article.appendChild(header);
@@ -499,7 +473,18 @@ function retrieveTroubleSupport(message){
         })
         .then(response => response.json())
         .then(data => {
-            var troubleMessage = createSupportPane(data.message, "trouble")
+
+            const orderList = document.createElement('ol');
+
+            data.message.forEach((message) => {
+                var infoMessage = document.createElement('li');
+                infoMessage.textContent = message;
+                orderList.appendChild(infoMessage);
+            });
+
+            var troubleMessage = createSupportPane(orderList, "trouble")
+
+
             troubleDiv.appendChild(troubleMessage);
             //troubleDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();

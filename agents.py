@@ -166,8 +166,7 @@ class mAgentTrouble:
             AVOID vague or general suggestions.\
             Every item should be less than 10 words.\
                             
-            Every item should be in a newline in this format:\
-            1: \n
+            Every item should be in a newline.\
                     
                 """
         template = ChatPromptTemplate.from_messages(

@@ -414,7 +414,7 @@ def getTroubleSupport(session_id):
         chat_history = messages_from_dict(retrieve_from_session)
 
         response_cw_trouble = trouble_agent.invoke({'domain': session[session_id][client_id]["domain"],'message':reply, 'sender':'client', "chat_history": chat_history})
-        response = "Troubleshooting Guide:\n" + response_cw_trouble
+        response = response_cw_trouble
 
         return jsonify({
             "message": response
