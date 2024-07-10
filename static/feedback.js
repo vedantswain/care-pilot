@@ -11,11 +11,26 @@ function updateClientQueue() {
     fetch(`/${sessionId}/update-clientQueue`)
     .then(response => response.json())
     .then(data => {
+// issue_68!!! 
+// show complete when == 0 , <=2; otherwise hide it 
+        if (data.queueLength <= 2 && data.queueLength > 0) {
+            completeButton.style.display = 'block';
+        } else if (data.queueLength === 0) {
+            completeButton.style.display = 'block';
+        } else {
+            completeButton.style.display = 'none';
+        }
+
         if (data.url) {
             window.location.href = data.url;
         }
     })
     .catch(error => console.error('Error updating client queue:', error));
+}
+
+
+function completeSurvey() {
+    window.location.href = '/complete';
 }
 
 document.addEventListener('DOMContentLoaded', function() {
