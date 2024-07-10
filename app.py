@@ -53,6 +53,7 @@ chat_history_collection = db.chat_history
 chat_client_info = db.chat_client_info
 chat_in_task = db.chat_in_task
 
+
 sender_agent = None
 chat_history = [
 ]
@@ -476,6 +477,17 @@ def getTroubleSupport(session_id):
     return jsonify({"message": "Invalid session or session expired"}), 400
 
 
+@app.route('/history/<session_id>')
+def reflectHistory(session_id):
+    chat_history = list(chat_history_collection.find({"session_id": session_id}, {"_id": 0}))
+    return jsonify({"chat_history": chat_history})
+
+@app.route('/conversation_history')
+def conversation_history():
+    session_id = request.args.get('session_id')
+    if not session_id:
+        return "Session ID is missing", 400
+    return render_template('conversation_history.html', session_id=session_id)
 
 
 

@@ -57,6 +57,22 @@ function confirmNextClient(sessionId) {
   }
 }
 
+function goToHistoryPage(session_id) {
+    console.log("Session ID:", session_id);  
+    if (session_id) {
+        window.location.href = `/conversation_history?session_id=${session_id}`;
+    } else {
+        console.error('Session ID is missing');
+        alert('Session ID is missing');
+    }
+}
+
+
+
+
+
+
+
 function showSurveyModal() {
   const goSurvey = confirm(
     'Do you want to end the conversation and go to survey?'
