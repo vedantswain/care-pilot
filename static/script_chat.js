@@ -7,7 +7,7 @@ function updateQueueDisplay(data) {
     clientElement.className = 'list-item box';
     // userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
     clientElement.innerHTML = `
-            <div class="media">
+            <div class="media">   
                 <div class="media-left">
                     <p>
                         <span class="icon is-large">
