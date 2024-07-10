@@ -475,33 +475,6 @@ def getTroubleSupport(session_id):
         })
     return jsonify({"message": "Invalid session or session expired"}), 400
 
-#  issue_68!!!
-@app.route('/<session_id>/update-clientQueue')
-def updateClientQueue(session_id):
-    if session_id not in session:
-        return jsonify({"message": "Invalid session"}), 400
-
-# only show complete
-    client_queue = session[session_id].get('client_queue', [])
-    if not client_queue:
-        return jsonify({"queueLength": 0, "url": "/complete"})
-
-    current_client = session[session_id].get('current_client')
-    if current_client in client_queue:
-        client_queue.remove(current_client)
-
-    session[session_id]['client_queue'] = client_queue
-    queue_length = len(client_queue)
-
-# show both, hide function is used in the front end
-    if queue_length > 0:
-        session[session_id]['current_client'] = client_queue[0]
-        next_client_url = f'/{session_id}/post-task-survey'
-        return jsonify({"url": next_client_url, "queueLength": queue_length})
-    else:
-        complete_url = '/complete'
-        return jsonify({"url": complete_url, "queueLength": queue_length})
-
 
 @app.route('/complete')
 def complete():
