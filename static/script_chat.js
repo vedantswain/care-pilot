@@ -27,6 +27,17 @@ function updateQueueDisplay(data) {
         `;
     queueContainer.appendChild(clientElement);
   });
+
+  nextButton = document.getElementById('nextButton');
+  completeButton = document.getElementById('completeButton');
+
+  if (data.clientQueue.length > 0) {
+      nextButton.style.display = 'block';
+  }
+  if (data.clientQueue.length < 3) {
+      completeButton.style.display = 'block';
+  }
+
 }
 
 // function endChatSession() {

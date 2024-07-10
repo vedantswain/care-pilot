@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Survey Complete</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bulma@0.8.1/css/bulma.min.css">
+    <style>
+        .container {
+            text-align: center;
+            margin-top: 50px;
+        }
+        .logo {
+            width: 150px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+        .survey-link {
+            font-size: 20px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <img src="{{ url_for('static', filename='pro-graphic.png') }}" alt="Logo" class="logo">
+        <p class="survey-link">
+            <a href="https://neu.co1.qualtrics.com/jfe/preview/previewId/28e095ac-3195-473f-a99b-7283b81f6fc5/SV_2gwveVtVLewIgcu?Q_CHL=preview&Q_SurveyVersionID=current" target="_blank">Complete the survey</a>
+        </p>
+    </div>
+</body>
+</html>

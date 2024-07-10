@@ -517,6 +517,10 @@ def getTroubleSupport(session_id):
     return jsonify({"message": "Invalid session or session expired"}), 400
 
 
+@app.route('/complete')
+def complete():
+    return render_template('complete.html')
+
 
 
 

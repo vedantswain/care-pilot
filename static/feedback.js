@@ -11,6 +11,7 @@ function updateClientQueue() {
     fetch(`/${sessionId}/update-clientQueue`)
     .then(response => response.json())
     .then(data => {
+
         if (data.url) {
             window.location.href = data.url;
         }
@@ -18,10 +19,18 @@ function updateClientQueue() {
     .catch(error => console.error('Error updating client queue:', error));
 }
 
+function completeSurvey() {
+    window.location.href = '/complete';
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     const form = document.getElementById('feedbackForm');
+
     form.addEventListener('submit', function(e) {
-        e.preventDefault(); 
+        e.preventDefault();
+
+        const submitterButton = e.submitter.id;
+
         const formData = new FormData(this);
         const formValues = {};
         formData.forEach((value, key) => { formValues[key] = value; });
@@ -63,7 +72,12 @@ document.addEventListener('DOMContentLoaded', function() {
             console.log('Success:', data);
             alert('Feedback submitted successfully!');
 
-            updateClientQueue();
+            if (submitterButton == "completeButton") {
+                completeSurvey();
+            }
+            else {
+                updateClientQueue();
+            }
         })
         .catch((error) => {
             console.error('Error:', error);
