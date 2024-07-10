@@ -1,7 +1,18 @@
-function chatBubbles(message, sender) {
-    const bubble = document.createElement('div');
-    bubble.className = sender === 'client' ? 'msg-outgoing' : 'msg-incoming';
-    bubble.innerHTML = `<article class="message ${sender === 'client' ? 'is-link' : 'is-warning'}"><div class="message-body">${message}</div></article>`;
+function createChatBubble(message, sender) {
+    const bubble = document.createElement('article');
+    let body = document.createElement('div');
+
+    if (sender === 'representative') {
+    bubble.classList.add('message', 'is-dark', 'msg-outgoing');
+    }
+    if (sender === 'client') {
+    bubble.classList.add('message', 'is-warning', 'msg-incoming');
+    }
+
+    body.classList.add('message-body');
+    body.innerHTML = message;
+    bubble.appendChild(body);
+
     document.getElementById('chatWindow').appendChild(bubble);
 }
 
@@ -24,8 +35,8 @@ function displayClientInfo(clients_info) {
                 <div class="media-content is-hidden-mobile">
                     <div class="content">
                         <p>
-                            <strong>Client Name :${client.client_name}</strong><br>
-                            <small class="has-text-weight-semibold">ID: ${client.client_id}</small>
+                            <strong>${client.client_name}</strong><br>
+                            <small class="has-text-weight-semibold">${client.category}</small>
                         </p>
                     </div>
                 </div>
@@ -33,20 +44,25 @@ function displayClientInfo(clients_info) {
         `;
         clientElement.addEventListener('click', () => {
             document.getElementById('chatWindow').innerHTML = '';
-            getClientHistory(client.client_id);
+            getClientHistory(client.client_id, client.client_name);
         });
         clientInfoContainer.appendChild(clientElement);
     });
 }
 
-function getClientHistory(client_id) {
+function getClientHistory(client_id, client_name) {
+    var clientNameElement = document.getElementById('client-history-name');
+    clientNameElement.innerHTML = client_name
+    var clientSubtitleElement = document.getElementById('client-history-subtitle');
+    clientSubtitleElement.innerHTML = 'Chat History'
+
     const sessionId = new URLSearchParams(window.location.search).get('session_id');
     fetch(`/history/${sessionId}/${client_id}`)
     .then(response => response.json())
     .then(data => {
         if (data.chat_history) {
             data.chat_history.forEach(chat => {
-                chatBubbles(chat.message, chat.sender);
+                createChatBubble(chat.message, chat.sender);
             });
         } else {
             alert('No chat history found');

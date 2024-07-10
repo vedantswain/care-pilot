@@ -17,9 +17,10 @@
             background-color: #f0f0f0;
         }
         .msg-incoming {
-            align-self: flex-start;
+            width: 32em;
         }
         .msg-outgoing {
+            width: 32em;
             align-self: flex-end;
         }
     </style>
@@ -28,13 +29,45 @@
 <body>
 
 <div class="columns is-mobile">
+
     <div class="column is-3 sidebar-user hero is-fullheight">
         <div id="clientInfo" class="box" style="margin: 16px;"></div>
     </div>
 
-    <div class="column is-6">
-        <div id="chatWindow" style="max-height: 55vh; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 10px;"></div>
+    <div class="column is-6-desktop is-4-tablet is-8-mobile is-paddingless">
+        <nav class="navbar has-shadow user-nav">
+            <div class="navbar-start">
+                <div class="media">
+                    <div class="media-left">
+                        <p>
+                    <span class="icon is-medium">
+                        <i class="fa-solid fa-headset"></i>
+                    </span>
+                        </p>
+                    </div>
+                    <div class="media-content">
+                        <div class="content">
+                            <p>
+                                <strong id="client-history-name">[...]</strong>
+                                <br>
+                                <small id="client-history-subtitle">Select client from the left</small>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+
+        <div class="columns">
+            <div class="column is-12 is-12-mobile is-flex hero is-fullheight message-window">
+
+                <div class="flex-item-1" id="chatWindow" style=" width: 100%; display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 55vh;">
+
+                </div>
+            </div>
+        </div>
     </div>
+
 </div>
 
 </body>

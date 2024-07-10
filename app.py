@@ -117,6 +117,7 @@ def index(session_id):
 def getReply(session_id):
     clientQueue = session[session_id]['client_queue']
     if request.method == 'GET':
+        val_name = request.args.get('name')
         val_domain = request.args.get('domain')
         val_category = request.args.get('category')
         val_grateful = request.args.get('grateful')
@@ -148,6 +149,7 @@ def getReply(session_id):
         chat_client_info.insert_one({
             "session_id": session_id,
             "client_id": client_id,
+            "client_name":val_name,
             "domain": val_domain,
             "category": val_category,
             "grateful": val_grateful,
@@ -484,14 +486,13 @@ def conversation_history():
     return render_template('conversation_history.html', session_id=session_id)
 
 @app.route('/history/<session_id>/<client_id>')
-def reflectClientHistory(session_id, client_id):
+def getClientHistory(session_id, client_id):
     chat_history = list(chat_history_collection.find({"session_id": session_id, "client_id": client_id}, {"_id": 0}))
     return jsonify({"chat_history": chat_history})
 
 @app.route('/history/<session_id>')
-def reflectHistory(session_id):
-    chat_history = list(chat_history_collection.find({"session_id": session_id}, {"_id": 0}))
-    clients_info = list(chat_client_info.find({"session_id": session_id}, {"_id": 0, "client_name": 1, "client_id": 1}))
+def getClientList(session_id):
+    clients_info = list(chat_client_info.find({"session_id": session_id}, {"_id": 0, "client_name": 1, "client_id": 1, "category":1}))
     return jsonify({"chat_history": chat_history, "clients_info": clients_info})
 
 
