@@ -54,6 +54,7 @@ chat_client_info = db.chat_client_info
 chat_in_task = db.chat_in_task
 chat_pre_task = db.chat_pre_task
 
+
 sender_agent = None
 chat_history = [
 ]
@@ -98,7 +99,8 @@ def start_chat(scenario):
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue
 
-    clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientParam = f"?name={client['name']}&domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    #
 
     return redirect(url_for('getPreSurvey', session_id=session_id) + clientParam)
 
@@ -106,13 +108,13 @@ def start_chat(scenario):
 @app.route('/<session_id>/pre-task-survey')
 def getPreSurvey(session_id):
     return render_template('pre_task_survey.html', session_id=session_id)
- 
+
 @app.route('/<session_id>/store-pre-task-survey', methods=['POST'])
 def storePreSurvey(session_id):
 
 
     if session_id in session:
-        
+
         data = request.get_json()
         clientParam = "?"+data['client_param']
 
@@ -131,7 +133,7 @@ def storePreSurvey(session_id):
             result = chat_pre_task.insert_one(data)
             if result.inserted_id:
                 jsoninfo = {
-                    "message": "Survey data saved successfully", 
+                    "message": "Survey data saved successfully",
                     "id": str(result.inserted_id)
                 }
                 return redirect(url_for('index', session_id=session_id) + clientParam, 302, jsoninfo)
@@ -157,6 +159,7 @@ def index(session_id):
 def getReply(session_id):
     clientQueue = session[session_id]['client_queue']
     if request.method == 'GET':
+        val_name = request.args.get('name')
         val_domain = request.args.get('domain')
         val_category = request.args.get('category')
         val_grateful = request.args.get('grateful')
@@ -188,6 +191,7 @@ def getReply(session_id):
         chat_client_info.insert_one({
             "session_id": session_id,
             "client_id": client_id,
+            "client_name":val_name,
             "domain": val_domain,
             "category": val_category,
             "grateful": val_grateful,
@@ -266,7 +270,7 @@ def update_client_queue(session_id):
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue
 
-    clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientParam = f"?name={client['name']}&domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     new_url = url_for('index', session_id=session_id) + clientParam
 
     return jsonify({"url": new_url})
@@ -516,12 +520,26 @@ def getTroubleSupport(session_id):
         })
     return jsonify({"message": "Invalid session or session expired"}), 400
 
+@app.route('/conversation_history')
+def conversation_history():
+    session_id = request.args.get('session_id')
+    if not session_id:
+        return "Session ID is missing", 400
+    return render_template('conversation_history.html', session_id=session_id)
 
 @app.route('/complete')
 def complete():
     return render_template('complete.html')
 
+@app.route('/history/<session_id>/<client_id>')
+def getClientHistory(session_id, client_id):
+    chat_history = list(chat_history_collection.find({"session_id": session_id, "client_id": client_id}, {"_id": 0}))
+    return jsonify({"chat_history": chat_history})
 
+@app.route('/history/<session_id>')
+def getClientList(session_id):
+    clients_info = list(chat_client_info.find({"session_id": session_id}, {"_id": 0, "client_name": 1, "client_id": 1, "category":1}))
+    return jsonify({"chat_history": chat_history, "clients_info": clients_info})
 
 
 if __name__ == "__main__":

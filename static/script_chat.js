@@ -7,7 +7,7 @@ function updateQueueDisplay(data) {
     clientElement.className = 'list-item box';
     // userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
     clientElement.innerHTML = `
-            <div class="media">
+            <div class="media">   
                 <div class="media-left">
                     <p>
                         <span class="icon is-large">
@@ -19,7 +19,7 @@ function updateQueueDisplay(data) {
                     <div class="content">
                         <p>
                             <strong>${client.name}</strong>
-                            <br><small class="has-text-weight-semibold">${client.complaint}</small>
+                            <br><small class="has-text-weight-semibold">${client.category}</small>
                         </p>
                     </div>
                 </div>
@@ -67,6 +67,22 @@ function confirmNextClient(sessionId) {
       .catch((error) => console.error('Error:', error));
   }
 }
+
+function goToHistoryPage(session_id) {
+    console.log("Session ID:", session_id);  
+    if (session_id) {
+        window.location.href = `/conversation_history?session_id=${session_id}`;
+    } else {
+        console.error('Session ID is missing');
+        alert('Session ID is missing');
+    }
+}
+
+
+
+
+
+
 
 function showSurveyModal() {
   const goSurvey = confirm(
