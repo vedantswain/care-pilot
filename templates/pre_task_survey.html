@@ -8,13 +8,19 @@
 </head>
 <body>
 
-<form id="preFeedbackForm">
-    <div class="modal" id="start-modal">
+<div class="modal" id="start-modal">
+    <form id="preFeedbackForm">
+        <header class="modal-card-head">
+            <p class="modal-card-title">Baseline</p>
+        </header>
         <div class="modal-content">
+
+            <div class="block is-size-4">
+                Think about the typical client you interact with as a part of your front-office role. Answer the following questions with respect to that typical client.
+            </div>
 
             <!-- Interaction -->
             <div class="block survey-section">
-                <h5>Think about the typical client you interact with as a part of your front-office role. Answer the following questions with respect to that typical client.</h5>
 
                 <div class="control content">
                     <h5>Q1. To what extent do you agree with the following statements about the typical client you converse with ？</h5>
@@ -72,7 +78,7 @@
                         <label class="radio"><input type="radio" name="cognitive_resources" value="4"> High</label>
                         <label class="radio"><input type="radio" name="cognitive_resources" value="5"> Very high</label>
                 </div>
-            </div>                
+            </div>
 
             <!-- Valence/Arousal -->
             <div class="block survey-section">
@@ -95,11 +101,12 @@
                 </div>
             </div>
 
-            
-            <button class="button is-success" type="submit">Start Task</button>
         </div>
-    </div>
-</form>
+        <footer class="modal-card-foot">
+            <button class="button is-success" type="submit">Start Task</button>
+        </footer>
+    </form>
+</div>
 
 <script src="{{ url_for('static', filename='pre_task_survey.js') }}"></script>
 
