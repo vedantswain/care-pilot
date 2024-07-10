@@ -98,7 +98,7 @@ def start_chat(scenario):
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue
 
-    clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientParam = f"?name={client['name']}&domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     #
     return redirect(url_for('index', session_id=session_id) + clientParam)
 
@@ -226,7 +226,7 @@ def update_client_queue(session_id):
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue
 
-    clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientParam = f"?name={client['name']}&domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     new_url = url_for('index', session_id=session_id) + clientParam
 
     return jsonify({"url": new_url})

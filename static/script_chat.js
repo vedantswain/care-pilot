@@ -19,7 +19,7 @@ function updateQueueDisplay(data) {
                     <div class="content">
                         <p>
                             <strong>${client.name}</strong>
-                            <br><small class="has-text-weight-semibold">${client.complaint}</small>
+                            <br><small class="has-text-weight-semibold">${client.category}</small>
                         </p>
                     </div>
                 </div>
