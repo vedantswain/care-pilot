@@ -52,6 +52,8 @@ chat_post_task = db.chat_post_task
 chat_history_collection = db.chat_history
 chat_client_info = db.chat_client_info
 chat_in_task = db.chat_in_task
+chat_pre_task = db.chat_pre_task
+
 
 sender_agent = None
 chat_history = [
@@ -97,9 +99,50 @@ def start_chat(scenario):
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue
 
-    clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientParam = f"?name={client['name']}&domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     #
-    return redirect(url_for('index', session_id=session_id) + clientParam)
+
+    return redirect(url_for('getPreSurvey', session_id=session_id) + clientParam)
+
+# End-point to test the pre-survey HTML
+@app.route('/<session_id>/pre-task-survey')
+def getPreSurvey(session_id):
+    return render_template('pre_task_survey.html', session_id=session_id)
+
+@app.route('/<session_id>/store-pre-task-survey', methods=['POST'])
+def storePreSurvey(session_id):
+
+
+    if session_id in session:
+
+        data = request.get_json()
+        clientParam = "?"+data['client_param']
+
+        for k in data:  # Convert string values into integers
+
+            if k != "client_param":
+                data[k] = int(data[k])
+
+        if not data:
+            return jsonify({"message": "No data received"}), 400
+
+        data['session_id'] = session_id
+        data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
+
+        try:
+            result = chat_pre_task.insert_one(data)
+            if result.inserted_id:
+                jsoninfo = {
+                    "message": "Survey data saved successfully",
+                    "id": str(result.inserted_id)
+                }
+                return redirect(url_for('index', session_id=session_id) + clientParam, 302, jsoninfo)
+            else:
+                return jsonify({"message": "Failed to save data"}), 500
+        except Exception as e:
+            return jsonify({"message": str(e)}), 500
+    else:
+        return jsonify({"message": "Invalid session or session expired"}), 400
 
 
 @app.route('/<session_id>/')
@@ -116,6 +159,7 @@ def index(session_id):
 def getReply(session_id):
     clientQueue = session[session_id]['client_queue']
     if request.method == 'GET':
+        val_name = request.args.get('name')
         val_domain = request.args.get('domain')
         val_category = request.args.get('category')
         val_grateful = request.args.get('grateful')
@@ -147,6 +191,7 @@ def getReply(session_id):
         chat_client_info.insert_one({
             "session_id": session_id,
             "client_id": client_id,
+            "client_name":val_name,
             "domain": val_domain,
             "category": val_category,
             "grateful": val_grateful,
@@ -225,7 +270,7 @@ def update_client_queue(session_id):
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue
 
-    clientParam = f"?domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
+    clientParam = f"?name={client['name']}&domain={client['domain']}&category={client['category']}&grateful={client['grateful']}&ranting={client['ranting']}&expression={client['expression']}&civil={client['civil']}&info={client['info']}&emo={client['emo']}"
     new_url = url_for('index', session_id=session_id) + clientParam
 
     return jsonify({"url": new_url})
@@ -267,6 +312,35 @@ def storePostSurvey(session_id):
     else:
         return jsonify({"message": "Invalid session or session expired"}), 400
 
+@app.route('/<session_id>/store-trouble-feedback',methods=['POST'])
+def storeTroubleFeedback(session_id):
+    if session_id in session:
+        client_id = request.json.get("client_id")
+        rating = int(request.json.get("rate")) * -1
+        support_type = request.json.get ("type")
+
+        turn_number = len(session[session_id][client_id]["chat_history"])//2+1
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+    
+        query = {
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": support_type
+        }
+        update = {
+            "$set":{
+                "user_feedback": rating,
+                "timestamp_feedback": timestamp,
+            }
+        }
+        res = chat_in_task.update_one(query, update)
+        if res == 0:
+            return jsonify({"message": "No existing record found to update"}), 404
+        return jsonify({"message": "Trouble feedback received"}), 200
+    return jsonify({"message": "Invalid session or session expired"}), 400
+   
+    
 
 @app.route('/<session_id>/store-emo-feedback', methods=['POST'])
 def storeEmoFeedback(session_id):
@@ -389,7 +463,6 @@ def sentiment(session_id):
 def getInfoSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
-
         reply = request.json.get("client_reply")
         # support_type = request.json.get("type")
 
@@ -399,9 +472,23 @@ def getInfoSupport(session_id):
         response_cw_info = info_agent.invoke({'domain': session[session_id][client_id]["domain"],'message':reply, 'sender':'client', "chat_history": chat_history})
         # response = response_cw_info.content
 
+        turn_number = len(chat_history) // 2 + 1
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+
+
+        chat_in_task.insert_one({
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": "TYPE_INFO_CUE",
+            "support_content": response_cw_info,
+            "timestamp_arrival": timestamp
+        })
         return jsonify({
             "message": response_cw_info
         })
+    return jsonify({"message": "Invalid session or session expired"}), 400
+
 
 @app.route('/<session_id>/get-trouble-support', methods=['POST'])
 def getTroubleSupport(session_id):
@@ -416,13 +503,53 @@ def getTroubleSupport(session_id):
         response_cw_trouble = trouble_agent.invoke({'domain': session[session_id][client_id]["domain"],'message':reply, 'sender':'client', "chat_history": chat_history})
         response = response_cw_trouble
 
+        turn_number = len(chat_history) // 2 + 1
+        timestamp = datetime.datetime.now(datetime.timezone.utc)
+
+        chat_in_task.insert_one({
+            "session_id": session_id,
+            "client_id": client_id,
+            "turn_number": turn_number,
+            "support_type": "TYPE_INFO_GUIDE",
+            "support_content": response,
+            "timestamp_arrival": timestamp
+        })
+
         return jsonify({
             "message": response
         })
+    return jsonify({"message": "Invalid session or session expired"}), 400
 
+@app.route('/conversation_history')
+def conversation_history():
+    session_id = request.args.get('session_id')
+    if not session_id:
+        return "Session ID is missing", 400
+    return render_template('conversation_history.html', session_id=session_id)
 
+@app.route('/complete')
+def complete():
+    return render_template('complete.html')
+
+@app.route('/history/<session_id>/<client_id>')
+def getClientHistory(session_id, client_id):
+    chat_history = list(chat_history_collection.find({"session_id": session_id, "client_id": client_id}, {"_id": 0}))
+    return jsonify({"chat_history": chat_history})
+
+@app.route('/history/<session_id>')
+def getClientList(session_id):
+    clients_info = list(chat_client_info.find({"session_id": session_id}, {"_id": 0, "client_name": 1, "client_id": 1, "category":1}))
+    return jsonify({"chat_history": chat_history, "clients_info": clients_info})
 
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, threaded=True)
 #%%
+
+
+
+
+
+
+
+

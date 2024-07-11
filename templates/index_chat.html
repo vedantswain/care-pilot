@@ -41,6 +41,17 @@
         </span>
     </button>
 
+    <!-- button link to conversation history -->
+    <button class="button is-link is-light is-hovered" onclick="goToHistoryPage('{{ session_id }}')">
+        <span class="icon">
+            <i class="fas fa-otter"></i>
+        </span>
+    </button>
+
+    
+    
+    
+
 
     <!--sidebar-left-->
     <div class="columns is-mobile">
@@ -331,7 +342,10 @@
                 </section>
                 <footer class="modal-card-foot">
                     <div class="buttons">
-                        <button class="button is-success" type="submit">Next Client</button>
+                        <button class="button is-success" id="nextButton" style="display:none;" type="submit">Next Client</button>
+                        <!-- <button class="button is-warning" id="completeButton" onclick="completeSurvey()">Complete</button> -->
+<!-- issue_68 -->
+                        <button class="button is-danger" id="completeButton" style="display:none;" type="submit">Complete</button>
                     </div>
                 </footer>
             </div>

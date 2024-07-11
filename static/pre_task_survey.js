@@ -5,32 +5,25 @@ function updateSlider(sliderName, slideAmount) {
     sliderValues[sliderName] = slideAmount;
 }
 
-function updateClientQueue() {
-    const sessionId = window.location.pathname.split('/')[1];
+// function updateClientQueue() {
+//     const sessionId = window.location.pathname.split('/')[1];
 
-    fetch(`/${sessionId}/update-clientQueue`)
-    .then(response => response.json())
-    .then(data => {
-
-        if (data.url) {
-            window.location.href = data.url;
-        }
-    })
-    .catch(error => console.error('Error updating client queue:', error));
-}
-
-function completeSurvey() {
-    window.location.href = '/complete';
-}
+//     fetch(`/${sessionId}/update-clientQueue`)
+//     .then(response => response.json())
+//     .then(data => {
+//         if (data.url) {
+//             window.location.href = data.url;
+//         }
+//     })
+//     .catch(error => console.error('Error updating client queue:', error));
+// }
 
 document.addEventListener('DOMContentLoaded', function() {
-    const form = document.getElementById('feedbackForm');
+    document.getElementById('start-modal').classList.add('is-active');
 
+    const form = document.getElementById('preFeedbackForm');
     form.addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        const submitterButton = e.submitter.id;
-
+        e.preventDefault(); 
         const formData = new FormData(this);
         const formValues = {};
         formData.forEach((value, key) => { formValues[key] = value; });
@@ -43,19 +36,19 @@ document.addEventListener('DOMContentLoaded', function() {
             return;
         }
         // Check if the all slider questions were answered. Need to check different dictionary because of default slider values.
-        sliderKeysValidation = ["affect_valence","affect_arousal","support_effective","support_helpful", "support_beneficial", "support_adequate", "support_sensitive", "support_caring", "support_understanding", "support_supportive"]
+        sliderKeysValidation = ["affect_valence","affect_arousal" ]
         allKeysExist = sliderKeysValidation.every(key => Object.keys(sliderValues).includes(key));
         if (!allKeysExist){
             alert("Please respond to all slider questions. If you would like to keep the value at the starting position, please move the slider back and forth to confirm your selection.");
             return;
         }
         const sessionId = window.location.pathname.split('/')[1];
-        const clientId = sessionStorage.getItem('client_id');
+        const clientParam = window.location.href.split('?')[1];
 
         data = formValues
-        data['client_id'] = clientId
+        data['client_param'] = clientParam
 
-        fetch(`/${sessionId}/store-survey`, {
+        fetch(`/${sessionId}/store-pre-task-survey`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -66,19 +59,15 @@ document.addEventListener('DOMContentLoaded', function() {
             if (!response.ok) {
                 throw new Error('Network response was not ok');
             }
-            return response.json();
-        })
-        .then(data => {
-            console.log('Success:', data);
             alert('Feedback submitted successfully!');
-
-            if (submitterButton == "completeButton") {
-                completeSurvey();
-            }
-            else {
-                updateClientQueue();
-            }
+            window.location.href = response.url
+            // return response.json();
         })
+        // .then(data => {
+        //     console.log('Success:', data);
+        //     alert('Feedback submitted successfully!');
+        //     // updateClientQueue();
+        // })
         .catch((error) => {
             console.error('Error:', error);
             alert('Error submitting feedback');
