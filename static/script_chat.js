@@ -647,7 +647,9 @@ function sendMessage() {
   if (showEmo == '1') {
     // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
     // retrieveEmoFeedback(TYPE_EMO_SHOES);
-    sendEmoFeedback('TYPE_EMO_REFRAME');
+    if (turn_number > 1){
+        sendEmoFeedback('TYPE_EMO_REFRAME');
+    }
     // retrieveEmoFeedback(TYPE_SENTIMENT);
   }
 

@@ -19,7 +19,6 @@ SUPPORT_TYPE_STRINGS = {
     "TYPE_SENTIMENT" : TYPE_SENTIMENT,
     "TYPE_INFO_CUE" : TYPE_INFO_CUE,
     "TYPE_INFO_GUIDE": TYPE_INFO_GUIDE
-
 }
 
 ### Only for testing/debugging
