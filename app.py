@@ -138,7 +138,7 @@ def getReply(session_id):
         client_id = str(uuid4())
         current_client = session[session_id]['current_client']
         session[session_id][client_id] = {"current_client": current_client, "domain": val_domain, "category": val_category, "civil": val_civil, "chat_history": []}
-        session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content=response)])
+        session[session_id][client_id]["chat_history"] = messages_to_dict([AIMessage(content="Client: "+response)])
         
 
         turn_number = len(session[session_id][client_id]["chat_history"])
@@ -180,7 +180,7 @@ def getReply(session_id):
         result = sender_agent.invoke({"input": prompt, "chat_history": chat_history, "civil": session[session_id][client_id]["civil"]})
         response = result
 
-        chat_history.extend([HumanMessage(content=prompt), AIMessage(content=response)])
+        chat_history.extend([HumanMessage(content="Representative: "+prompt), AIMessage(content="Client: "+response)])
         session[session_id][client_id]["chat_history"] = messages_to_dict(chat_history)
 
         turn_number = len(chat_history) // 2 + 1
