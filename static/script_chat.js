@@ -1,3 +1,5 @@
+var turn_number = 0;
+
 function updateQueueDisplay(data) {
   const queueContainer = document.querySelector('#client-queue');
   queueContainer.innerHTML = '';
@@ -7,7 +9,7 @@ function updateQueueDisplay(data) {
     clientElement.className = 'list-item box';
     // userElement.href = `../?product=${user.product}&grateful=${user.grateful}&ranting=${user.ranting}&expression=${user.expression}&civil=${user.civil}&info=${user.info}&emo=${user.emo}`;
     clientElement.innerHTML = `
-            <div class="media">   
+            <div class="media">
                 <div class="media-left">
                     <p>
                         <span class="icon is-large">
@@ -41,10 +43,11 @@ function updateQueueDisplay(data) {
 }
 
 // function endChatSession() {
+ 
 
 //     if (userQueue.length > 0) {
-// const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}&civil=${userQueue[0].civil}&info=${userQueue[0].info}&emo=${userQueue[0].emo}`;
-// window.location.href = nextUserLink;
+        // const nextUserLink = `../?product=${userQueue[0].product}&grateful=${userQueue[0].grateful}&ranting=${userQueue[0].ranting}&expression=${userQueue[0].expression}&civil=${userQueue[0].civil}&info=${userQueue[0].info}&emo=${userQueue[0].emo}`;
+        // window.location.href = nextUserLink;
 //     } else {
 //         console.log("The queue is now empty.");
 //         resetQueueToInitialState();
@@ -52,6 +55,7 @@ function updateQueueDisplay(data) {
 //         window.location.href = nextUserLink;
 //     }
 // }
+
 
 // secret button that used to jump into next conversation
 function confirmNextClient(sessionId) {
@@ -69,7 +73,7 @@ function confirmNextClient(sessionId) {
 }
 
 function goToHistoryPage(session_id) {
-    console.log("Session ID:", session_id);  
+    console.log("Session ID:", session_id);
     if (session_id) {
         window.location.href = `/conversation_history?session_id=${session_id}`;
     } else {
@@ -77,12 +81,6 @@ function goToHistoryPage(session_id) {
         alert('Session ID is missing');
     }
 }
-
-
-
-
-
-
 
 function showSurveyModal() {
   const goSurvey = confirm(
@@ -93,6 +91,7 @@ function showSurveyModal() {
     modal.classList.add('is-active');
   }
 }
+
 
 function createMessageElement(messageText, msgClass, messageHeader = '') {
   const article = document.createElement('article');
@@ -113,14 +112,14 @@ function createMessageElement(messageText, msgClass, messageHeader = '') {
   return article;
 }
 
+
 function createSupportPane(messageText, msgClass) {
   const article = document.createElement('div');
   article.classList.add('card-content');
 
-  const body = document.createElement('div');
-  innerContent = document.createElement('div');
-  markedmsgText = marked.parse(messageText);
-  innerContent.innerHTML = markedmsgText;
+    const body = document.createElement('div');
+    innerContent = document.createElement('div');
+    innerContent.innerHTML = messageText;
 
   if (msgClass === 'senti') {
     const span = document.createElement('span');
@@ -172,45 +171,20 @@ function createSupportPane(messageText, msgClass) {
 
   body.appendChild(innerContent);
 
-  if (msgClass === 'info') {
-    // let header = body.querySelector('.card-header');
-    // if (!header) {
-    //     header = document.createElement('div');
-    //     header.classList.add('card-header');
-    //     body.insertBefore(header, body.firstChild); // Insert at the top
-    // }
+    if (msgClass === "info"){
 
-    // const button = document.createElement('button');
-    // button.classList.add('card-header-icon');
-    // const span = document.createElement('span');
-    // span.classList.add('icon', 'is-small');
-    // const icon = document.createElement('i');
-    // icon.classList.add('fas', 'fa-copy');
-    // span.appendChild(icon);
-    // button.appendChild(span);
-    // header.appendChild(button);
-    // //article.appendChild(header);
-    // button.addEventListener('click', () => {
-    //     navigator.clipboard.writeText(messageText)
-    //         .then(() => {
-    //             const textarea = document.getElementById('messageInput');
-    //             textarea.value = messageText;
-    //         })
-    //         .catch(err => {
-    //             console.error('Could not copy text: ', err);
-    //         });
-    // });
-
-    article.classList.add('is-info');
-  }
-  if (msgClass === 'emo') {
-    article.classList.add('is-emo');
-  }
-  if (msgClass === 'trouble') {
-    article.classList.add('is-trouble');
-  }
-  //article.appendChild(header);
-  article.appendChild(body);
+        article.classList.add('is-info')
+    }
+    if (msgClass === "emo"){
+        article.classList.add('is-emo')
+    }
+    if (msgClass === "trouble"){
+        innerContent.innerHTML = "";
+        innerContent.appendChild(messageText);
+        article.classList.add('is-trouble')
+    }
+    //article.appendChild(header);
+    article.appendChild(body);
 
   return article;
 }
@@ -238,8 +212,11 @@ function validateInput() {
   showInfo = sessionStorage.getItem('show_info') == '1';
 
   if (showEmo) {
-    sliderKeysValidation.push('TYPE_EMO_REFRAME-helpful_unhelpful');
-    messageFlagsValidation.push('support_emo_reframe', 'support_emo_sentiment');
+    messageFlagsValidation.push('support_emo_sentiment');
+    if (turn_number > 1) {      // only visible after 1st turn
+        sliderKeysValidation.push('TYPE_EMO_REFRAME-helpful_unhelpful');
+        messageFlagsValidation.push('support_emo_reframe');
+    }
   }
 
   if (showInfo) {
@@ -321,6 +298,7 @@ function createFooter(support_type) {
 
   return footer;
 }
+
 
 function designHeader(header, iconClass) {
   const p = document.createElement('p');
@@ -497,7 +475,7 @@ function sendTroubleFeedback(support_type) {
 
   var input = document.getElementById(`${support_type}-feedback`);
   var rate = input.value;
-  fetch(`/${sessionId}/store-trouble-feedback`, { 
+  fetch(`/${sessionId}/store-trouble-feedback`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -553,28 +531,39 @@ function retrieveTroubleSupport(message, support_type) {
   const sessionId = window.location.pathname.split('/')[1];
   const clientId = sessionStorage.getItem('client_id');
 
-  fetch(`/${sessionId}/get-trouble-support`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({ client_reply: message, client_id: clientId }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      var troubleMessage = createSupportPane(data.message, 'support_trouble');
-      troubleDiv.appendChild(troubleMessage);
-      //troubleDiv.scrollTop = supportDiv.scrollHeight;
-      document.getElementById(loaderId).remove();
-      const p = document.createElement('p');
-      p.classList.add('card-header-icon');
-      const span = document.createElement('span');
-      span.classList.add('icon', 'is-small');
-      const icon = document.createElement('i');
-      icon.classList.add('fas', 'fa-circle-info');
-      span.appendChild(icon);
-      p.appendChild(span);
-      header.appendChild(p);
+    fetch(`/${sessionId}/get-trouble-support`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({client_reply: message, client_id: clientId}),
+        })
+        .then(response => response.json())
+        .then(data => {
+
+            const orderList = document.createElement('ol');
+
+            data.message.forEach((message) => {
+                var infoMessage = document.createElement('li');
+                infoMessage.textContent = message;
+                orderList.appendChild(infoMessage);
+            });
+
+            var troubleMessage = createSupportPane(orderList, "trouble")
+
+
+            troubleDiv.appendChild(troubleMessage);
+            //troubleDiv.scrollTop = supportDiv.scrollHeight;
+            document.getElementById(loaderId).remove();
+            const p = document.createElement('p');
+            p.classList.add('card-header-icon');
+            const span = document.createElement('span');
+            span.classList.add('icon', 'is-small');
+            const icon = document.createElement('i');
+            icon.classList.add('fas', 'fa-circle-info');
+            span.appendChild(icon);
+            p.appendChild(span);
+            header.appendChild(p);
 
       // support_type == "TYPE_TROUBLE"
       footer = createFooter(support_type);
@@ -588,6 +577,8 @@ function retrieveTroubleSupport(message, support_type) {
 }
 
 function processClientResponse(data) {
+  turn_number += 1;
+
   const chatDiv = document.getElementById('chatWindow');
   const typing = document.getElementById('typing');
   var aiMessage = createMessageElement(data.message, 'in');
@@ -613,9 +604,14 @@ function processClientResponse(data) {
     //        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
     //        retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
     retrieveEmoSupport(data.message, 'TYPE_SENTIMENT');
-    retrieveEmoSupport(data.message, 'TYPE_EMO_REFRAME');
+
+    if (turn_number > 1){
+        retrieveEmoSupport(data.message, 'TYPE_EMO_REFRAME');
+    }
+
   }
 }
+
 
 function sendMessage() {
   var input = document.getElementById('messageInput');
@@ -651,72 +647,80 @@ function sendMessage() {
   if (showEmo == '1') {
     // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
     // retrieveEmoFeedback(TYPE_EMO_SHOES);
-    sendEmoFeedback('TYPE_EMO_REFRAME');
+    if (turn_number > 1){
+        sendEmoFeedback('TYPE_EMO_REFRAME');
+    }
     // retrieveEmoFeedback(TYPE_SENTIMENT);
   }
 
-  fetch(`/${sessionId}/get-reply`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-    },
-    body: JSON.stringify({
-      prompt: message,
-      client_id: clientId,
-      show_info: showInfo,
-      show_emo: showEmo,
-    }),
-  })
-    .then((response) => response.json())
-    .then((data) => {
-      const isFinish = data.message.includes('FINISH:999');
-      if (isFinish) {
-        const modal = document.querySelector('#finish-modal');
-        modal.classList.add('is-active');
+    fetch(`/${sessionId}/get-reply`, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({prompt: message, client_id: clientId, show_info: showInfo, show_emo: showEmo}),
+    })
+    .then(response => response.json())
+    .then(data => {
+        const isFinish = data.message.includes("FINISH:999");
+        if(isFinish) {
+            const modal = document.querySelector('#finish-modal');
+            modal.classList.add("is-active");
 
-        typing.style.display = 'none';
-        input.disabled = true;
-      } else {
-        processClientResponse(data);
-      }
+            typing.style.display = 'none';
+            input.disabled = true;
+        } else {
+            processClientResponse(data);
+        }
     })
     .catch((error) => {
-      console.error('Error:', error);
+        console.error('Error:', error);
     });
-}
+    }
+
+
 
 // Define a function to execute after the page loads
 function fetchFirstMsg() {
-  var input = document.getElementById('messageInput');
-  var button = document.getElementById('sendButton');
-  input.disabled = true;
-  button.disabled = true;
+    var input = document.getElementById('messageInput');
+    var button = document.getElementById('sendButton');
+    input.disabled = true;
+    button.disabled = true;
 
-  const urlParams = new URLSearchParams(window.location.search);
-  const sessionId = window.location.pathname.split('/')[1];
+    const urlParams = new URLSearchParams(window.location.search);
+    const sessionId = window.location.pathname.split('/')[1];
 
-  // Make a GET request using fetch
-  fetch(`/${sessionId}/get-reply?${urlParams}`)
-    .then((response) => {
-      // Check if the request was successful
-      if (!response.ok) {
-        throw new Error('Network response was not ok');
-      }
-      // Parse the JSON response
-      return response.json();
+    // Make a GET request using fetch
+    fetch(`/${sessionId}/get-reply?${urlParams}`)
+    .then(response => {
+        // Check if the request was successful
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        // Parse the JSON response
+        return response.json();
     })
-    .then((data) => {
-      sessionStorage.setItem('client_id', data.client);
-      sessionStorage.setItem('show_info', data.show_info);
-      sessionStorage.setItem('show_emo', data.show_emo);
-      updateQueueDisplay(data);
-      processClientResponse(data);
+    .then(data => {
+        sessionStorage.setItem("client_id", data.client);
+        sessionStorage.setItem("show_info", data.show_info);
+        sessionStorage.setItem("show_emo", data.show_emo);
+        updateQueueDisplay(data);
+        processClientResponse(data);
     })
-    .catch((error) => {
-      // Handle any errors that occur during the request
-      console.error('Error fetching data:', error);
+    .catch(error => {
+        // Handle any errors that occur during the request
+        console.error('Error fetching data:', error);
     });
 }
 
 // Register the fetchData function to be executed after the page loads
 window.onload = fetchFirstMsg;
+
+
+
+
+
+
+
+
+
