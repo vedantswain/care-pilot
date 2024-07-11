@@ -3,7 +3,7 @@ const TYPE_EMO_SHOES = common_strings["TYPE_EMO_SHOES"]
 const TYPE_EMO_REFRAME = common_strings["TYPE_EMO_REFRAME"]
 const TYPE_SENTIMENT = common_strings["TYPE_SENTIMENT"]
 
-
+var turn_number = 0;
 
 function updateQueueDisplay(data) {
     const queueContainer = document.querySelector('#client-queue');
@@ -506,6 +506,8 @@ function retrieveTroubleSupport(message){
 }
 
 function processClientResponse(data){
+    turn_number += 1;
+
     const chatDiv = document.getElementById('chatWindow');
     const typing = document.getElementById('typing');
     var aiMessage = createMessageElement(data.message, "in")
@@ -531,7 +533,9 @@ function processClientResponse(data){
 //        retrieveEmoSupport(data.message,TYPE_EMO_THOUGHT);
 //        retrieveEmoSupport(data.message,TYPE_EMO_SHOES);
         retrieveEmoSupport(data.message, "TYPE_SENTIMENT");
-        retrieveEmoSupport(data.message,"TYPE_EMO_REFRAME");
+        if (turn_number > 1){
+            retrieveEmoSupport(data.message,"TYPE_EMO_REFRAME");
+        }
     }
 }
 
