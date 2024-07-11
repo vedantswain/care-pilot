@@ -212,8 +212,11 @@ function validateInput() {
   showInfo = sessionStorage.getItem('show_info') == '1';
 
   if (showEmo) {
-    sliderKeysValidation.push('TYPE_EMO_REFRAME-helpful_unhelpful');
-    messageFlagsValidation.push('support_emo_reframe', 'support_emo_sentiment');
+    messageFlagsValidation.push('support_emo_sentiment');
+    if (turn_number > 1) {      // only visible after 1st turn
+        sliderKeysValidation.push('TYPE_EMO_REFRAME-helpful_unhelpful');
+        messageFlagsValidation.push('support_emo_reframe');
+    }
   }
 
   if (showInfo) {
