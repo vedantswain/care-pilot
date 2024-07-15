@@ -3,7 +3,18 @@ const TYPE_EMO_SHOES = common_strings["TYPE_EMO_SHOES"]
 const TYPE_EMO_REFRAME = common_strings["TYPE_EMO_REFRAME"]
 const TYPE_SENTIMENT = common_strings["TYPE_SENTIMENT"]
 
-
+function getPropilotAvatar() {
+    const avatarContainer = document.createElement('div');
+    avatarContainer.classList.add('card-header-icon');
+    const avatar = document.createElement('figure');
+    avatar.classList.add('image', 'is-24x24');
+    const avatarImg = document.createElement('img');
+    avatarImg.src = '/static/images/cue.png';
+    avatarImg.classList.add('is-rounded');
+    avatar.appendChild(avatarImg);
+    avatarContainer.appendChild(avatar);
+    return avatarContainer;
+}
 
 function updateQueueDisplay(data) {
     const queueContainer = document.querySelector('#client-queue');
@@ -306,22 +317,15 @@ function retrieveInfoSupport(message){
     const headerTitle = document.createElement('div');
     headerTitle.classList.add('card-header-title');
     headerTitle.textContent = "Ways to Continue the Conversation".toUpperCase();
+
+    const avatarPropilot = getPropilotAvatar();
+
+    header.appendChild(avatarPropilot);
     header.appendChild(headerTitle);
 
     let loader = createLoader('info-loader');
     header.appendChild(loader);
 
-    const avatarContainer = document.createElement('div');
-    avatarContainer.classList.add('media-left');
-    const avatar = document.createElement('figure');
-    avatar.classList.add('image', 'is-24x24');
-    const avatarImg = document.createElement('img');
-    avatarImg.src = '/static/images/cue.png'; 
-    avatarImg.classList.add('is-rounded');
-    avatar.appendChild(avatarImg);
-    avatarContainer.appendChild(avatar);
-
-    header.appendChild(avatarContainer);
     infoDiv.appendChild(header);
 
     const sessionId = window.location.pathname.split('/')[1];
@@ -387,6 +391,9 @@ function retrieveEmoSupport(message, support_type){
     headerTitle.classList.add('card-header-title');
     headerTitle.textContent = support_type.toUpperCase();
 
+    const avatarPropilot = getPropilotAvatar();
+
+    header.appendChild(avatarPropilot);
     header.appendChild(headerTitle);
     header.appendChild(loader);
     
@@ -410,17 +417,6 @@ function retrieveEmoSupport(message, support_type){
             document.getElementById(loaderId).remove();
             const sentimentPane = createSupportPane(data.message, "senti");
             card.appendChild(sentimentPane);
-
-            const avatarContainer = document.createElement('div');
-            avatarContainer.classList.add('media-left');
-            const avatar = document.createElement('figure');
-            avatar.classList.add('image', 'is-24x24');
-            const avatarImg = document.createElement('img');
-            avatarImg.src = '/static/images/sentiment.png'; 
-            avatarImg.classList.add('is-rounded');
-            avatar.appendChild(avatarImg);
-            avatarContainer.appendChild(avatar);
-            header.appendChild(avatarContainer);
 
             designHeader(header, 'fa-people-arrows');
 
@@ -459,17 +455,6 @@ function retrieveEmoSupport(message, support_type){
                 const reframePane = createSupportPane(data.message.reframe, "emo");
                 card.appendChild(thoughtPane);
                 card.appendChild(reframePane);
-
-                const avatarContainer = document.createElement('div');
-                avatarContainer.classList.add('media-left');
-                const avatar = document.createElement('figure');
-                avatar.classList.add('image', 'is-24x24');
-                const avatarImg = document.createElement('img');
-                avatarImg.src = '/static/images/reframe.png'; 
-                avatarImg.classList.add('is-rounded');
-                avatar.appendChild(avatarImg);
-                avatarContainer.appendChild(avatar);
-                header.appendChild(avatarContainer);
 
                 designHeader(header, 'fa-spa');
 
@@ -511,26 +496,21 @@ function retrieveTroubleSupport(message){
     const header = document.createElement('div');
     header.classList.add('card-header');
 
+
     const headerTitle = document.createElement('div');
     headerTitle.classList.add('card-header-title');
     headerTitle.textContent = "Ways to Help Your Customers".toUpperCase();
+
+
+    const avatarPropilot = getPropilotAvatar();
+
+    header.appendChild(avatarPropilot);
     header.appendChild(headerTitle);
     
     let loaderId = 'trouble-loader'
     let loader = createLoader(loaderId)
     header.appendChild(loader);
     troubleDiv.appendChild(header);
-
-    const avatarContainer = document.createElement('div');
-    avatarContainer.classList.add('media-left');
-    const avatar = document.createElement('figure');
-    avatar.classList.add('image', 'is-24x24');
-    const avatarImg = document.createElement('img');
-    avatarImg.src = '/static/images/guidance.png'; 
-    avatarImg.classList.add('is-rounded');
-    avatar.appendChild(avatarImg); 
-    avatarContainer.appendChild(avatar);
-    troubleDiv.appendChild(avatarContainer);
 
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
@@ -548,15 +528,8 @@ function retrieveTroubleSupport(message){
             troubleDiv.appendChild(troubleMessage);
             //troubleDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
-            const p = document.createElement('p');
-            p.classList.add('card-header-icon');
-            const span = document.createElement('span');
-            span.classList.add('icon', 'is-small');
-            const icon = document.createElement('i');
-            icon.classList.add('fas', 'fa-circle-info');
-            span.appendChild(icon);
-            p.appendChild(span);
-            header.appendChild(p);
+
+            designHeader(header, 'fa-circle-info');
 
             updateFlag('support_trouble')
         })

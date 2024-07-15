@@ -412,11 +412,6 @@ def getTroubleSupport(session_id):
         return jsonify({
             "message": response
         })
-    
-@app.route('/static/<filename>')
-def send_avatar(filename):
-    return send_from_directory('static', filename)
-
 
 
 if __name__ == "__main__":
