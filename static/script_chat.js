@@ -469,28 +469,31 @@ function sendEmoFeedback(support_type) {
 function retrieveTroubleSupport(message){
     const troubleDiv = document.getElementById('troubleWindow');
     troubleDiv.innerHTML = '';
+
     const header = document.createElement('div');
     header.classList.add('card-header');
+
     const headerTitle = document.createElement('div');
     headerTitle.classList.add('card-header-title');
     headerTitle.textContent = "Ways to Help Your Customers".toUpperCase();
+    header.appendChild(headerTitle);
+    
     let loaderId = 'trouble-loader'
     let loader = createLoader(loaderId)
+    header.appendChild(loader);
+    troubleDiv.appendChild(header);
 
     const avatarContainer = document.createElement('div');
     avatarContainer.classList.add('media-left');
     const avatar = document.createElement('figure');
-    avatar.classList.add('image', 'is-48x48');
+    avatar.classList.add('image', 'is-24x24');
     const avatarImg = document.createElement('img');
-    avatarImg.src = 'static/guidance.png'; 
+    avatarImg.src = '/static/guidance.png'; 
     avatarImg.classList.add('is-rounded');
-
-    header.appendChild(avatarImg); 
+    avatar.appendChild(avatarImg); 
     avatarContainer.appendChild(avatar);
+    troubleDiv.appendChild(avatarContainer);
 
-    header.appendChild(headerTitle);
-    header.appendChild(loader);
-    troubleDiv.appendChild(header);
     const sessionId = window.location.pathname.split('/')[1];
     const clientId = sessionStorage.getItem('client_id');
 

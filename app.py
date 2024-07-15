@@ -414,9 +414,10 @@ def getTroubleSupport(session_id):
             "message": response
         })
     
-@app.route('/static/<path:filename>')
+@app.route('/static/<filename>')
 def send_avatar(filename):
     return send_from_directory('static', filename)
+
 
 
 if __name__ == "__main__":
