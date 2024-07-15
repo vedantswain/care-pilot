@@ -298,15 +298,30 @@ function createLoader(loaderId='info-loader') {
 
 function retrieveInfoSupport(message){
     const infoDiv = document.getElementById('co-pilot');
+    infoDiv.innerHTML = ''; 
 
     const header = document.createElement('div');
     header.classList.add('card-header');
+
     const headerTitle = document.createElement('div');
     headerTitle.classList.add('card-header-title');
     headerTitle.textContent = "Ways to Continue the Conversation".toUpperCase();
-    let loader = createLoader()
     header.appendChild(headerTitle);
+
+    let loader = createLoader('info-loader');
     header.appendChild(loader);
+
+    const avatarContainer = document.createElement('div');
+    avatarContainer.classList.add('media-left');
+    const avatar = document.createElement('figure');
+    avatar.classList.add('image', 'is-24x24');
+    const avatarImg = document.createElement('img');
+    avatarImg.src = '/static/images/cue.png'; 
+    avatarImg.classList.add('is-rounded');
+    avatar.appendChild(avatarImg);
+    avatarContainer.appendChild(avatar);
+
+    header.appendChild(avatarContainer);
     infoDiv.appendChild(header);
 
     const sessionId = window.location.pathname.split('/')[1];
@@ -488,7 +503,7 @@ function retrieveTroubleSupport(message){
     const avatar = document.createElement('figure');
     avatar.classList.add('image', 'is-24x24');
     const avatarImg = document.createElement('img');
-    avatarImg.src = '/static/guidance.png'; 
+    avatarImg.src = '/static/images/guidance.png'; 
     avatarImg.classList.add('is-rounded');
     avatar.appendChild(avatarImg); 
     avatarContainer.appendChild(avatar);

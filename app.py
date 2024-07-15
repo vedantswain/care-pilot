@@ -1,5 +1,4 @@
 from flask import Flask, send_from_directory
-
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 import os, json
 import certifi
