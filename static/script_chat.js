@@ -469,14 +469,6 @@ function sendEmoFeedback(support_type) {
 function retrieveTroubleSupport(message){
     const troubleDiv = document.getElementById('troubleWindow');
 
-    const avatar = document.createElement('img');
-    avatar.src = 'static/guidance.png'; 
-    avatar.alt = 'Avatar';
-    avatar.style.width = '40px'; 
-    avatar.style.height = '40px';
-    avatar.style.borderRadius = '50%';
-    avatar.style.marginRight = '10px';
-
     const header = document.createElement('div');
     header.classList.add('card-header');
     const headerTitle = document.createElement('div');
@@ -485,7 +477,17 @@ function retrieveTroubleSupport(message){
     let loaderId = 'trouble-loader'
     let loader = createLoader(loaderId)
 
-    header.appendChild(avatar); 
+    const avatarContainer = document.createElement('div');
+    avatarContainer.classList.add('media-left');
+    const avatar = document.createElement('figure');
+    avatar.classList.add('image', 'is-48x48');
+    const avatarImg = document.createElement('img');
+    avatarImg.src = 'static/guidance.png'; 
+    avatarImg.classList.add('is-rounded');
+
+    header.appendChild(avatarImg); 
+    avatarContainer.appendChild(avatar);
+
     header.appendChild(headerTitle);
     header.appendChild(loader);
     troubleDiv.appendChild(header);
