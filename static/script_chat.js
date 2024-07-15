@@ -335,7 +335,7 @@ function retrieveInfoSupport(message,support_type) {
   const sessionId = window.location.pathname.split('/')[1];
   const clientId = sessionStorage.getItem('client_id');
 
-  fetch(`/${sessionId}/get-info-support`, {
+  fetch(`/get-info-support/${sessionId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -403,7 +403,7 @@ function retrieveEmoSupport(message, support_type) {
   const clientId = sessionStorage.getItem('client_id');
 
   if (support_type == 'TYPE_SENTIMENT') {
-    fetch(`/${sessionId}/sentiment`, {
+    fetch(`/sentiment/${sessionId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -422,7 +422,7 @@ function retrieveEmoSupport(message, support_type) {
       })
       .catch((error) => console.error('Error:', error));
   } else {
-    fetch(`/${sessionId}/get-emo-support`, {
+    fetch(`/get-emo-support/${sessionId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -475,7 +475,7 @@ function sendTroubleFeedback(support_type) {
 
   var input = document.getElementById(`${support_type}-feedback`);
   var rate = input.value;
-  fetch(`/${sessionId}/store-trouble-feedback`, {
+  fetch(`/store-trouble-feedback/${sessionId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -498,7 +498,7 @@ function sendEmoFeedback(support_type) {
 
   var input = document.getElementById(`${support_type}-feedback`);
   var rate = input.value;
-  fetch(`/${sessionId}/store-emo-feedback`, {
+  fetch(`/store-emo-feedback/${sessionId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -531,7 +531,7 @@ function retrieveTroubleSupport(message, support_type) {
   const sessionId = window.location.pathname.split('/')[1];
   const clientId = sessionStorage.getItem('client_id');
 
-    fetch(`/${sessionId}/get-trouble-support`, {
+    fetch(`/get-trouble-support/${sessionId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -653,7 +653,7 @@ function sendMessage() {
     // retrieveEmoFeedback(TYPE_SENTIMENT);
   }
 
-    fetch(`/${sessionId}/get-reply`, {
+    fetch(`/get-reply/${sessionId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

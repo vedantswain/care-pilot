@@ -105,11 +105,11 @@ def start_chat(scenario):
     return redirect(url_for('getPreSurvey', session_id=session_id) + clientParam)
 
 # End-point to test the pre-survey HTML
-@app.route('/<session_id>/pre-task-survey')
+@app.route('/pre-task-survey/<session_id>')
 def getPreSurvey(session_id):
     return render_template('pre_task_survey.html', session_id=session_id)
 
-@app.route('/<session_id>/store-pre-task-survey', methods=['POST'])
+@app.route('/store-pre-task-survey/<session_id>', methods=['POST'])
 def storePreSurvey(session_id):
 
 
@@ -145,7 +145,7 @@ def storePreSurvey(session_id):
         return jsonify({"message": "Invalid session or session expired"}), 400
 
 
-@app.route('/<session_id>/')
+@app.route('/index/<session_id>')
 def index(session_id):
     if session_id in session:
         current_client = session[session_id]['current_client']
@@ -155,7 +155,7 @@ def index(session_id):
     return render_template('index_chat.html', session_id=session_id, current_client=current_client, common_strings=common.SUPPORT_TYPE_STRINGS)
 
 
-@app.route('/<session_id>/get-reply', methods=['GET','POST'])
+@app.route('/get-reply/<session_id>', methods=['GET','POST'])
 def getReply(session_id):
     clientQueue = session[session_id]['client_queue']
     if request.method == 'GET':
@@ -262,7 +262,7 @@ def getReply(session_id):
 
     })
 
-@app.route('/<session_id>/update-clientQueue')
+@app.route('/update-clientQueue/<session_id>')
 def update_client_queue(session_id):
     clientQueue = session[session_id]['client_queue']
     client = clientQueue.pop(0)
@@ -276,11 +276,11 @@ def update_client_queue(session_id):
     return jsonify({"url": new_url})
 
 # End-point to test the survey HTML
-@app.route('/<session_id>/post-task-survey')
+@app.route('/post-task-survey/<session_id>')
 def getSurvey(session_id):
     return render_template('feedback.html', session_id=session_id)
 
-@app.route('/<session_id>/store-survey', methods=['POST'])
+@app.route('/store-survey/<session_id>', methods=['POST'])
 def storePostSurvey(session_id):
     if session_id in session:
         data = request.get_json()
@@ -312,7 +312,7 @@ def storePostSurvey(session_id):
     else:
         return jsonify({"message": "Invalid session or session expired"}), 400
 
-@app.route('/<session_id>/store-trouble-feedback',methods=['POST'])
+@app.route('/store-trouble-feedback/<session_id>',methods=['POST'])
 def storeTroubleFeedback(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -342,7 +342,7 @@ def storeTroubleFeedback(session_id):
    
     
 
-@app.route('/<session_id>/store-emo-feedback', methods=['POST'])
+@app.route('/store-emo-feedback/<session_id>', methods=['POST'])
 def storeEmoFeedback(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -372,7 +372,7 @@ def storeEmoFeedback(session_id):
     return jsonify({"message": "Invalid session or session expired"}), 400
 
 
-@app.route('/<session_id>/get-emo-support', methods=['POST'])
+@app.route('/get-emo-support/<session_id>', methods=['POST'])
 def getEmoSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -432,7 +432,7 @@ def getEmoSupport(session_id):
 
     return jsonify({"error": "Invalid session_id"}), 400
 
-@app.route('/<session_id>/sentiment', methods=['POST'])
+@app.route('/sentiment/<session_id>', methods=['POST'])
 def sentiment(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -459,7 +459,7 @@ def sentiment(session_id):
 
 
 
-@app.route('/<session_id>/get-info-support', methods=['POST'])
+@app.route('/get-info-support/<session_id>', methods=['POST'])
 def getInfoSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -490,7 +490,7 @@ def getInfoSupport(session_id):
     return jsonify({"message": "Invalid session or session expired"}), 400
 
 
-@app.route('/<session_id>/get-trouble-support', methods=['POST'])
+@app.route('/get-trouble-support/<session_id>', methods=['POST'])
 def getTroubleSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")

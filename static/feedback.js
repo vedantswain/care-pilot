@@ -8,7 +8,7 @@ function updateSlider(sliderName, slideAmount) {
 function updateClientQueue() {
     const sessionId = window.location.pathname.split('/')[1];
 
-    fetch(`/${sessionId}/update-clientQueue`)
+    fetch(`/update-clientQueue/${sessionId}`)
     .then(response => response.json())
     .then(data => {
 
@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data = formValues
         data['client_id'] = clientId
 
-        fetch(`/${sessionId}/store-survey`, {
+        fetch(`/store-survey/${sessionId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
