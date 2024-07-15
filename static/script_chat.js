@@ -410,6 +410,18 @@ function retrieveEmoSupport(message, support_type){
             document.getElementById(loaderId).remove();
             const sentimentPane = createSupportPane(data.message, "senti");
             card.appendChild(sentimentPane);
+
+            const avatarContainer = document.createElement('div');
+            avatarContainer.classList.add('media-left');
+            const avatar = document.createElement('figure');
+            avatar.classList.add('image', 'is-24x24');
+            const avatarImg = document.createElement('img');
+            avatarImg.src = '/static/images/sentiment.png'; 
+            avatarImg.classList.add('is-rounded');
+            avatar.appendChild(avatarImg);
+            avatarContainer.appendChild(avatar);
+            header.appendChild(avatarContainer);
+
             designHeader(header, 'fa-people-arrows');
 
 
@@ -447,6 +459,17 @@ function retrieveEmoSupport(message, support_type){
                 const reframePane = createSupportPane(data.message.reframe, "emo");
                 card.appendChild(thoughtPane);
                 card.appendChild(reframePane);
+
+                const avatarContainer = document.createElement('div');
+                avatarContainer.classList.add('media-left');
+                const avatar = document.createElement('figure');
+                avatar.classList.add('image', 'is-24x24');
+                const avatarImg = document.createElement('img');
+                avatarImg.src = '/static/images/reframe.png'; 
+                avatarImg.classList.add('is-rounded');
+                avatar.appendChild(avatarImg);
+                avatarContainer.appendChild(avatar);
+                header.appendChild(avatarContainer);
 
                 designHeader(header, 'fa-spa');
 
