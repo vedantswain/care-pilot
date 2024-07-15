@@ -468,7 +468,7 @@ function sendEmoFeedback(support_type) {
 
 function retrieveTroubleSupport(message){
     const troubleDiv = document.getElementById('troubleWindow');
-
+    troubleDiv.innerHTML = '';
     const header = document.createElement('div');
     header.classList.add('card-header');
     const headerTitle = document.createElement('div');

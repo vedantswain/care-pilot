@@ -1,3 +1,5 @@
+from flask import Flask, send_from_directory
+
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 import os, json
 import certifi
@@ -411,7 +413,10 @@ def getTroubleSupport(session_id):
         return jsonify({
             "message": response
         })
-
+    
+@app.route('/static/<path:filename>')
+def send_avatar(filename):
+    return send_from_directory('static', filename)
 
 
 if __name__ == "__main__":
