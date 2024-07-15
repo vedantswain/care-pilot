@@ -469,6 +469,14 @@ function sendEmoFeedback(support_type) {
 function retrieveTroubleSupport(message){
     const troubleDiv = document.getElementById('troubleWindow');
 
+    const avatar = document.createElement('img');
+    avatar.src = 'static/guidance.png'; 
+    avatar.alt = 'Avatar';
+    avatar.style.width = '40px'; 
+    avatar.style.height = '40px';
+    avatar.style.borderRadius = '50%';
+    avatar.style.marginRight = '10px';
+
     const header = document.createElement('div');
     header.classList.add('card-header');
     const headerTitle = document.createElement('div');
@@ -476,6 +484,8 @@ function retrieveTroubleSupport(message){
     headerTitle.textContent = "Ways to Help Your Customers".toUpperCase();
     let loaderId = 'trouble-loader'
     let loader = createLoader(loaderId)
+
+    header.appendChild(avatar); 
     header.appendChild(headerTitle);
     header.appendChild(loader);
     troubleDiv.appendChild(header);
