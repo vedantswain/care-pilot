@@ -7,9 +7,9 @@ function getPropilotAvatar() {
     const avatarContainer = document.createElement('div');
     avatarContainer.classList.add('card-header-icon');
     const avatar = document.createElement('figure');
-    avatar.classList.add('image', 'is-24x24');
+    avatar.classList.add('image', 'is-32x32');
     const avatarImg = document.createElement('img');
-    avatarImg.src = '/static/images/cue.png';
+    avatarImg.src = '/static/images/propilot.jpeg';
     avatarImg.classList.add('is-rounded');
     avatar.appendChild(avatarImg);
     avatarContainer.appendChild(avatar);
