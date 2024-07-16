@@ -6,9 +6,9 @@ function updateSlider(sliderName, slideAmount) {
 }
 
 function updateClientQueue() {
-    const sessionId = window.location.pathname.split('/')[1];
+    const sessionId = window.location.pathname.split('/')[2];
 
-    fetch(`/${sessionId}/update-clientQueue`)
+    fetch(`/update-clientQueue/${sessionId}`)
     .then(response => response.json())
     .then(data => {
 
@@ -49,13 +49,13 @@ document.addEventListener('DOMContentLoaded', function() {
             alert("Please respond to all slider questions. If you would like to keep the value at the starting position, please move the slider back and forth to confirm your selection.");
             return;
         }
-        const sessionId = window.location.pathname.split('/')[1];
+        const sessionId = window.location.pathname.split('/')[2];
         const clientId = sessionStorage.getItem('client_id');
 
         data = formValues
         data['client_id'] = clientId
 
-        fetch(`/${sessionId}/store-survey`, {
+        fetch(`/store-survey/${sessionId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

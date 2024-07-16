@@ -42,13 +42,13 @@ document.addEventListener('DOMContentLoaded', function() {
             alert("Please respond to all slider questions. If you would like to keep the value at the starting position, please move the slider back and forth to confirm your selection.");
             return;
         }
-        const sessionId = window.location.pathname.split('/')[1];
+        const sessionId = window.location.pathname.split('/')[2];
         const clientParam = window.location.href.split('?')[1];
 
         data = formValues
         data['client_param'] = clientParam
 
-        fetch(`/${sessionId}/store-pre-task-survey`, {
+        fetch(`/store-pre-task-survey/${sessionId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

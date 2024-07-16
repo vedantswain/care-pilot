@@ -61,7 +61,7 @@ function updateQueueDisplay(data) {
 function confirmNextClient(sessionId) {
   const userConfirmed = confirm('Do you want to go to the next client?');
   if (userConfirmed) {
-    fetch(`/${sessionId}/update-clientQueue`)
+    fetch(`/update-clientQueue/${sessionId}`)
       .then((response) => response.json())
       .then((data) => {
         if (data.url) {
@@ -332,10 +332,10 @@ function retrieveInfoSupport(message,support_type) {
   header.appendChild(loader);
   infoDiv.appendChild(header);
 
-  const sessionId = window.location.pathname.split('/')[1];
+  const sessionId = window.location.pathname.split('/')[2];
   const clientId = sessionStorage.getItem('client_id');
 
-  fetch(`/${sessionId}/get-info-support`, {
+  fetch(`/get-info-support/${sessionId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -399,11 +399,11 @@ function retrieveEmoSupport(message, support_type) {
   card.appendChild(header);
   supportDiv.appendChild(card);
 
-  const sessionId = window.location.pathname.split('/')[1];
+  const sessionId = window.location.pathname.split('/')[2];
   const clientId = sessionStorage.getItem('client_id');
 
   if (support_type == 'TYPE_SENTIMENT') {
-    fetch(`/${sessionId}/sentiment`, {
+    fetch(`/sentiment/${sessionId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -422,7 +422,7 @@ function retrieveEmoSupport(message, support_type) {
       })
       .catch((error) => console.error('Error:', error));
   } else {
-    fetch(`/${sessionId}/get-emo-support`, {
+    fetch(`/get-emo-support/${sessionId}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -470,12 +470,12 @@ function retrieveEmoSupport(message, support_type) {
 }
 
 function sendTroubleFeedback(support_type) {
-  const sessionId = window.location.pathname.split('/')[1];
+  const sessionId = window.location.pathname.split('/')[2];
   const clientId = sessionStorage.getItem('client_id');
 
   var input = document.getElementById(`${support_type}-feedback`);
   var rate = input.value;
-  fetch(`/${sessionId}/store-trouble-feedback`, {
+  fetch(`/store-trouble-feedback/${sessionId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -493,12 +493,12 @@ function sendTroubleFeedback(support_type) {
 }
 
 function sendEmoFeedback(support_type) {
-  const sessionId = window.location.pathname.split('/')[1];
+  const sessionId = window.location.pathname.split('/')[2];
   const clientId = sessionStorage.getItem('client_id');
 
   var input = document.getElementById(`${support_type}-feedback`);
   var rate = input.value;
-  fetch(`/${sessionId}/store-emo-feedback`, {
+  fetch(`/store-emo-feedback/${sessionId}`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -528,10 +528,10 @@ function retrieveTroubleSupport(message, support_type) {
   header.appendChild(headerTitle);
   header.appendChild(loader);
   troubleDiv.appendChild(header);
-  const sessionId = window.location.pathname.split('/')[1];
+  const sessionId = window.location.pathname.split('/')[2];
   const clientId = sessionStorage.getItem('client_id');
 
-    fetch(`/${sessionId}/get-trouble-support`, {
+    fetch(`/get-trouble-support/${sessionId}`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -635,7 +635,7 @@ function sendMessage() {
 
   // const urlParams = new URLSearchParams(window.location.search);
   // const product = urlParams.get('product');
-  const sessionId = window.location.pathname.split('/')[1];
+  const sessionId = window.location.pathname.split('/')[2];
   const clientId = sessionStorage.getItem('client_id');
   const showInfo = sessionStorage.getItem('show_info');
   const showEmo = sessionStorage.getItem('show_emo');
@@ -653,7 +653,7 @@ function sendMessage() {
     // retrieveEmoFeedback(TYPE_SENTIMENT);
   }
 
-    fetch(`/${sessionId}/get-reply`, {
+    fetch(`/get-reply/${sessionId}`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -688,10 +688,10 @@ function fetchFirstMsg() {
     button.disabled = true;
 
     const urlParams = new URLSearchParams(window.location.search);
-    const sessionId = window.location.pathname.split('/')[1];
+    const sessionId = window.location.pathname.split('/')[2];
 
     // Make a GET request using fetch
-    fetch(`/${sessionId}/get-reply?${urlParams}`)
+    fetch(`/get-reply/${sessionId}?${urlParams}`)
     .then(response => {
         // Check if the request was successful
         if (!response.ok) {
