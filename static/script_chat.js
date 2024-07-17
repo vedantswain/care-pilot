@@ -423,6 +423,9 @@ function retrieveEmoSupport(message, support_type) {
         card.appendChild(sentimentPane);
         designHeader(header, 'fa-people-arrows');
 
+        const footer = createFooter(support_type);
+        sentimentPane.appendChild(footer); 
+
         updateFlag('support_emo_sentiment');
       })
       .catch((error) => console.error('Error:', error));
@@ -452,10 +455,6 @@ function retrieveEmoSupport(message, support_type) {
 
           designHeader(header, 'fa-people-arrows');
 
-          footer = createFooter(support_type);
-          card.appendChild(footer);
-
-          updateFlag('support_emo_sentiment');
           
         } else if (support_type == 'TYPE_EMO_REFRAME') {
           const thoughtPane = createSupportPane(data.message.thought, 'emo');
