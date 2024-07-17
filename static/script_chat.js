@@ -212,7 +212,7 @@ function validateInput() {
   showInfo = sessionStorage.getItem('show_info') == '1';
 
   if (showEmo) {
-        sliderKeysValidation.push('TYPE_SENTIMENT-helpful_unhelpful');
+    sliderKeysValidation.push('TYPE_SENTIMENT-helpful_unhelpful');
     messageFlagsValidation.push('support_emo_sentiment');
 
  
@@ -449,7 +449,7 @@ function retrieveEmoSupport(message, support_type) {
         // supportDiv.scrollTop = supportDiv.scrollHeight;
         document.getElementById(loaderId).remove();
 
-        if (support_type == 'TYPE_SENTIMENT') {
+        if (support_type == 'TYPE_EMO_SHOES') {
           const shoesPane = createSupportPane(data.message, 'emo');
           card.appendChild(shoesPane);
 

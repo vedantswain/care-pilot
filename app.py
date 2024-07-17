@@ -439,7 +439,7 @@ def getEmoSupport(session_id):
                     'reframe': reframe
                 }
             })
-        elif support_type=="TYPE_SENTIMENT":
+        elif support_type=="TYPE_EMO_SHOES":
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
             chat_in_task.insert_one({
