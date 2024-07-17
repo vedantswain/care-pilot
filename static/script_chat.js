@@ -212,7 +212,10 @@ function validateInput() {
   showInfo = sessionStorage.getItem('show_info') == '1';
 
   if (showEmo) {
+        sliderKeysValidation.push('TYPE_SENTIMENT-helpful_unhelpful');
     messageFlagsValidation.push('support_emo_sentiment');
+
+ 
     if (turn_number > 1) {      // only visible after 1st turn
         sliderKeysValidation.push('TYPE_EMO_REFRAME-helpful_unhelpful');
         messageFlagsValidation.push('support_emo_reframe');
@@ -367,6 +370,8 @@ function retrieveInfoSupport(message,support_type) {
     });
 }
 
+
+
 function retrieveEmoSupport(message, support_type) {
   const supportDiv = document.getElementById('supportWindow');
 
@@ -441,7 +446,7 @@ function retrieveEmoSupport(message, support_type) {
         // supportDiv.scrollTop = supportDiv.scrollHeight;
         document.getElementById(loaderId).remove();
 
-        if (support_type == 'TYPE_EMO_SHOES') {
+        if (support_type == 'TYPE_SENTIMENT') {
           const shoesPane = createSupportPane(data.message, 'emo');
           card.appendChild(shoesPane);
 
@@ -449,6 +454,9 @@ function retrieveEmoSupport(message, support_type) {
 
           footer = createFooter(support_type);
           card.appendChild(footer);
+
+          updateFlag('support_emo_sentiment');
+          
         } else if (support_type == 'TYPE_EMO_REFRAME') {
           const thoughtPane = createSupportPane(data.message.thought, 'emo');
           const reframePane = createSupportPane(data.message.reframe, 'emo');
@@ -468,6 +476,30 @@ function retrieveEmoSupport(message, support_type) {
       });
   }
 }
+
+function sendSentimentFeedback(support_type) {
+  const sessionId = window.location.pathname.split('/')[2];
+  const clientId = sessionStorage.getItem('client_id');
+
+  var input = document.getElementById(`${support_type}-feedback`);
+  var rate = input.value;
+  fetch(`/store-sentiment-feedback/${sessionId}`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      rate: rate,
+      type: support_type,
+      client_id: clientId,
+    }),
+  })
+    .then((response) => response.json())
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+}
+
 
 function sendTroubleFeedback(support_type) {
   const sessionId = window.location.pathname.split('/')[2];
@@ -645,6 +677,7 @@ function sendMessage() {
   }
 
   if (showEmo == '1') {
+    sendSentimentFeedback('TYPE_SENTIMENT');
     // retrieveEmoFeedback(TYPE_EMO_THOUGHT);
     // retrieveEmoFeedback(TYPE_EMO_SHOES);
     if (turn_number > 1){
