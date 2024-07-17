@@ -9,12 +9,16 @@ TYPE_EMO_THOUGHT = "You might be thinking"
 TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
 TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"
 TYPE_SENTIMENT = "Client's Sentiment"
+TYPE_INFO_CUE = "Ways to Continue the Conversation"
+TYPE_INFO_GUIDE = "Ways to Help Your Customer"
 
 SUPPORT_TYPE_STRINGS = {
     "TYPE_EMO_THOUGHT" : TYPE_EMO_THOUGHT,
     "TYPE_EMO_SHOES" : TYPE_EMO_SHOES,
     "TYPE_EMO_REFRAME" : TYPE_EMO_REFRAME,
-    "TYPE_SENTIMENT" : TYPE_SENTIMENT
+    "TYPE_SENTIMENT" : TYPE_SENTIMENT,
+    "TYPE_INFO_CUE" : TYPE_INFO_CUE,
+    "TYPE_INFO_GUIDE": TYPE_INFO_GUIDE
 }
 
 ### Only for testing/debugging

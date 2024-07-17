@@ -129,7 +129,6 @@ def analyze_sentiment_decision(client_latest_response):
     label_score = round(average_score)
 
     for key in sentiment_dict:
-        print(key)
         if sentiment_dict[key] == label_score:
             return key
     return label_score
