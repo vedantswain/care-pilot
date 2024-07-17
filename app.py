@@ -1,3 +1,4 @@
+from flask import Flask, send_from_directory
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 import os, json
 import certifi
@@ -94,7 +95,7 @@ def start_chat(scenario):
     # random.shuffle(clientQueue)
     client = clientQueue.pop(0)
     session_id = str(uuid4())   ### unique to each user/participant/representative
-    current_client = client['name']
+    current_client = client
     session[session_id] = {}
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue
@@ -266,7 +267,7 @@ def getReply(session_id):
 def update_client_queue(session_id):
     clientQueue = session[session_id]['client_queue']
     client = clientQueue.pop(0)
-    current_client = client['name']
+    current_client = client
     session[session_id]['current_client'] = current_client
     session[session_id]['client_queue'] = clientQueue
 
@@ -540,7 +541,6 @@ def getClientHistory(session_id, client_id):
 def getClientList(session_id):
     clients_info = list(chat_client_info.find({"session_id": session_id}, {"_id": 0, "client_name": 1, "client_id": 1, "category":1}))
     return jsonify({"chat_history": chat_history, "clients_info": clients_info})
-
 
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=8080, threaded=True)

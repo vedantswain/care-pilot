@@ -1,5 +1,18 @@
 var turn_number = 0;
 
+function getPropilotAvatar() {
+    const avatarContainer = document.createElement('div');
+    avatarContainer.classList.add('card-header-icon');
+    const avatar = document.createElement('figure');
+    avatar.classList.add('image', 'is-32x32');
+    const avatarImg = document.createElement('img');
+    avatarImg.src = '/static/images/propilot.jpeg';
+    avatarImg.classList.add('is-rounded');
+    avatar.appendChild(avatarImg);
+    avatarContainer.appendChild(avatar);
+    return avatarContainer;
+}
+
 function updateQueueDisplay(data) {
   const queueContainer = document.querySelector('#client-queue');
   queueContainer.innerHTML = '';
@@ -12,9 +25,9 @@ function updateQueueDisplay(data) {
             <div class="media">
                 <div class="media-left">
                     <p>
-                        <span class="icon is-large">
-                            <i class="fas fa-2x fa-circle-user"></i>
-                        </span>
+                        <figure class="image is-24x24">
+                          <img class="is-rounded" src=${client.avatar} />
+                        </figure>
                     </p>
                 </div>
                 <div class="media-content is-hidden-mobile">
@@ -41,6 +54,7 @@ function updateQueueDisplay(data) {
   }
 
 }
+
 
 // function endChatSession() {
  
@@ -322,15 +336,22 @@ function createLoader(loaderId = 'info-loader') {
 function retrieveInfoSupport(message,support_type) {
   const infoDiv = document.getElementById('co-pilot');
 
-  const header = document.createElement('div');
-  header.classList.add('card-header');
-  const headerTitle = document.createElement('div');
-  headerTitle.classList.add('card-header-title');
-  headerTitle.textContent = common_strings[support_type].toUpperCase();
-  let loader = createLoader();
-  header.appendChild(headerTitle);
-  header.appendChild(loader);
-  infoDiv.appendChild(header);
+    const header = document.createElement('div');
+    header.classList.add('card-header');
+
+    const headerTitle = document.createElement('div');
+    headerTitle.classList.add('card-header-title');
+    headerTitle.textContent = common_strings[support_type].toUpperCase();
+
+    const avatarPropilot = getPropilotAvatar();
+
+    header.appendChild(avatarPropilot);
+    header.appendChild(headerTitle);
+
+    let loader = createLoader('info-loader');
+    header.appendChild(loader);
+
+    infoDiv.appendChild(header);
 
   const sessionId = window.location.pathname.split('/')[2];
   const clientId = sessionStorage.getItem('client_id');
@@ -393,11 +414,14 @@ function retrieveEmoSupport(message, support_type) {
   headerTitle.classList.add('card-header-title');
   headerTitle.textContent = common_strings[support_type].toUpperCase();
 
-  header.appendChild(headerTitle);
-  header.appendChild(loader);
+    const avatarPropilot = getPropilotAvatar();
 
-  card.appendChild(header);
-  supportDiv.appendChild(card);
+    header.appendChild(avatarPropilot);
+    header.appendChild(headerTitle);
+    header.appendChild(loader);
+    
+    card.appendChild(header);
+    supportDiv.appendChild(card);
 
   const sessionId = window.location.pathname.split('/')[2];
   const clientId = sessionStorage.getItem('client_id');
@@ -518,18 +542,27 @@ function sendEmoFeedback(support_type) {
 function retrieveTroubleSupport(message, support_type) {
   const troubleDiv = document.getElementById('troubleWindow');
 
-  const header = document.createElement('div');
-  header.classList.add('card-header');
-  const headerTitle = document.createElement('div');
-  headerTitle.classList.add('card-header-title');
-  headerTitle.textContent = common_strings[support_type].toUpperCase();
-  let loaderId = 'trouble-loader';
-  let loader = createLoader(loaderId);
-  header.appendChild(headerTitle);
-  header.appendChild(loader);
-  troubleDiv.appendChild(header);
-  const sessionId = window.location.pathname.split('/')[2];
-  const clientId = sessionStorage.getItem('client_id');
+    const header = document.createElement('div');
+    header.classList.add('card-header');
+
+
+    const headerTitle = document.createElement('div');
+    headerTitle.classList.add('card-header-title');
+    headerTitle.textContent = common_strings[support_type].toUpperCase();
+
+
+    const avatarPropilot = getPropilotAvatar();
+
+    header.appendChild(avatarPropilot);
+    header.appendChild(headerTitle);
+
+    let loaderId = 'trouble-loader'
+    let loader = createLoader(loaderId)
+    header.appendChild(loader);
+    troubleDiv.appendChild(header);
+
+    const sessionId = window.location.pathname.split('/')[2];
+    const clientId = sessionStorage.getItem('client_id');
 
     fetch(`/get-trouble-support/${sessionId}`, {
             method: 'POST',
@@ -555,15 +588,8 @@ function retrieveTroubleSupport(message, support_type) {
             troubleDiv.appendChild(troubleMessage);
             //troubleDiv.scrollTop = supportDiv.scrollHeight;
             document.getElementById(loaderId).remove();
-            const p = document.createElement('p');
-            p.classList.add('card-header-icon');
-            const span = document.createElement('span');
-            span.classList.add('icon', 'is-small');
-            const icon = document.createElement('i');
-            icon.classList.add('fas', 'fa-circle-info');
-            span.appendChild(icon);
-            p.appendChild(span);
-            header.appendChild(p);
+
+            designHeader(header, 'fa-circle-info');
 
       // support_type == "TYPE_TROUBLE"
       footer = createFooter(support_type);
