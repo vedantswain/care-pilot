@@ -27,36 +27,38 @@
 </head>
 <body>
 
-     <!-- button link to next client-->
-    <button class="button is-danger is-light" onclick="confirmNextClient('{{ session_id }}')">
-         <span class="icon">
-            <i class="fas fa-dog"></i>
-         </span>
-    </button>
+    <div class="buttons has-addons">
+        <!-- button link to next client-->
+        <button class="button is-danger is-outlined" onclick="confirmNextClient('{{ session_id }}')">
+             <span class="icon">
+                <i class="fas fa-dog"></i>
+             </span>
+        </button>
 
-    <!-- button link to survey -->
+        <!-- button link to survey -->
 
-    <button class="button is-warning is-light is-hovered" onclick="showSurveyModal()">
-        <span class="icon">
-            <i class="fas fa-cat"></i>
-        </span>
-    </button>
+        <button class="button is-success is-outlined" onclick="showSurveyModal()">
+            <span class="icon">
+                <i class="fas fa-cat"></i>
+            </span>
+        </button>
 
-    <!-- button link to conversation history -->
-    <button class="button is-link is-light is-hovered" onclick="goToHistoryPage('{{ session_id }}')">
-        <span class="icon">
-            <i class="fas fa-otter"></i>
-        </span>
-    </button>
+        <!-- button link to conversation history -->
+        <button class="button is-link is-outlined" onclick="goToHistoryPage('{{ session_id }}')">
+            <span class="icon">
+                <i class="fas fa-otter"></i>
+            </span>
+        </button>
+    </div>
 
-    
-    
-    
+
+
 
 
     <!--sidebar-left-->
     <div class="columns is-mobile">
-        <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-user hero is-fullheight">
+        <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-user hero is-fullheight"
+        style="overflow-y: auto; overflow-anchor: auto; max-height: 55vh;">
 
             <div>
                 <div style="margin-top: 8%; margin-left: 5%;">

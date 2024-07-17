@@ -297,7 +297,7 @@ function createFooter(support_type) {
   input.setAttribute('value', '0');
   input.setAttribute('step', '1');
   input.style.margin = '0 4px';
-  input.style.width = '32em';
+  input.style.width = 'fit-content';
   input.style.flex = '1';
   input.addEventListener('input', function () {
     updateInTask(this.name, this.value);

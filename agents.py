@@ -324,7 +324,7 @@ class mAgentER:
         prompt = """
                 The representative needs to be thinking: {thought}\
                 
-                Rephrase the thought as if you are speaking back to the representative.\
+                Rephrase the thought as if you are convincing the representative to think that way.\
                 
                 The rephrase should be addressed back to the person who has the thought,\
                 who should be referred to as "you".\
