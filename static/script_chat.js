@@ -284,7 +284,15 @@ function createFooter(support_type) {
   leftLabel.textContent = 'Helpful';
   leftLabel.style.marginRight = '4px';
   leftLabel.style.width = '4em';
+  leftLabel.classList.add('slider-label');
   sliderContainer.appendChild(leftLabel);
+
+  const leftLabelIcon = document.createElement('span');
+  leftLabelIcon.classList.add('icon', 'is-small', 'slider-icon');
+    var icon = document.createElement('i');
+    icon.classList.add('fas', "fa-thumbs-up");
+    leftLabelIcon.appendChild(icon);
+    sliderContainer.appendChild(leftLabelIcon);
 
   const input = document.createElement('input');
   input.id = `${support_type}-feedback`;
@@ -307,7 +315,15 @@ function createFooter(support_type) {
   rightLabel.textContent = 'Unhelpful';
   rightLabel.style.marginLeft = '4px';
   rightLabel.style.width = '4em';
+  rightLabel.classList.add('slider-label');
   sliderContainer.appendChild(rightLabel);
+
+  const rightLabelIcon = document.createElement('span');
+  rightLabelIcon.classList.add('icon', 'is-small', 'slider-icon');
+    var icon = document.createElement('i');
+    icon.classList.add('fas', "fa-thumbs-down");
+    rightLabelIcon.appendChild(icon);
+    sliderContainer.appendChild(rightLabelIcon);
 
   footerItem.appendChild(sliderContainer);
   footer.appendChild(footerItem);

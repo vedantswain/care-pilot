@@ -5,6 +5,15 @@ html, body {
 html {
     font-size: 14px;
 }
+
+
+.slider-label {
+    display: flex;
+}
+.slider-icon {
+    display: none;
+}
+
 @media screen and (max-width: 1440px) {
     html {
         font-size: 12px;
@@ -19,7 +28,14 @@ html {
     html {
         font-size: 10px;
     }
+    .slider-label {
+        display: none;
+    }
+    .slider-icon {
+        display: flex;
+    }
 }
+
 
 *::-webkit-scrollbar {
 	width: 10px;
@@ -123,7 +139,7 @@ html {
 }
 
 .message-window {
-	min-height: calc(100vh - 126px) !important;
+	min-height: calc(100vh - 72px) !important;
     display:flex;
     flex-direction: column;
     flex-wrap: nowrap;
