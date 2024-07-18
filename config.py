@@ -9,8 +9,8 @@ TYPE_EMO_THOUGHT = "You might be thinking"
 TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
 TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"
 TYPE_SENTIMENT = "Client's Sentiment"
-TYPE_INFO_CUE = "Ways to Continue the Conversation"
-TYPE_INFO_GUIDE = "Ways to Help Your Customer"
+TYPE_INFO_CUE = "Response Suggestions"
+TYPE_INFO_GUIDE = "Guidance for Complaint Resolution"
 
 SUPPORT_TYPE_STRINGS = {
     "TYPE_EMO_THOUGHT" : TYPE_EMO_THOUGHT,
