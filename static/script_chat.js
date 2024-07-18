@@ -278,7 +278,6 @@ function createFooter(support_type) {
   sliderContainer.classList.add('slider-container');
   sliderContainer.style.display = 'flex';
   sliderContainer.style.alignItems = 'center';
-  sliderContainer.style.width = '72%';
   sliderContainer.style.padding = '0 4px';
 
   const leftLabel = document.createElement('span');

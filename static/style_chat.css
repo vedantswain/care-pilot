@@ -3,12 +3,21 @@ html, body {
 }
 
 html {
-    font-size: 16px;
+    font-size: 14px;
 }
-
-@media screen and (min-width: 1023px) {
+@media screen and (max-width: 1440px) {
     html {
         font-size: 12px;
+    }
+}
+@media screen and (max-width: 1200px) {
+    html {
+        font-size: 11px;
+    }
+}
+@media screen and (max-width: 1024px) {
+    html {
+        font-size: 10px;
     }
 }
 
@@ -114,7 +123,7 @@ html {
 }
 
 .message-window {
-	min-height: calc(100vh - 76px) !important;
+	min-height: calc(100vh - 126px) !important;
     display:flex;
     flex-direction: column;
     flex-wrap: nowrap;
