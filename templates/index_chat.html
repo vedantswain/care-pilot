@@ -27,39 +27,40 @@
 </head>
 <body>
 
-     <!-- button link to next client-->
-    <button class="button is-danger is-light" onclick="confirmNextClient('{{ session_id }}')">
-         <span class="icon">
-            <i class="fas fa-dog"></i>
-         </span>
-    </button>
 
-    <!-- button link to survey -->
+    <div class="columns is-mobile" style="padding: 0.5em;">
 
-    <button class="button is-warning is-light is-hovered" onclick="showSurveyModal()">
-        <span class="icon">
-            <i class="fas fa-cat"></i>
-        </span>
-    </button>
+        <!--sidebar-left-->
+        <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-user hero is-fullheight"
+        style="overflow-y: auto; overflow-anchor: auto; max-height: 55vh;">
 
-    <!-- button link to conversation history -->
-    <button class="button is-link is-light is-hovered" onclick="goToHistoryPage('{{ session_id }}')">
-        <span class="icon">
-            <i class="fas fa-otter"></i>
-        </span>
-    </button>
+            <div class="buttons has-addons" style="padding: 0.5em;">
+                <!-- button link to next client-->
+                <button class="button is-danger is-dark" onclick="confirmNextClient('{{ session_id }}')">
+             <span class="icon">
+                <i class="fas fa-dog"></i>
+             </span>
+                </button>
 
-    
-    
-    
+                <!-- button link to survey -->
 
+                <button class="button is-warning is-dark" onclick="showSurveyModal()">
+            <span class="icon">
+                <i class="fas fa-cat"></i>
+            </span>
+                </button>
 
-    <!--sidebar-left-->
-    <div class="columns is-mobile">
-        <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-user hero is-fullheight">
+                <!-- button link to conversation history -->
+                <button class="button is-light" onclick="goToHistoryPage('{{ session_id }}')">
+            <span class="icon">
+                <i class="fas fa-otter"></i>
+            </span>
+                </button>
+            </div>
+
 
             <div>
-                <div style="margin-top: 8%; margin-left: 5%;">
+                <div style="margin-left: 5%;">
                     <p> 
                         <strong>Queue</strong>
                     </p>
@@ -97,7 +98,7 @@
         </div>
 
 
-
+        <!--central-->
         <div class="column is-6-desktop is-4-tablet is-8-mobile is-paddingless">
             <nav class="navbar has-shadow user-nav">
                 <div class="navbar-start">
@@ -202,6 +203,7 @@
             </div>
         </div>
 
+        <!--sidebar-right-->
         <div class="column is-paddingless is-3-desktop is-4-tablet is-2-mobile sidebar-profile is-fullheight" style="display: flex; flex-direction: column; overflow-y: auto; overflow-anchor: auto; max-height: 100vh; margin-right: 4em;">
 
             <div id="supportWindow" style="padding: 32px 32px 16px 16px;">

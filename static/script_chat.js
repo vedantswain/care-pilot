@@ -278,14 +278,21 @@ function createFooter(support_type) {
   sliderContainer.classList.add('slider-container');
   sliderContainer.style.display = 'flex';
   sliderContainer.style.alignItems = 'center';
-  sliderContainer.style.width = '72%';
   sliderContainer.style.padding = '0 4px';
 
   const leftLabel = document.createElement('span');
   leftLabel.textContent = 'Helpful';
   leftLabel.style.marginRight = '4px';
   leftLabel.style.width = '4em';
+  leftLabel.classList.add('slider-label');
   sliderContainer.appendChild(leftLabel);
+
+  const leftLabelIcon = document.createElement('span');
+  leftLabelIcon.classList.add('icon', 'is-small', 'slider-icon');
+    var icon = document.createElement('i');
+    icon.classList.add('fas', "fa-thumbs-up");
+    leftLabelIcon.appendChild(icon);
+    sliderContainer.appendChild(leftLabelIcon);
 
   const input = document.createElement('input');
   input.id = `${support_type}-feedback`;
@@ -297,7 +304,7 @@ function createFooter(support_type) {
   input.setAttribute('value', '0');
   input.setAttribute('step', '1');
   input.style.margin = '0 4px';
-  input.style.width = '32em';
+  input.style.width = 'fit-content';
   input.style.flex = '1';
   input.addEventListener('input', function () {
     updateInTask(this.name, this.value);
@@ -308,7 +315,15 @@ function createFooter(support_type) {
   rightLabel.textContent = 'Unhelpful';
   rightLabel.style.marginLeft = '4px';
   rightLabel.style.width = '4em';
+  rightLabel.classList.add('slider-label');
   sliderContainer.appendChild(rightLabel);
+
+  const rightLabelIcon = document.createElement('span');
+  rightLabelIcon.classList.add('icon', 'is-small', 'slider-icon');
+    var icon = document.createElement('i');
+    icon.classList.add('fas', "fa-thumbs-down");
+    rightLabelIcon.appendChild(icon);
+    sliderContainer.appendChild(rightLabelIcon);
 
   footerItem.appendChild(sliderContainer);
   footer.appendChild(footerItem);
