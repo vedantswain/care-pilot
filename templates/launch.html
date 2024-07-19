@@ -3,7 +3,8 @@
 
 <script>
     function startChatSession(scenario) {
-        window.location.href = '/chat/'+scenario+'/';
+        var params = window.location.search
+        window.location.href = '/chat/'+scenario+'/'+params;
     }
 </script>
 

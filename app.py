@@ -92,6 +92,10 @@ def launch():
 
 @app.route('/chat/<scenario>/')
 def start_chat(scenario):
+    val_pwd = request.args.get('pwd')
+    if val_pwd != common.ADMIN_PWD:
+        return "Access restricted to participants", 401
+
     global clientQueue
     if not clientQueue:
         # clientQueue = common.randomQueue
@@ -110,14 +114,14 @@ def start_chat(scenario):
     return redirect(url_for('getPreSurvey', session_id=session_id) + clientParam)
 
 # End-point to test the pre-survey HTML
-@app.route('/pre-task-survey/<session_id>')
+@app.route('/pre-task-survey/<session_id>/')
 def getPreSurvey(session_id):
+    if session_id not in session:
+        return "Invalid session", 401
     return render_template('pre_task_survey.html', session_id=session_id)
 
-@app.route('/store-pre-task-survey/<session_id>', methods=['POST'])
+@app.route('/store-pre-task-survey/<session_id>/', methods=['POST'])
 def storePreSurvey(session_id):
-
-
     if session_id in session:
 
         data = request.get_json()
@@ -162,6 +166,8 @@ def index(session_id):
 
 @app.route('/get-reply/<session_id>', methods=['GET','POST'])
 def getReply(session_id):
+    if session_id not in session:
+        return "Invalid session", 401
     clientQueue = session[session_id]['client_queue']
     if request.method == 'GET':
         val_name = request.args.get('name')
@@ -269,6 +275,8 @@ def getReply(session_id):
 
 @app.route('/update-clientQueue/<session_id>')
 def update_client_queue(session_id):
+    if session_id not in session:
+        return "Invalid session", 401
     clientQueue = session[session_id]['client_queue']
     client = clientQueue.pop(0)
     current_client = client
@@ -283,6 +291,8 @@ def update_client_queue(session_id):
 # End-point to test the survey HTML
 @app.route('/post-task-survey/<session_id>')
 def getSurvey(session_id):
+    if session_id not in session:
+        return "Invalid session", 401
     return render_template('feedback.html', session_id=session_id)
 
 @app.route('/store-survey/<session_id>', methods=['POST'])
@@ -564,11 +574,15 @@ def complete():
 
 @app.route('/history/<session_id>/<client_id>')
 def getClientHistory(session_id, client_id):
+    if session_id not in session:
+        return "Invalid session", 401
     chat_history = list(chat_history_collection.find({"session_id": session_id, "client_id": client_id}, {"_id": 0}))
     return jsonify({"chat_history": chat_history})
 
 @app.route('/history/<session_id>')
 def getClientList(session_id):
+    if session_id not in session:
+        return "Invalid session", 401
     clients_info = list(chat_client_info.find({"session_id": session_id}, {"_id": 0, "client_name": 1, "client_id": 1, "category":1}))
     return jsonify({"chat_history": chat_history, "clients_info": clients_info})
 
