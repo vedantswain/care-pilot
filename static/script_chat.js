@@ -89,7 +89,7 @@ function confirmNextClient(sessionId) {
 function goToHistoryPage(session_id) {
     console.log("Session ID:", session_id);
     if (session_id) {
-        window.location.href = `/conversation_history?session_id=${session_id}`;
+        window.open(`/conversation_history?session_id=${session_id}`, '_blank');
     } else {
         console.error('Session ID is missing');
         alert('Session ID is missing');

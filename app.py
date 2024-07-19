@@ -561,25 +561,25 @@ def getTroubleSupport(session_id):
         })
     return jsonify({"message": "Invalid session or session expired"}), 400
 
-@app.route('/conversation_history')
+@app.route('/conversation_history/')
 def conversation_history():
     session_id = request.args.get('session_id')
     if not session_id:
         return "Session ID is missing", 400
     return render_template('conversation_history.html', session_id=session_id)
 
-@app.route('/complete')
+@app.route('/complete/')
 def complete():
     return render_template('complete.html')
 
-@app.route('/history/<session_id>/<client_id>')
+@app.route('/history/<session_id>/<client_id>/')
 def getClientHistory(session_id, client_id):
     if session_id not in session:
         return "Invalid session", 401
     chat_history = list(chat_history_collection.find({"session_id": session_id, "client_id": client_id}, {"_id": 0}))
     return jsonify({"chat_history": chat_history})
 
-@app.route('/history/<session_id>')
+@app.route('/history/<session_id>/')
 def getClientList(session_id):
     if session_id not in session:
         return "Invalid session", 401
