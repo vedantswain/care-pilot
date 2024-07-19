@@ -5,6 +5,8 @@ Reduces risk of errors when changing code or introducing new types.
 '''
 import random
 
+ADMIN_PWD = "491062"
+
 TYPE_EMO_THOUGHT = "You might be thinking"
 TYPE_EMO_SHOES = "Put Yourself in the Client's Shoes"
 TYPE_EMO_REFRAME = "Be Mindful of Your Emotions"

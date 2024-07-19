@@ -82,9 +82,13 @@ trouble_agent = mAgentTrouble()
 def hello():
     return render_template('landing.html')
 
-@app.route('/launch')
+@app.route('/launch/')
 def launch():
-    return render_template('launch.html')
+    val_pwd = request.args.get('pwd')
+    if val_pwd == common.ADMIN_PWD:
+        return render_template('launch.html')
+    else:
+        return "Access restricted to participants", 401
 
 @app.route('/chat/<scenario>/')
 def start_chat(scenario):
