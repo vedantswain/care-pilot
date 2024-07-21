@@ -21,12 +21,33 @@
             margin-top: 20px;
         }
     </style>
+    <script type="text/javascript">
+        function goToHistoryPage(session_id) {
+            console.log("Session ID:", session_id);
+            if (session_id) {
+                window.open(`/conversation_history?session_id=${session_id}`, '_blank');
+            } else {
+                console.error('Session ID is missing');
+                alert('Session ID is missing');
+            }
+        }
+    </script>
 </head>
 <body>
     <div class="container">
+        <div class="buttons has-addons" style="padding: 0.5em;">
+            <!-- button link to conversation history -->
+            <button class="button is-light" onclick="goToHistoryPage('{{ session_id }}')">
+            <span class="icon">
+                <i class="fas fa-otter"></i>
+            </span>
+            </button>
+        </div>
+
+
         <img src="{{ url_for('static', filename='pro-graphic.png') }}" alt="Logo" class="logo">
         <p class="survey-link">
-            <a href="https://neu.co1.qualtrics.com/jfe/preview/previewId/28e095ac-3195-473f-a99b-7283b81f6fc5/SV_2gwveVtVLewIgcu?Q_CHL=preview&Q_SurveyVersionID=current" target="_blank">Complete the survey</a>
+            <a href="https://neu.co1.qualtrics.com/jfe/preview/previewId/28e095ac-3195-473f-a99b-7283b81f6fc5/SV_2gwveVtVLewIgcu?Q_CHL=preview&Q_SurveyVersionID=current" target="_blank">Click to Complete Exit Survey</a>
         </p>
     </div>
 </body>

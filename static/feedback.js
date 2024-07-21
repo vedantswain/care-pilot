@@ -20,7 +20,8 @@ function updateClientQueue() {
 }
 
 function completeSurvey() {
-    window.location.href = '/complete';
+    const session_id = window.location.pathname.split('/')[2];
+    window.open(`/complete?session_id=${session_id}`);
 }
 
 document.addEventListener('DOMContentLoaded', function() {

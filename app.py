@@ -570,7 +570,10 @@ def conversation_history():
 
 @app.route('/complete/')
 def complete():
-    return render_template('complete.html')
+    session_id = request.args.get('session_id')
+    if not session_id:
+        return "Session ID is missing", 400
+    return render_template('complete.html', session_id=session_id)
 
 @app.route('/history/<session_id>/<client_id>/')
 def getClientHistory(session_id, client_id):
