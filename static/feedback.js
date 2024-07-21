@@ -55,7 +55,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data = formValues
         data['client_id'] = clientId
 
-        fetch(`/store-survey/${sessionId}`, {
+        fetch(`/store-survey/${sessionId}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',

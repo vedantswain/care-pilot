@@ -57,7 +57,7 @@ function getClientHistory(client_id, client_name) {
     clientSubtitleElement.innerHTML = 'Chat History'
 
     const sessionId = new URLSearchParams(window.location.search).get('session_id');
-    fetch(`/history/${sessionId}/${client_id}`)
+    fetch(`/history/${sessionId}/${client_id}/`)
     .then(response => response.json())
     .then(data => {
         if (data.chat_history) {

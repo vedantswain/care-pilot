@@ -164,7 +164,7 @@ def index(session_id):
     return render_template('index_chat.html', session_id=session_id, current_client=current_client, common_strings=common.SUPPORT_TYPE_STRINGS)
 
 
-@app.route('/get-reply/<session_id>', methods=['GET','POST'])
+@app.route('/get-reply/<session_id>/', methods=['GET','POST'])
 def getReply(session_id):
     if session_id not in session:
         return "Invalid session", 401
@@ -273,7 +273,7 @@ def getReply(session_id):
 
     })
 
-@app.route('/update-clientQueue/<session_id>')
+@app.route('/update-clientQueue/<session_id>/')
 def update_client_queue(session_id):
     if session_id not in session:
         return "Invalid session", 401
@@ -289,13 +289,13 @@ def update_client_queue(session_id):
     return jsonify({"url": new_url})
 
 # End-point to test the survey HTML
-@app.route('/post-task-survey/<session_id>')
+@app.route('/post-task-survey/<session_id>/')
 def getSurvey(session_id):
     if session_id not in session:
         return "Invalid session", 401
     return render_template('feedback.html', session_id=session_id)
 
-@app.route('/store-survey/<session_id>', methods=['POST'])
+@app.route('/store-survey/<session_id>/', methods=['POST'])
 def storePostSurvey(session_id):
     if session_id in session:
         data = request.get_json()
@@ -327,7 +327,7 @@ def storePostSurvey(session_id):
     else:
         return jsonify({"message": "Invalid session or session expired"}), 400
 
-@app.route('/store-trouble-feedback/<session_id>',methods=['POST'])
+@app.route('/store-trouble-feedback/<session_id>/',methods=['POST'])
 def storeTroubleFeedback(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -355,7 +355,7 @@ def storeTroubleFeedback(session_id):
         return jsonify({"message": "Trouble feedback received"}), 200
     return jsonify({"message": "Invalid session or session expired"}), 400
    
-@app.route('/store-sentiment-feedback/<session_id>',methods=['POST'])
+@app.route('/store-sentiment-feedback/<session_id>/',methods=['POST'])
 def storeSentimentFeedback(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -383,7 +383,7 @@ def storeSentimentFeedback(session_id):
         return jsonify({"message": "Trouble feedback received"}), 200
     return jsonify({"message": "Invalid session or session expired"}), 400
 
-@app.route('/store-emo-feedback/<session_id>', methods=['POST'])
+@app.route('/store-emo-feedback/<session_id>/', methods=['POST'])
 def storeEmoFeedback(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -413,7 +413,7 @@ def storeEmoFeedback(session_id):
     return jsonify({"message": "Invalid session or session expired"}), 400
 
 
-@app.route('/get-emo-support/<session_id>', methods=['POST'])
+@app.route('/get-emo-support/<session_id>/', methods=['POST'])
 def getEmoSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -473,7 +473,7 @@ def getEmoSupport(session_id):
 
     return jsonify({"error": "Invalid session_id"}), 400
 
-@app.route('/sentiment/<session_id>', methods=['POST'])
+@app.route('/sentiment/<session_id>/', methods=['POST'])
 def sentiment(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -500,7 +500,7 @@ def sentiment(session_id):
 
 
 
-@app.route('/get-info-support/<session_id>', methods=['POST'])
+@app.route('/get-info-support/<session_id>/', methods=['POST'])
 def getInfoSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
@@ -531,7 +531,7 @@ def getInfoSupport(session_id):
     return jsonify({"message": "Invalid session or session expired"}), 400
 
 
-@app.route('/get-trouble-support/<session_id>', methods=['POST'])
+@app.route('/get-trouble-support/<session_id>/', methods=['POST'])
 def getTroubleSupport(session_id):
     if session_id in session:
         client_id = request.json.get("client_id")
