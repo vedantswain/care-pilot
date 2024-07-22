@@ -185,7 +185,7 @@ def getReply(session_id):
             "category": val_category,
             "is_grateful": 'grateful' if val_grateful==1 else 'NOT grateful',
             "is_ranting": 'ranting' if val_ranting==1 else 'NOT ranting',
-            "is_expression": 'expression' if val_expression==1 else 'NOT expression'
+            "is_expression": 'expressive' if val_expression==1 else 'NOT expressive'
         }
 
         response = sender_initial.invoke(complaint_parameters)
