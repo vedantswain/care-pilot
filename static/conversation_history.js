@@ -74,7 +74,7 @@ function getClientHistory(client_id, client_name) {
 }
 
 function getHistory(session_id) {
-    fetch(`/history/${session_id}`)
+    fetch(`/history/${session_id}/`)
     .then(response => response.json())
     .then(data => {
         if (data.clients_info) {
