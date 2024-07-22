@@ -21,7 +21,7 @@ function updateClientQueue() {
 
 function completeSurvey() {
     const session_id = window.location.pathname.split('/')[2];
-    window.open(`/complete?session_id=${session_id}`);
+    window.open(`/complete/?session_id=${session_id}`);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
