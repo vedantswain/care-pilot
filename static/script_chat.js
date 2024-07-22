@@ -764,7 +764,7 @@ function fetchFirstMsg() {
     const sessionId = window.location.pathname.split('/')[2];
 
     // Make a GET request using fetch
-    fetch(`/get-reply/${sessionId}?${urlParams}`)
+    fetch(`/get-reply/${sessionId}/?${urlParams}`)
     .then(response => {
         // Check if the request was successful
         if (!response.ok) {
