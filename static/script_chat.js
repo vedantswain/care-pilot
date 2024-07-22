@@ -75,7 +75,7 @@ function updateQueueDisplay(data) {
 function confirmNextClient(sessionId) {
   const userConfirmed = confirm('Do you want to go to the next client?');
   if (userConfirmed) {
-    fetch(`/update-clientQueue/${sessionId}`)
+    fetch(`/update-clientQueue/${sessionId}/`)
       .then((response) => response.json())
       .then((data) => {
         if (data.url) {
@@ -89,7 +89,7 @@ function confirmNextClient(sessionId) {
 function goToHistoryPage(session_id) {
     console.log("Session ID:", session_id);
     if (session_id) {
-        window.location.href = `/conversation_history?session_id=${session_id}`;
+        window.open(`/conversation_history?session_id=${session_id}`, '_blank');
     } else {
         console.error('Session ID is missing');
         alert('Session ID is missing');
@@ -374,7 +374,7 @@ function retrieveInfoSupport(message,support_type) {
   const sessionId = window.location.pathname.split('/')[2];
   const clientId = sessionStorage.getItem('client_id');
 
-  fetch(`/get-info-support/${sessionId}`, {
+  fetch(`/get-info-support/${sessionId}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -447,7 +447,7 @@ function retrieveEmoSupport(message, support_type) {
   const clientId = sessionStorage.getItem('client_id');
 
   if (support_type == 'TYPE_SENTIMENT') {
-    fetch(`/sentiment/${sessionId}`, {
+    fetch(`/sentiment/${sessionId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -469,7 +469,7 @@ function retrieveEmoSupport(message, support_type) {
       })
       .catch((error) => console.error('Error:', error));
   } else {
-    fetch(`/get-emo-support/${sessionId}`, {
+    fetch(`/get-emo-support/${sessionId}/`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -521,7 +521,7 @@ function sendSentimentFeedback(support_type) {
 
   var input = document.getElementById(`${support_type}-feedback`);
   var rate = input.value;
-  fetch(`/store-sentiment-feedback/${sessionId}`, {
+  fetch(`/store-sentiment-feedback/${sessionId}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -545,7 +545,7 @@ function sendTroubleFeedback(support_type) {
 
   var input = document.getElementById(`${support_type}-feedback`);
   var rate = input.value;
-  fetch(`/store-trouble-feedback/${sessionId}`, {
+  fetch(`/store-trouble-feedback/${sessionId}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -568,7 +568,7 @@ function sendEmoFeedback(support_type) {
 
   var input = document.getElementById(`${support_type}-feedback`);
   var rate = input.value;
-  fetch(`/store-emo-feedback/${sessionId}`, {
+  fetch(`/store-emo-feedback/${sessionId}/`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -610,7 +610,7 @@ function retrieveTroubleSupport(message, support_type) {
     const sessionId = window.location.pathname.split('/')[2];
     const clientId = sessionStorage.getItem('client_id');
 
-    fetch(`/get-trouble-support/${sessionId}`, {
+    fetch(`/get-trouble-support/${sessionId}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -726,7 +726,7 @@ function sendMessage() {
     // retrieveEmoFeedback(TYPE_SENTIMENT);
   }
 
-    fetch(`/get-reply/${sessionId}`, {
+    fetch(`/get-reply/${sessionId}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',

@@ -20,7 +20,8 @@ function updateClientQueue() {
 }
 
 function completeSurvey() {
-    window.location.href = '/complete';
+    const session_id = window.location.pathname.split('/')[2];
+    window.open(`/complete?session_id=${session_id}`);
 }
 
 document.addEventListener('DOMContentLoaded', function() {
@@ -55,7 +56,7 @@ document.addEventListener('DOMContentLoaded', function() {
         data = formValues
         data['client_id'] = clientId
 
-        fetch(`/store-survey/${sessionId}`, {
+        fetch(`/store-survey/${sessionId}/`, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
