@@ -123,6 +123,6 @@ categories = mAgents.categories.keys()
 scenarios = generate_scenarios(domains, categories, examples_per_pair=3)
 
 df = pd.DataFrame(scenarios)
-df.to_csv("/Users/jashparekh/Desktop/scenarios_using_twitter_examples.csv", index=False)
+df.to_csv("/Users/max/Desktop/scenarios_using_twitter_examples.csv", index=False)
 
 print("scenarios_using_twitter_examples.csv")
