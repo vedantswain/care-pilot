@@ -8,7 +8,7 @@ function updateSlider(sliderName, slideAmount) {
 function updateClientQueue() {
     const sessionId = window.location.pathname.split('/')[2];
 
-    fetch(`/update-clientQueue/${sessionId}`)
+    fetch(`/update-clientQueue/${sessionId}/`)
     .then(response => response.json())
     .then(data => {
 
