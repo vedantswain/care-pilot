@@ -209,7 +209,8 @@ def getReply(session_id):
             "ranting": val_ranting,
             "expression": val_expression,
             "civil": val_civil,
-            "emo": show_emo
+            "emo": show_emo,
+            "timestamp": timestamp
         })
 
         # Inserting first complaint message
