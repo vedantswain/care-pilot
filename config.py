@@ -29,7 +29,8 @@ randomQueue = [
     { "id": 2, "name": "Jamal K.", "domain": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
     { "id": 3, "name": "Maria N.", "domain": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
     { "id": 4, "name": "Elijah P.", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0},
-    { "id": 4, "name": "Samantha K.", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 1, "info": 0, "emo": 1}
+    { "id": 5, "name": "Anna Z.", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 1, "info": 0, "emo": 1}
+    { "id": 6, "name": "Samantha K.", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 1, "info": 0, "emo": 1}
 ]
 
 '''
@@ -38,6 +39,7 @@ Unlike testing we will keep "grateful": 0, "ranting": 1, "expression":1
 Other conditions will maintain fixed order in the queue
 '''
 studyQueue = [
+    { "id": 1, "grateful": 0, "ranting": 1, "expression":1, "civil": 1, "info": 1, "emo": 0},
     { "id": 1, "grateful": 0, "ranting": 1, "expression":1, "civil": 1, "info": 1, "emo": 0},
     { "id": 1, "grateful": 0, "ranting": 1, "expression":1, "civil": 0, "info": 1, "emo": 0},
     { "id": 1, "grateful": 0, "ranting": 1, "expression":1, "civil": 0, "info": 1, "emo": 1},
@@ -57,10 +59,14 @@ def get_study_queue(scenario):
     names = [client['name'] for client  in randomQueue]
     random.shuffle(names)
     random.shuffle(complaintTypes)
+
     for client_id in range(len(studyQueue)):
+        client_name = names[client_id % len(names)]
+        complaint_type = complaintTypes[client_id % len(complaintTypes)]
+
+        studyQueue[client_id]['category'] = complaint_type
         client_name = names[client_id]
         studyQueue[client_id]['name'] = client_name
-        studyQueue[client_id]['category'] = complaintTypes[client_id]
         studyQueue[client_id]['domain'] = scenario
         studyQueue[client_id]['avatar'] = "https://avatar.iran.liara.run/username?username="+client_name.replace(' ','+')
     return studyQueue
