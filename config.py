@@ -29,7 +29,7 @@ randomQueue = [
     { "id": 2, "name": "Jamal K.", "domain": "Hotel", "grateful": 1, "ranting": 0, "expression": 1, "civil": 1, "info": 1, "emo": 0},
     { "id": 3, "name": "Maria N.", "domain": "Airline",  "grateful": 1, "ranting": 1, "expression": 1, "civil": 1, "info": 0, "emo": 1},
     { "id": 4, "name": "Elijah P.", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 0, "info": 0, "emo": 0},
-    { "id": 5, "name": "Anna Z.", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 1, "info": 0, "emo": 1}
+    { "id": 5, "name": "Anna Z.", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 1, "info": 0, "emo": 1},
     { "id": 6, "name": "Samantha K.", "domain": "Hotel" , "grateful": 0, "ranting": 1, "expression":0, "civil": 1, "info": 0, "emo": 1}
 ]
 
