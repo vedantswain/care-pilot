@@ -2,6 +2,8 @@ data/
 .csv
 .DS_store
 
+output/*.csv
+
 # Flask
 .idea/
 .vscode/
