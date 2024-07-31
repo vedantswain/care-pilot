@@ -578,15 +578,11 @@ def complete():
 
 @app.route('/history/<session_id>/<client_id>/')
 def getClientHistory(session_id, client_id):
-    if session_id not in session:
-        return "Invalid session", 401
     chat_history = list(chat_history_collection.find({"session_id": session_id, "client_id": client_id}, {"_id": 0}))
     return jsonify({"chat_history": chat_history})
 
 @app.route('/history/<session_id>/')
 def getClientList(session_id):
-    if session_id not in session:
-        return "Invalid session", 401
     clients_info = list(chat_client_info.find({"session_id": session_id}, {"_id": 0, "client_name": 1, "client_id": 1, "category":1}))
     return jsonify({"chat_history": chat_history, "clients_info": clients_info})
 
