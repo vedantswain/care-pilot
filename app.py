@@ -96,10 +96,7 @@ def start_chat(scenario):
     if val_pwd != common.ADMIN_PWD:
         return "Access restricted to participants", 401
 
-    global clientQueue
-    if not clientQueue:
-        # clientQueue = common.randomQueue
-        clientQueue = common.get_study_queue(scenario)
+    clientQueue = common.get_study_queue(scenario)
     # random.shuffle(clientQueue)
     client = clientQueue.pop(0)
     session_id = str(uuid4())   ### unique to each user/participant/representative

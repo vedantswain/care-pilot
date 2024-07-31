@@ -4,6 +4,7 @@ This ensures that we only need to make changes in one location to reflect it acr
 Reduces risk of errors when changing code or introducing new types.
 '''
 import random
+import copy
 
 ADMIN_PWD = "491062"
 
@@ -69,4 +70,4 @@ def get_study_queue(scenario):
         studyQueue[client_id]['name'] = client_name
         studyQueue[client_id]['domain'] = scenario
         studyQueue[client_id]['avatar'] = "https://avatar.iran.liara.run/username?username="+client_name.replace(' ','+')
-    return studyQueue
+    return copy.deepcopy(studyQueue)
