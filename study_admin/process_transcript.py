@@ -34,29 +34,18 @@ def process_transcript(input_file, output_file):
     # end = ""
     # speaker = ""
     # text = ""
-
-
-    i = 0
-    while i < len(data):
-        if re.match(r'^\d+$', data[i].strip()):
-            line = data[i].strip()
-            start, end = data[i+1].strip().split(" --> ")
-            if ": " in data[i+2]:
-                speaker, text = data[i+2].strip().split(": ", 1)
-                lines.append([line, start, end, speaker, text])
-                i += 2
-        i += 1
         
     # Process the data
     i = 0
     while i < len(data):
         if re.match(r'^\d+$', data[i].strip()):
             line = data[i].strip()
-            start, end = data[i+1].strip().split(" --> ")
-            if ": " in data[i+2]:
-                speaker, text = data[i+2].strip().split(": ", 1)
-                lines.append([line, start, end, speaker, text])
-                i += 2
+            if "-->" in data[i+1]:
+                start, end = data[i+1].strip().split(" --> ")
+                if ": " in data[i+2]:
+                    speaker, text = data[i+2].strip().split(": ", 1)
+                    lines.append([line, start, end, speaker, text])
+                    i += 2
         i += 1
 
     # Write the output file
