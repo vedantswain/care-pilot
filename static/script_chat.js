@@ -136,6 +136,12 @@ function createSupportPane(messageText, msgClass) {
     innerContent.innerHTML = messageText;
 
   if (msgClass === 'senti') {
+    const preface = document.createElement('p');
+    preface.classList.add('preface');
+    preface.textContent = "Estimate based on client's last message:";
+
+    body.appendChild(preface);
+
     const span = document.createElement('span');
     span.classList.add('icon', 'is-small');
     const icon = document.createElement('i');
