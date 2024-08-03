@@ -125,11 +125,15 @@ function validateAndSubmit(e, formElement) {
     e.preventDefault();
     const formData = new FormData(formElement);
     const formValues = {};
-    formData.forEach((value, key) => { formValues[key] = value; });
 
     // Check if the all radio questions were answered
     inputKeysValidation = ["dat1","dat2","dat3","dat4"]
-    allKeysExist = inputKeysValidation.every(key => Object.keys(formValues).includes(key));
+    formValues["dat1"] = document.querySelector('input[name="dat1"]').value.trim();
+    formValues["dat2"] = document.querySelector('input[name="dat2"]').value.trim();
+    formValues["dat3"] = document.querySelector('textarea[name="dat3"]').value.trim();
+    formValues["dat4"] = document.querySelector('textarea[name="dat4"]').value.trim();
+
+    allKeysExist = inputKeysValidation.every(key => formValues[key]!="");
     if (!allKeysExist){
         alert("Please respond to all questions.");
         return;

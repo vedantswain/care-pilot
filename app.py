@@ -54,7 +54,7 @@ chat_history_collection = db.chat_history
 chat_client_info = db.chat_client_info
 chat_in_task = db.chat_in_task
 chat_pre_task = db.chat_pre_task
-
+summative_writing = db.summative_writing
 
 sender_agent = None
 chat_history = [
@@ -119,6 +119,24 @@ def get_tsv():
 def start_writing():
     val_prolific = request.args.get('PROLIFIC_PID')
     return render_template('summative_survey.html')
+
+@app.route('/store-summative-writing/<prolific_id>/', methods=['POST'])
+def store_summative_writing(prolific_id):
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "No data received"}), 400
+
+    data['prolific_id'] = prolific_id
+    data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
+
+    try:
+        result = summative_writing.insert_one(data)
+        if result.inserted_id:
+            return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+        else:
+            return jsonify({"message": "Failed to save data"}), 500
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
 
 
 # End-point to test the pre-survey HTML
