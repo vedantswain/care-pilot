@@ -1,0 +1,43 @@
+.conversation {
+    width: unset !important;
+    font-size: medium;
+    line-height: normal;
+    margin: auto;
+}
+
+.context-blurb {
+    font-size: medium;
+    font-style: italic;
+    font-weight: lighter;
+    text-align: left;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #eee;
+    border-left-width: 5px;
+    border-radius: 16px;
+    border-color: red;
+    background-color: mistyrose;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 20px;
+}
+.message {
+    padding: 10px;
+    margin: 10px 0;
+    border-radius: 5px;
+    max-width: 70%;
+}
+.customer {
+    background-color: #fff5c4;
+    text-align: left;
+}
+.representative {
+    background-color: #e8e8e8;
+    text-align: right;
+    margin-left: auto;
+}
+.spacer {
+    height: 20px; /* Adjust the height as needed */
+ }

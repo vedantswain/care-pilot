@@ -110,6 +110,17 @@ def start_chat(scenario):
 
     return redirect(url_for('getPreSurvey', session_id=session_id) + clientParam)
 
+@app.route('/summative/phase1/get-tsv/')
+def get_tsv():
+    return send_from_directory('', 'phase1_scenarios.tsv')
+
+
+@app.route('/summative/phase1/writing/')
+def start_writing():
+    val_prolific = request.args.get('PROLIFIC_PID')
+    return render_template('summative_survey.html')
+
+
 # End-point to test the pre-survey HTML
 @app.route('/pre-task-survey/<session_id>/')
 def getPreSurvey(session_id):
