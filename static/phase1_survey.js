@@ -318,10 +318,10 @@ function validateAndSubmit(e, formElement) {
     data['incident_id'] = selectedQuestions[currentIncidentIndex]['ID']
 
     if (behaviorKnown) {
-        data['context'] = document.querySelector('.context-blurb').textContent;
+        data['context_behav'] = document.querySelector('.context-blurb').textContent;
     }
     if (personalityKnown) {
-        data['context'] = document.querySelector('.context-blurb').textContent;
+        data['context_pers'] = document.querySelector('.context-blurb').textContent;
     }
 
     fetch(`/store-summative-writing/${prolific_id}/`, {
