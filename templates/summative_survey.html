@@ -11,13 +11,72 @@
 </head>
 <body>
 
-<div class="modal" id="start-modal">
+<div class="modal" id="transition-modal">
+        <div class="modal-card">
+            <div class="modal-content" >
+
+                <div class="block is-size-4" id="transition-blurb">
+                    <p>You will now be shown excerpts from conversations between a Client (on the left; in yellow) and a Representative (on the right; in grey).</p>
+                    <p>&nbsp;</p>
+                    <p> Please read these excerpts carefully.</p>
+                    <p>&nbsp;</p>
+                    <p> Follow the instructions in prompts below the excerpts and write appropriate messages.</p>
+                </div>
+
+
+            </div>
+            <footer class="modal-card-foot">
+                <button class="button is-success" id="summativeNextBtn">Next</button>
+            </footer>
+        </div>
+</div>
+
+
+<div class="modal" id="personality-modal">
+    <form id="summativePhaseIPersonality">
+        <div class="modal-card">
+            <header class="modal-card-head">
+            </header>
+            <div class="modal-content"  id="main-survey">
+
+                <!-- Interaction -->
+                <div class="block survey-section" id="">
+
+                    <div class="control content">
+                        <h5>Describe an emotion the representative would feel in this situation (1 word).</h5>
+                        <div class="radios">
+                            <label class="radio">
+                                <input type="radio" name="personality" />
+                                Going
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="personality" />
+                                Not going
+                            </label>
+                            <label class="radio">
+                                <input type="radio" name="personality" disabled />
+                                Maybe
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <footer class="modal-card-foot">
+                <button class="button is-success" type="submit" id="summativePersonalityBtn">Next</button>
+            </footer>
+        </div>
+    </form>
+</div>
+
+<div class="modal" id="survey-modal">
     <form id="summativePhaseI">
         <div class="modal-card">
             <header class="modal-card-head">
                 <p class="modal-card-title" id="instruction">Read the excerpt below carefully and respond to the prompts.</p>
             </header>
-            <div class="modal-content">
+            <div class="modal-content"  id="personality-survey">
 
                 <div class="block is-size-4" id="qContainer">
                 </div>

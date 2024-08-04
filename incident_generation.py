@@ -94,7 +94,7 @@ def generate_scenarios(domains, categories, examples_per_pair):
 
 
                 # Generate support agent response
-                support_agent_response2 = agent_representative().invoke({"chat_history": chat_history, "message": initial_complaint, "sender":"client"})
+                support_agent_response2 = agent_representative().invoke({"chat_history": chat_history, "message": follow_up_complaint1, "sender":"client"})
                 chat_history.extend([HumanMessage(content="Representative: "+support_agent_response2)])
 
 

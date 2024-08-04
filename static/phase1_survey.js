@@ -1,3 +1,8 @@
+const indexAtBehavior = 2;
+const indexAtPersonality = 4;
+
+var personalityKnown = false;
+
 const selectedQuestions = [];
 var currentIncidentIndex = 0;
 
@@ -46,40 +51,69 @@ function createConversationHTML(conversation) {
 }
 
 function displayIncident() {
-        var qContainer = document.getElementById("qContainer");
+    var qContainer = document.getElementById("qContainer");
 
-        var qContainer = document.getElementById("qContainer");
-        qContainer.innerHTML = '';
-        document.querySelector('input[name="dat1"]').value = "";
-        document.querySelector('input[name="dat2"]').value = "";
-        document.querySelector('textarea[name="dat3"]').value = "";
-        document.querySelector('textarea[name="dat4"]').value = "";
+    var qContainer = document.getElementById("qContainer");
+    qContainer.innerHTML = '';
+    document.querySelector('input[name="dat1"]').value = "";
+    document.querySelector('input[name="dat2"]').value = "";
+    document.querySelector('textarea[name="dat3"]').value = "";
+    document.querySelector('textarea[name="dat4"]').value = "";
 
-        document.querySelector('input[name="dat1"]').disabled = false;
-        document.querySelector('input[name="dat2"]').disabled = false;
-        document.querySelector('textarea[name="dat3"]').disabled = false;
-        document.querySelector('textarea[name="dat4"]').disabled = false;
+    document.querySelector('input[name="dat1"]').disabled = false;
+    document.querySelector('input[name="dat2"]').disabled = false;
+    document.querySelector('textarea[name="dat3"]').disabled = false;
+    document.querySelector('textarea[name="dat4"]').disabled = false;
 
-        summativeSubmitBtn = document.getElementById('summativeSubmitBtn');
-        summativeSubmitBtn.disabled = false;
+    summativeSubmitBtn = document.getElementById('summativeSubmitBtn');
+    summativeSubmitBtn.disabled = false;
 
-        var incidentIndex = currentIncidentIndex;
+    var incidentIndex = currentIncidentIndex;
 
-        var progressBar = document.getElementById('progress-bar');
-        progressBar.style.display = 'block';
-        var progressLoader = document.getElementById('progress-loader');
-        progressLoader.style.display = 'none';
+    var progressBar = document.getElementById('progress-bar');
+    progressBar.style.display = 'block';
+    var progressLoader = document.getElementById('progress-loader');
+    progressLoader.style.display = 'none';
 
-        var incidentData = selectedQuestions[incidentIndex];
-        console.log("Incident Data for Block "+incidentIndex+": ", incidentData);
-        if (incidentData) {
-            var question = incidentData;
-            var incidentHTML = createConversationHTML(question);
-            qContainer.appendChild(incidentHTML);
-        } else {
-            console.error("Incident data missing.");
-        }
+    var incidentData = selectedQuestions[incidentIndex];
+    console.log("Incident Data for Block "+incidentIndex+": ", incidentData);
+    if (incidentData) {
+        var question = incidentData;
+        var incidentHTML = createConversationHTML(question);
+        qContainer.appendChild(incidentHTML);
+    } else {
+        console.error("Incident data missing.");
+    }
 }
+
+function nextIncident() {
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.value = (currentIncidentIndex + 1) / selectedQuestions.length * 100;
+
+    const progressLoader = document.getElementById('progress-loader');
+    progressLoader.style.display = 'block';
+    progressBar.style.display = 'none';
+
+    currentIncidentIndex++;
+
+    var qContainer = document.getElementById("qContainer");
+    qContainer.innerHTML = '';
+
+    document.querySelector('input[name="dat1"]').disabled = true;
+    document.querySelector('input[name="dat2"]').disabled = true;
+    document.querySelector('textarea[name="dat3"]').disabled = true;
+    document.querySelector('textarea[name="dat4"]').disabled = true;
+
+    if (currentIncidentIndex < selectedQuestions.length) {
+        if (currentIncidentIndex === indexAtBehavior || currentIncidentIndex === indexAtPersonality) {
+            setTimeout(initiateTransition, 3000);
+        }
+        setTimeout(displayIncident, 3000);
+    } else {
+        document.getElementById('end-modal').classList.add('is-active');
+    }
+}
+
 
 function loadIncidents(domain){
     // Define a list of possible domains
@@ -144,30 +178,6 @@ function loadIncidents(domain){
     });
 }
 
-function nextIncident() {
-    const progressBar = document.getElementById('progress-bar');
-    progressBar.value = (currentIncidentIndex + 1) / selectedQuestions.length * 100;
-
-    const progressLoader = document.getElementById('progress-loader');
-    progressLoader.style.display = 'block';
-    progressBar.style.display = 'none';
-
-    currentIncidentIndex++;
-
-    var qContainer = document.getElementById("qContainer");
-    qContainer.innerHTML = '';
-
-    document.querySelector('input[name="dat1"]').disabled = true;
-    document.querySelector('input[name="dat2"]').disabled = true;
-    document.querySelector('textarea[name="dat3"]').disabled = true;
-    document.querySelector('textarea[name="dat4"]').disabled = true;
-
-    if (currentIncidentIndex < selectedQuestions.length) {
-        setTimeout(displayIncident, 3000);
-    } else {
-        document.getElementById('end-modal').classList.add('is-active');
-    }
-}
 
 function validateAndSubmit(e, formElement) {
     e.preventDefault();
@@ -186,6 +196,7 @@ function validateAndSubmit(e, formElement) {
     formValues["dat4"] = document.querySelector('textarea[name="dat4"]').value.trim();
 
     allKeysExist = inputKeysValidation.every(key => formValues[key]!="");
+    allKeysExist = true;
     if (!allKeysExist){
         alert("Please respond to all questions.");
 
@@ -225,8 +236,37 @@ function validateAndSubmit(e, formElement) {
     });
 }
 
+function initiateNextPart() {
+    document.getElementById('transition-modal').classList.remove('is-active');
+    document.getElementById('survey-modal').classList.add('is-active');
+}
+
+function initiateTransition() {
+    var transitionBlurb = document.getElementById('transition-blurb');
+
+    document.getElementById('survey-modal').classList.remove('is-active');
+
+    if (currentIncidentIndex === indexAtBehavior) {
+        transitionBlurb.innerHTML = `
+        <p>For the next set of conversation excerpts, you will be given <b>additional information</b> about the representative.</p>
+        <p>&nbsp;</p>
+        <p>Please read this information carefully and consider it when responding to the questions.</p>
+        `;
+    }
+    if (currentIncidentIndex === indexAtPersonality && personalityKnown === false) {
+        transitionBlurb.innerHTML = '';
+        document.getElementById('personality-modal').classList.add('is-active');
+    }
+
+
+    document.getElementById('transition-modal').classList.add('is-active');
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    document.getElementById('start-modal').classList.add('is-active');
+    document.getElementById('transition-modal').classList.add('is-active');
+
+    var nextBtn = document.getElementById('summativeNextBtn');
+    nextBtn.addEventListener('click', initiateNextPart);
 
     const urlParams = new URLSearchParams(window.location.search);
     const domain_from_url = urlParams.get('domain');
