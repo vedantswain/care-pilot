@@ -118,12 +118,12 @@ def get_tsv():
 @app.route('/summative/phase1/writing/')
 def start_writing():
     val_prolific = request.args.get('PROLIFIC_PID')
-    session['prolific_id'] = val_prolific
+    session[val_prolific] = 0
     return render_template('summative_survey.html')
 
 @app.route('/store-summative-writing/<prolific_id>/', methods=['POST'])
 def store_summative_writing(prolific_id):
-    if 'prolific_id' not in session or session['prolific_id'] != prolific_id:
+    if prolific_id not in session:
         return jsonify({"message": "Invalid session or session expired"}), 400
 
     data = request.get_json()
@@ -136,6 +136,7 @@ def store_summative_writing(prolific_id):
     try:
         result = summative_writing.insert_one(data)
         if result.inserted_id:
+            session[prolific_id] += 1
             return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
         else:
             return jsonify({"message": "Failed to save data"}), 500
@@ -144,7 +145,7 @@ def store_summative_writing(prolific_id):
 
 @app.route('/summative/phase1/complete/<prolific_id>/', methods=['GET'])
 def complete_summative_writing(prolific_id):
-    if 'prolific_id' not in session or session['prolific_id'] != prolific_id:
+    if prolific_id not in session or session[prolific_id] < 6:
         return jsonify({"message": "Invalid session or session expired"}), 400
 
     redirect_url = "https://app.prolific.co/submissions/complete?cc=C19F0ZME"

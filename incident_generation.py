@@ -123,6 +123,8 @@ categories = mAgents.categories.keys()
 scenarios = generate_scenarios(domains, categories, examples_per_pair=3)
 
 df = pd.DataFrame(scenarios)
-df.to_csv("/Users/max/Desktop/scenarios_using_twitter_examples.csv", index=False)
+file_path = "phase1_scenarios.tsv"
+df.to_csv(file_path, sep='\t', index=False)
 
-print("scenarios_using_twitter_examples.csv")
+print("Saved file to {}".format(file_path))
+#%%

@@ -97,7 +97,7 @@ function createConversationHTML(conversation) {
     addMessage(conversation["Support Agent Response 1"], 'representative');
     addMessage(conversation["Follow-up Complaint 1"], 'customer');
     addMessage(conversation["Support Agent Response 2"], 'representative');
-    addMessage(conversation["Follow-up Complaint 2\r"], 'customer');
+    addMessage(conversation["Follow-up Complaint 2"], 'customer');
 
     return container;
 }
