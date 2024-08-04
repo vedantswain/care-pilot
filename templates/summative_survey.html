@@ -37,25 +37,29 @@
         <div class="modal-card">
             <header class="modal-card-head">
             </header>
-            <div class="modal-content"  id="main-survey">
+            <div class="modal-content"  id="personality-survey">
 
                 <!-- Interaction -->
-                <div class="block survey-section" id="">
+                <div class="block survey-section" id="qPers">
+                    <div class="control content">
+                        <h5>Think of a coworker you have provided social support to in the past. Enter their initials into the box below.</h5>
+                        <input class="input" type="text" name="pers1" placeholder="Initials only" />
+                    </div>
 
                     <div class="box control content">
-                        <h5>Describe an emotion the representative would feel in this situation (1 word).</h5>
+                        <h5>Which of the following does your coworker most embody?.</h5>
                         <div class="radios">
                             <label class="radio radio-pers">
                                 <input type="radio" name="personality" />
-                                Going
+                                <p>They are organized and dependable. They tend to remain composed when facing challenges, but are prone to setting unrealistic expectations.</p>
                             </label>
                             <label class="radio radio-pers">
                                 <input type="radio" name="personality" />
-                                Not going
+                                <p>They are organized and dependable. They tend to remain composed when facing challenges, but are prone to setting unrealistic expectations.</p>
                             </label>
                             <label class="radio radio-pers">
                                 <input type="radio" name="personality" />
-                                Maybe
+                                <p>They are detail-oriented and reliable but might appear distant. They tend to work carefully, but are prone to overthinking.</p>
                             </label>
                         </div>
                     </div>
@@ -76,7 +80,7 @@
             <header class="modal-card-head">
                 <p class="modal-card-title" id="instruction">Read the excerpt below carefully and respond to the prompts.</p>
             </header>
-            <div class="modal-content"  id="personality-survey">
+            <div class="modal-content"  id="main-survey">
 
                 <div class="block is-size-4" id="qContainer">
                 </div>

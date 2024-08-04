@@ -2,6 +2,7 @@ const indexAtBehavior = 2;
 const indexAtPersonality = 4;
 
 var personalityKnown = false;
+var persContext = {};
 
 const selectedQuestions = [];
 var currentIncidentIndex = 0;
@@ -178,6 +179,50 @@ function loadIncidents(domain){
     });
 }
 
+function validateAndStorePersonality(e, formElement) {
+    e.preventDefault();
+
+    summativeSubmitBtn = document.getElementById('summativePersonalityBtn');
+    summativeSubmitBtn.disabled = true;
+
+    const formData = new FormData(formElement);
+    const formValues = {};
+
+    // Check if the all radio questions were answered
+    inputKeysValidation = ["pers1"]
+    persContext["coworker_inits"] = document.querySelector('input[name="pers1"]').value.trim();
+    allKeysExist = inputKeysValidation.every(key => formValues[key]!="");
+    allKeysExist = true;
+    if (!allKeysExist){
+        alert("Please respond to all questions.");
+
+        summativeSubmitBtn.disabled = false;
+
+        return;
+    }
+
+    const radios = document.querySelectorAll('input[name="personality"]');
+    let selectedValue = null;
+
+    radios.forEach((radio) => {
+        if (radio.checked) {
+            selectedValue = radio.value;
+        }
+    });
+
+    if (selectedValue) {
+        personalityKnown = true;
+        persContext["personality"] = selectedValue;
+        console.log('Selected personality:', selectedValue);
+        document.getElementById('personality-modal').classList.remove('is-active');
+
+        initiateTransition();
+    } else {
+        alert("Please respond to all questions.");
+        summativeSubmitBtn.disabled = false;
+    }
+}
+
 
 function validateAndSubmit(e, formElement) {
     e.preventDefault();
@@ -253,9 +298,21 @@ function initiateTransition() {
         <p>Please read this information carefully and consider it when responding to the questions.</p>
         `;
     }
-    if (currentIncidentIndex === indexAtPersonality && personalityKnown === false) {
-        transitionBlurb.innerHTML = '';
-        document.getElementById('personality-modal').classList.add('is-active');
+    if (currentIncidentIndex === indexAtPersonality) {
+        if (personalityKnown){
+            transitionBlurb.innerHTML = `
+            <p>For the next set of conversation excerpts, <b>imagine that `+persContext['coworker_initis']+` is the representative</b> engaging with the client.</p>
+            <p>&nbsp;</p>
+            <p>Please consider their personality when responding to the questions.</p>`;
+        }
+        else{
+            transitionBlurb.innerHTML = '';
+            document.getElementById('personality-modal').classList.add('is-active');
+            const form = document.getElementById('summativePhaseIPersonality');
+            form.addEventListener('submit', function(e) {
+                validateAndStorePersonality(e, this);
+            });
+        }
     }
 
 
