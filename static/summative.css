@@ -41,3 +41,17 @@ body {
 .spacer {
     height: 20px; /* Adjust the height as needed */
  }
+radio-pers{
+    display: flex;
+    width: fit-content;
+}
+.radios {
+.radio {
+ display: block;
+
+ & + .radio {
+   margin-left: 0;
+   margin-top: .5em;
+ }
+}
+}
