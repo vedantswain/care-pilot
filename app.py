@@ -145,7 +145,8 @@ def store_summative_writing(prolific_id):
 
 @app.route('/summative/phase1/complete/<prolific_id>/', methods=['GET'])
 def complete_summative_writing(prolific_id):
-    if prolific_id not in session or session[prolific_id] < 6:
+    completion_count = session[prolific_id]
+    if prolific_id not in session or completion_count < 6:
         return jsonify({"message": "Invalid session or session expired"}), 400
 
     redirect_url = "https://app.prolific.co/submissions/complete?cc=C19F0ZME"
