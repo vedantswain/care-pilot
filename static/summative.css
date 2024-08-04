@@ -53,5 +53,10 @@ body {
     .radio-pers{
         display: flex;
         width: fit-content;
+
+        p {
+            text-align: left;
+            margin-left: 1rem;
+        }
     }
 }

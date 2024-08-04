@@ -4,6 +4,16 @@ const indexAtPersonality = 4;
 var personalityKnown = false;
 var persContext = {};
 
+var behaviorKnown = false;
+
+var defaultBehaviors = [
+    "The conversation takes place about 2 hours into the work shift. The representative has already addressed a few customer complaints before the following incident.",
+    "The conversation takes place in the second half of the work shift. The representative has been working longer hours over the past few days and has not been taking breaks.",
+    "The conversation takes place at the middle of the work shift. The representative has been spending minimal time on tasks and has been regularly checking their personal messages."
+];
+
+var remainingBehaviors = [];
+
 const selectedQuestions = [];
 var currentIncidentIndex = 0;
 
@@ -23,6 +33,41 @@ function getDataFromTSV(data) {
         result.push(obj);
     }
     return result;
+}
+
+function getBehaviorContext() {
+    var qContainer = document.getElementById("qContainer");
+
+    remainingBehaviors = remainingBehaviors || defaultBehaviors.slice();
+
+    var behaviorIndex = Math.floor(Math.random() * remainingBehaviors.length);
+    var selectedBehavior = remainingBehaviors.splice(behaviorIndex, 1)[0];
+
+    Qualtrics.SurveyEngine.setEmbeddedData("remaining_behaviors", JSON.stringify(remainingBehaviors));
+
+    var header = document.createElement('h2');
+    header.classList.add("context-blurb");
+    header.textContent = "" + selectedBehavior;
+
+    var incidentHTML = createConversationHTML(question);
+
+    qContainer.prepend(header);
+
+    console.log("Behavior Header and Incident HTML appended to container");
+}
+
+function getPersonalityContext() {
+    var qContainer = document.getElementById("qContainer");
+
+    var header = document.createElement('h2');
+    header.classList.add("context-blurb");
+    header.textContent = persContext["personality"];
+
+    var incidentHTML = createConversationHTML(question);
+
+    qContainer.prepend(header);
+
+    console.log("Personality Header and Incident HTML appended to container");
 }
 
 function createConversationHTML(conversation) {
@@ -81,6 +126,14 @@ function displayIncident() {
     if (incidentData) {
         var question = incidentData;
         var incidentHTML = createConversationHTML(question);
+
+        if (behaviorKnown && incidentIndex > indexAtBehavior) {
+            getBehaviorContext();
+        }
+        if (personalityKnown && incidentIndex > indexAtPersonality) {
+            getPersonalityContext();
+        }
+
         qContainer.appendChild(incidentHTML);
     } else {
         console.error("Incident data missing.");
@@ -297,11 +350,13 @@ function initiateTransition() {
         <p>&nbsp;</p>
         <p>Please read this information carefully and consider it when responding to the questions.</p>
         `;
+        behaviorKnown = true;
+        personalityKnown = false;
     }
     if (currentIncidentIndex === indexAtPersonality) {
         if (personalityKnown){
             transitionBlurb.innerHTML = `
-            <p>For the next set of conversation excerpts, <b>imagine that `+persContext['coworker_initis']+` is the representative</b> engaging with the client.</p>
+            <p>For the next set of conversation excerpts, <b>imagine that `+persContext["coworker_inits"]+` is the representative</b> engaging with the client.</p>
             <p>&nbsp;</p>
             <p>Please consider their personality when responding to the questions.</p>`;
         }
@@ -312,6 +367,7 @@ function initiateTransition() {
             form.addEventListener('submit', function(e) {
                 validateAndStorePersonality(e, this);
             });
+            behaviorKnown = false;
         }
     }
 
@@ -335,3 +391,7 @@ document.addEventListener('DOMContentLoaded', function() {
         validateAndSubmit(e, this);
     });
 });
+
+
+
+
