@@ -50,15 +50,15 @@
                         <h5>Which of the following does your coworker most embody?.</h5>
                         <div class="radios">
                             <label class="radio radio-pers">
-                                <input type="radio" name="personality" />
+                                <input type="radio" name="personality" data-index="0"/>
                                 <p>They are organized and dependable. They tend to remain composed when facing challenges, but are prone to setting unrealistic expectations.</p>
                             </label>
                             <label class="radio radio-pers">
-                                <input type="radio" name="personality" />
-                                <p>They are organized and dependable. They tend to remain composed when facing challenges, but are prone to setting unrealistic expectations.</p>
+                                <input type="radio" name="personality"  data-index="1"/>
+                                <p>They are outgoing, competitive, and high energy. They tend to work on impulse, but are also prone to frustration.</p>
                             </label>
                             <label class="radio radio-pers">
-                                <input type="radio" name="personality" />
+                                <input type="radio" name="personality"  data-index="2"/>
                                 <p>They are detail-oriented and reliable but might appear distant. They tend to work carefully, but are prone to overthinking.</p>
                             </label>
                         </div>
@@ -78,7 +78,7 @@
     <form id="summativePhaseI">
         <div class="modal-card">
             <header class="modal-card-head">
-                <p class="modal-card-title" id="instruction">Read the excerpt below carefully and respond to the prompts.</p>
+                <p id="instruction" style="font-size:medium;">Read the excerpt below carefully and respond to the prompts.</p>
             </header>
             <div class="modal-content"  id="main-survey">
 
@@ -124,6 +124,28 @@
         </div>
     </form>
 </div>
+
+
+<div class="modal" id="end-modal">
+    <div class="modal-card">
+        <div class="modal-content" >
+
+            <div class="block is-size-4">
+                <p>Thank you for completing the task.</p>
+                <p>&nbsp;</p>
+                <p>Your responses will help improve technologies for worker wellbeing.</p>
+                <p>&nbsp;</p>
+                <p>Click "Complete" to be redirected back to Prolific with the completion code.</p>
+            </div>
+
+
+        </div>
+        <footer class="modal-card-foot">
+            <button class="button is-danger" id="completeBtn">Complete</button>
+        </footer>
+    </div>
+</div>
+
 
 <script src="{{ url_for('static', filename='phase1_survey.js') }}"></script>
 

@@ -1,8 +1,18 @@
 const indexAtBehavior = 2;
 const indexAtPersonality = 4;
 
+TIMEOUT_DURATION = 1000;
+
+var defaultDomains = ["mobile-device", "hotel", "airlines"];
+
 var personalityKnown = false;
 var persContext = {};
+
+var defaultPersonalities = [
+    "They are organized and dependable. They tend to remain composed when facing challenges, but are prone to setting unrealistic expectations.",
+    "They are outgoing, competitive, and high energy. They tend to work on impulse, but are also prone to frustration.",
+    "They are detail-oriented and reliable but might appear distant. They tend to work carefully, but are prone to overthinking."
+]
 
 var behaviorKnown = false;
 
@@ -38,18 +48,16 @@ function getDataFromTSV(data) {
 function getBehaviorContext() {
     var qContainer = document.getElementById("qContainer");
 
-    remainingBehaviors = remainingBehaviors || defaultBehaviors.slice();
+    if (remainingBehaviors.length === 0){
+        remainingBehaviors = defaultBehaviors;
+    }
 
     var behaviorIndex = Math.floor(Math.random() * remainingBehaviors.length);
     var selectedBehavior = remainingBehaviors.splice(behaviorIndex, 1)[0];
 
-    Qualtrics.SurveyEngine.setEmbeddedData("remaining_behaviors", JSON.stringify(remainingBehaviors));
-
     var header = document.createElement('h2');
     header.classList.add("context-blurb");
     header.textContent = "" + selectedBehavior;
-
-    var incidentHTML = createConversationHTML(question);
 
     qContainer.prepend(header);
 
@@ -62,8 +70,6 @@ function getPersonalityContext() {
     var header = document.createElement('h2');
     header.classList.add("context-blurb");
     header.textContent = persContext["personality"];
-
-    var incidentHTML = createConversationHTML(question);
 
     qContainer.prepend(header);
 
@@ -127,10 +133,10 @@ function displayIncident() {
         var question = incidentData;
         var incidentHTML = createConversationHTML(question);
 
-        if (behaviorKnown && incidentIndex > indexAtBehavior) {
+        if (behaviorKnown && incidentIndex >= indexAtBehavior) {
             getBehaviorContext();
         }
-        if (personalityKnown && incidentIndex > indexAtPersonality) {
+        if (personalityKnown && incidentIndex >= indexAtPersonality) {
             getPersonalityContext();
         }
 
@@ -160,11 +166,14 @@ function nextIncident() {
 
     if (currentIncidentIndex < selectedQuestions.length) {
         if (currentIncidentIndex === indexAtBehavior || currentIncidentIndex === indexAtPersonality) {
-            setTimeout(initiateTransition, 3000);
+            setTimeout(initiateTransition, TIMEOUT_DURATION);
         }
-        setTimeout(displayIncident, 3000);
+        else {
+            setTimeout(displayIncident, TIMEOUT_DURATION);
+        }
     } else {
         document.getElementById('end-modal').classList.add('is-active');
+        document.getElementById('survey-modal').classList.remove('is-active');
     }
 }
 
@@ -259,13 +268,13 @@ function validateAndStorePersonality(e, formElement) {
 
     radios.forEach((radio) => {
         if (radio.checked) {
-            selectedValue = radio.value;
+            selectedValue = radio.getAttribute('data-index');
         }
     });
 
     if (selectedValue) {
         personalityKnown = true;
-        persContext["personality"] = selectedValue;
+        persContext["personality"] = defaultPersonalities[selectedValue];
         console.log('Selected personality:', selectedValue);
         document.getElementById('personality-modal').classList.remove('is-active');
 
@@ -275,7 +284,6 @@ function validateAndStorePersonality(e, formElement) {
         summativeSubmitBtn.disabled = false;
     }
 }
-
 
 function validateAndSubmit(e, formElement) {
     e.preventDefault();
@@ -294,7 +302,6 @@ function validateAndSubmit(e, formElement) {
     formValues["dat4"] = document.querySelector('textarea[name="dat4"]').value.trim();
 
     allKeysExist = inputKeysValidation.every(key => formValues[key]!="");
-    allKeysExist = true;
     if (!allKeysExist){
         alert("Please respond to all questions.");
 
@@ -309,6 +316,13 @@ function validateAndSubmit(e, formElement) {
     data = formValues
     data['scenario_num'] = currentIncidentIndex
     data['incident_id'] = selectedQuestions[currentIncidentIndex]['ID']
+
+    if (behaviorKnown) {
+        data['context'] = document.querySelector('.context-blurb').textContent;
+    }
+    if (personalityKnown) {
+        data['context'] = document.querySelector('.context-blurb').textContent;
+    }
 
     fetch(`/store-summative-writing/${prolific_id}/`, {
         method: 'POST',
@@ -337,6 +351,27 @@ function validateAndSubmit(e, formElement) {
 function initiateNextPart() {
     document.getElementById('transition-modal').classList.remove('is-active');
     document.getElementById('survey-modal').classList.add('is-active');
+
+    var instruction = document.getElementById('instruction');
+
+    if (currentIncidentIndex === indexAtBehavior) {
+
+        instruction.innerHTML = `
+        <p>Consider what the representative is going through below. Keep this information in mind as you read the excerpt below.</p>
+        <p>&nbsp;</p>
+        <p>Read carefully and respond to the prompts. </p>
+        `;
+    }
+    else if (currentIncidentIndex === indexAtPersonality) {
+        instruction.innerHTML = `
+        <p>Imagine that your coworker, `+persContext['coworker_inits']+` is the representative speaking to the client. Keep their personality in mind as you read the excerpt below. </p>
+        <p>&nbsp;</p>
+        <p>Read carefully and respond to the prompts.</p>
+        `;
+    }
+
+
+    setTimeout(displayIncident, TIMEOUT_DURATION);
 }
 
 function initiateTransition() {
@@ -375,21 +410,51 @@ function initiateTransition() {
     document.getElementById('transition-modal').classList.add('is-active');
 }
 
+function completeSummative() {
+    var completeBtn = document.getElementById('completeBtn');
+    completeBtn.disabled = true;
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const prolific_id = urlParams.get('PROLIFIC_PID');
+
+    fetch(`/summative/phase1/complete/${prolific_id}/`)
+    .then(response => {
+        // Check if the request was successful
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        // Parse the JSON response
+        return response.json();
+    })
+    .then((data) => {
+         if (data.url) {
+           window.location.href = data.url;
+         }
+    })
+    .catch((error) => {
+        console.error('Error:', error)
+        completeBtn.disabled = false;
+    });
+}
+
 document.addEventListener('DOMContentLoaded', function() {
     document.getElementById('transition-modal').classList.add('is-active');
 
     var nextBtn = document.getElementById('summativeNextBtn');
     nextBtn.addEventListener('click', initiateNextPart);
 
-    const urlParams = new URLSearchParams(window.location.search);
-    const domain_from_url = urlParams.get('domain');
+    var randomDomain = defaultDomains[Math.floor(Math.random() * defaultDomains.length)];
+    console.log("Random Domain: " + randomDomain);
 
-    loadIncidents(domain_from_url);
+    loadIncidents(randomDomain);
 
     const form = document.getElementById('summativePhaseI');
     form.addEventListener('submit', function(e) {
         validateAndSubmit(e, this);
     });
+
+    var completeBtn = document.getElementById('completeBtn');
+    completeBtn.addEventListener('click', completeSummative);
 });
 
 
