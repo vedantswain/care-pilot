@@ -114,14 +114,18 @@ def start_chat(scenario):
 def get_tsv():
     return send_from_directory('', 'phase1_scenarios.tsv')
 
-
+# End-point for summative survey
 @app.route('/summative/phase1/writing/')
 def start_writing():
     val_prolific = request.args.get('PROLIFIC_PID')
+    session['prolific_id'] = val_prolific
     return render_template('summative_survey.html')
 
 @app.route('/store-summative-writing/<prolific_id>/', methods=['POST'])
 def store_summative_writing(prolific_id):
+    if 'prolific_id' not in session or session['prolific_id'] != prolific_id:
+        return jsonify({"message": "Invalid session or session expired"}), 400
+
     data = request.get_json()
     if not data:
         return jsonify({"message": "No data received"}), 400
@@ -138,6 +142,15 @@ def store_summative_writing(prolific_id):
     except Exception as e:
         return jsonify({"message": str(e)}), 500
 
+@app.route('/summative/phase1/complete/<prolific_id>/', methods=['GET'])
+def complete_summative_writing(prolific_id):
+    if 'prolific_id' not in session or session['prolific_id'] != prolific_id:
+        return jsonify({"message": "Invalid session or session expired"}), 400
+
+    redirect_url = "https://app.prolific.co/submissions/complete?cc=C19F0ZME"
+    return jsonify({"url": redirect_url})
+
+
 
 # End-point to test the pre-survey HTML
 @app.route('/pre-task-survey/<session_id>/')
@@ -145,6 +158,7 @@ def getPreSurvey(session_id):
     if session_id not in session:
         return "Invalid session", 401
     return render_template('pre_task_survey.html', session_id=session_id)
+
 
 @app.route('/store-pre-task-survey/<session_id>/', methods=['POST'])
 def storePreSurvey(session_id):
