@@ -45,7 +45,31 @@ function createConversationHTML(conversation) {
     return container;
 }
 
-function displayIncident(incidentIndex) {
+function displayIncident() {
+        var qContainer = document.getElementById("qContainer");
+
+        var qContainer = document.getElementById("qContainer");
+        qContainer.innerHTML = '';
+        document.querySelector('input[name="dat1"]').value = "";
+        document.querySelector('input[name="dat2"]').value = "";
+        document.querySelector('textarea[name="dat3"]').value = "";
+        document.querySelector('textarea[name="dat4"]').value = "";
+
+        document.querySelector('input[name="dat1"]').disabled = false;
+        document.querySelector('input[name="dat2"]').disabled = false;
+        document.querySelector('textarea[name="dat3"]').disabled = false;
+        document.querySelector('textarea[name="dat4"]').disabled = false;
+
+        summativeSubmitBtn = document.getElementById('summativeSubmitBtn');
+        summativeSubmitBtn.disabled = false;
+
+        var incidentIndex = currentIncidentIndex;
+
+        var progressBar = document.getElementById('progress-bar');
+        progressBar.style.display = 'block';
+        var progressLoader = document.getElementById('progress-loader');
+        progressLoader.style.display = 'none';
+
         var incidentData = selectedQuestions[incidentIndex];
         console.log("Incident Data for Block "+incidentIndex+": ", incidentData);
         if (incidentData) {
@@ -104,7 +128,7 @@ function loadIncidents(domain){
 
             console.log("Selected Questions: ", selectedQuestions);
 
-            displayIncident(currentIncidentIndex);
+            displayIncident();
             // Store selected questions and domain in embedded data fields
 //            Qualtrics.SurveyEngine.setEmbeddedData("selectedDomain", randomDomain);
 //            selectedQuestions.forEach((question, index) => {
@@ -120,9 +144,37 @@ function loadIncidents(domain){
     });
 }
 
+function nextIncident() {
+    const progressBar = document.getElementById('progress-bar');
+    progressBar.value = (currentIncidentIndex + 1) / selectedQuestions.length * 100;
+
+    const progressLoader = document.getElementById('progress-loader');
+    progressLoader.style.display = 'block';
+    progressBar.style.display = 'none';
+
+    currentIncidentIndex++;
+
+    var qContainer = document.getElementById("qContainer");
+    qContainer.innerHTML = '';
+
+    document.querySelector('input[name="dat1"]').disabled = true;
+    document.querySelector('input[name="dat2"]').disabled = true;
+    document.querySelector('textarea[name="dat3"]').disabled = true;
+    document.querySelector('textarea[name="dat4"]').disabled = true;
+
+    if (currentIncidentIndex < selectedQuestions.length) {
+        setTimeout(displayIncident, 3000);
+    } else {
+        document.getElementById('end-modal').classList.add('is-active');
+    }
+}
 
 function validateAndSubmit(e, formElement) {
     e.preventDefault();
+
+    summativeSubmitBtn = document.getElementById('summativeSubmitBtn');
+    summativeSubmitBtn.disabled = true;
+
     const formData = new FormData(formElement);
     const formValues = {};
 
@@ -136,6 +188,9 @@ function validateAndSubmit(e, formElement) {
     allKeysExist = inputKeysValidation.every(key => formValues[key]!="");
     if (!allKeysExist){
         alert("Please respond to all questions.");
+
+        summativeSubmitBtn.disabled = false;
+
         return;
     }
 
@@ -156,19 +211,17 @@ function validateAndSubmit(e, formElement) {
     .then(response => {
         if (!response.ok) {
             throw new Error('Network response was not ok');
+
+            summativeSubmitBtn.disabled = false;
         }
-        alert('Feedback submitted successfully!');
-        window.location.href = response.url
-        // return response.json();
+        console.log('Feedback submitted successfully!');
+        nextIncident();
     })
-    // .then(data => {
-    //     console.log('Success:', data);
-    //     alert('Feedback submitted successfully!');
-    //     // updateClientQueue();
-    // })
     .catch((error) => {
         console.error('Error:', error);
         alert('Error submitting response. Please try again.');
+
+        summativeSubmitBtn.disabled = false;
     });
 }
 
