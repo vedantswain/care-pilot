@@ -94,7 +94,7 @@ def generate_scenarios(domains, categories, examples_per_pair):
 
 
                 # Generate support agent response
-                support_agent_response2 = agent_representative().invoke({"chat_history": chat_history, "message": initial_complaint, "sender":"client"})
+                support_agent_response2 = agent_representative().invoke({"chat_history": chat_history, "message": follow_up_complaint1, "sender":"client"})
                 chat_history.extend([HumanMessage(content="Representative: "+support_agent_response2)])
 
 
@@ -123,6 +123,9 @@ categories = mAgents.categories.keys()
 scenarios = generate_scenarios(domains, categories, examples_per_pair=3)
 
 df = pd.DataFrame(scenarios)
-df.to_csv("/Users/max/Desktop/scenarios_using_twitter_examples.csv", index=False)
+df["ID"] = range(1, len(df)+1)
+file_path = "phase1_scenarios.tsv"
+df.to_csv(file_path, sep='\t', index=False)
 
-print("scenarios_using_twitter_examples.csv")
+print("Saved file to {}".format(file_path))
+#%%
