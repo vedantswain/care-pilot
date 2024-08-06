@@ -27,10 +27,15 @@ var remainingBehaviors = [];
 const selectedQuestions = [];
 var currentIncidentIndex = 0;
 
+
 function getDataFromTSV(data) {
-    var lines = data.split("\n");
+    var lines = data.split("\r\n");
     var result = [];
     var headers = lines[0].split("\t");
+
+    for (var i = 0; i < headers.length; i++) {
+        headers[i] = headers[i].replace(/\n|\r/g, "");
+    }
 
     for (var i = 1; i < lines.length; i++) {
         var obj = {};
