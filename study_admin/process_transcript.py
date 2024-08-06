@@ -21,6 +21,7 @@ Sample output in .csv file:
 import re
 import csv
 
+
 def process_transcript(input_file, output_file):
     # Read the input file
     with open(input_file, 'r') as file:
@@ -28,21 +29,23 @@ def process_transcript(input_file, output_file):
 
     # Initialize the variables
     lines = []
-    line = ""
-    start = ""
-    end = ""
-    speaker = ""
-    text = ""
-
+    # line = ""
+    # start = ""
+    # end = ""
+    # speaker = ""
+    # text = ""
+        
     # Process the data
     i = 0
     while i < len(data):
         if re.match(r'^\d+$', data[i].strip()):
             line = data[i].strip()
-            start, end = data[i+1].strip().split(" --> ")
-            speaker, text = data[i+2].strip().split(": ", 1)
-            lines.append([line, start, end, speaker, text])
-            i += 2
+            if "-->" in data[i+1]:
+                start, end = data[i+1].strip().split(" --> ")
+                if ": " in data[i+2]:
+                    speaker, text = data[i+2].strip().split(": ", 1)
+                    lines.append([line, start, end, speaker, text])
+                    i += 2
         i += 1
 
     # Write the output file
@@ -56,3 +59,7 @@ if __name__ == "__main__":
     input_file = input("Enter the input file path: ")
     output_file = str(input_file).replace(".vtt", ".csv")
     process_transcript(input_file, output_file)
+
+
+
+
