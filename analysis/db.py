@@ -1,6 +1,6 @@
 from pymongo import MongoClient
 import pandas as pd
-import os
+import os, sys
 
 client = MongoClient('localhost', 27017)
 db = client['flask_db']
@@ -10,13 +10,9 @@ collections = {
     'chat_history': db.chat_history,
     'chat_client_info': db.chat_client_info,
     'chat_in_task': db.chat_in_task,
-    'chat_pre_task': db.chat_pre_task
+    'chat_pre_task': db.chat_pre_task,
+    'summative_writing': db.summative_writing
 }
-
-# !!! MAKE SURE you have a file called "csv" on your desktop
-
-desktop_path = '/Users/max/Desktop/csv'
-os.makedirs(desktop_path, exist_ok=True)
 
 
 def fetch_and_format_data(collection):
@@ -25,22 +21,23 @@ def fetch_and_format_data(collection):
     df = df.loc[:, ~df.columns.duplicated()]
     return df
 
-chat_post_task_data = fetch_and_format_data(db.chat_post_task)
-csv_file_name = os.path.join(desktop_path, "chat_post_task.csv")
-chat_post_task_data.to_csv(csv_file_name, index=False)
+def mongo_to_tsv(collection, file_name):
+    data = fetch_and_format_data(collection)
+    file_name = os.path.join(DIR_PATH, file_name)
+    data.to_csv(file_name, sep='\t', index=False)
+    print(f"Data saved to {file_name}")
 
-chat_history_data = fetch_and_format_data(db.chat_history)
-csv_file_name = os.path.join(desktop_path, "chat_history.csv")
-chat_history_data.to_csv(csv_file_name, index=False)
 
-chat_client_info_data = fetch_and_format_data(db.chat_client_info)
-csv_file_name = os.path.join(desktop_path, "chat_client_info.csv")
-chat_client_info_data.to_csv(csv_file_name, index=False)
+### If argument provided, it will be used as DIR_PATH
+DIR_PATH = '../data'    # Default path is data directory in the project. Already in .gitignore
+if len(sys.argv) > 1:
+    DIR_PATH = sys.argv[1]
+os.makedirs(DIR_PATH, exist_ok=True)
 
-chat_in_task_data = fetch_and_format_data(db.chat_in_task)
-csv_file_name = os.path.join(desktop_path, "chat_in_task.csv")
-chat_in_task_data.to_csv(csv_file_name, index=False)
 
-chat_pre_task_data = fetch_and_format_data(db.chat_pre_task)
-csv_file_name = os.path.join(desktop_path, "chat_pre_task.csv")
-chat_pre_task_data.to_csv(csv_file_name, index=False)
+mongo_to_tsv(db.chat_post_task, 'chat_post_task.tsv')
+mongo_to_tsv(db.chat_history, 'chat_history.tsv')
+mongo_to_tsv(db.chat_client_info, 'chat_client_info.tsv')
+mongo_to_tsv(db.chat_in_task, 'chat_in_task.tsv')
+mongo_to_tsv(db.chat_pre_task, 'chat_pre_task.tsv')
+mongo_to_tsv(db.summative_writing, 'summative_writing.tsv')
