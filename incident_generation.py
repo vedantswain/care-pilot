@@ -125,7 +125,7 @@ scenarios = generate_scenarios(domains, categories, examples_per_pair=3)
 df = pd.DataFrame(scenarios)
 df["ID"] = range(1, len(df)+1)
 file_path = "phase1_scenarios.tsv"
-df.to_csv(file_path, sep='\t', index=False)
+df.to_csv(file_path, sep='\t', index=False, lineterminator='\n')
 
 print("Saved file to {}".format(file_path))
 #%%

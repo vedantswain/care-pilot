@@ -29,7 +29,10 @@ var currentIncidentIndex = 0;
 
 
 function getDataFromTSV(data) {
-    var lines = data.split("\r\n");
+    data = data.replace(/\r/g, ""); // Remove carriage returns
+    data = data.replace("\"\n", "\""); // Remove newlines within quotes
+
+    var lines = data.split("\n");
     var result = [];
     var headers = lines[0].split("\t");
 
@@ -38,6 +41,10 @@ function getDataFromTSV(data) {
     }
 
     for (var i = 1; i < lines.length; i++) {
+        if (lines[i] === "") {
+            continue;
+        }
+
         var obj = {};
         var currentline = lines[i].split("\t");
 
