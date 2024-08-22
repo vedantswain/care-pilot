@@ -16,14 +16,15 @@ Data for Phase 1: [OneDrive](https://northeastern-my.sharepoint.com/:f:/r/person
 To generate a reframing for any incident, use the following:
 ```python
 from agents import mAgentER
+from langchain_core.messages import AIMessage, HumanMessage
 
 emo_agent = mAgentER()
 
 chat_history = [
-   incident_row['Initial Complaint'], 
-   incident_row['Support Agent Response 1'], 
-   incident_row['Follow-up Complaint 1'], 
-   incident_row['Support Agent Response 2']
+    AIMessage(content="Client: "+incident_row['Initial Complaint']),
+    HumanMessage(content="Representative: "+incident_row['Support Agent Response 1']),
+    AIMessage(content="Client: "+incident_row['Follow-up Complaint 1']),
+    HumanMessage(content="Representative: "+incident_row['Support Agent Response 2'])
 ]
 reply = incident_row['Follow-up Complaint 2']
 response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
