@@ -1,14 +1,16 @@
-import time
+import time,os
 import pandas as pd
-import agents_validation as av
 from langchain_core.messages import AIMessage, HumanMessage
+import agents_validation as av
 
-DIR_PATH = '../data'    # Default path is data directory in the project. Already in .gitignore
-DIR_SERVER_PATH = DIR_PATH+'server_data/'
-DIR_SANITIZED_PATH = DIR_SERVER_PATH+'sanitized_data/'
+ROOT_RELATIVE_PATH = os.path.dirname(os.path.abspath(''))
+
+DIR_PATH = os.path.join(ROOT_RELATIVE_PATH,'data')    # Default path is data directory in the project. Already in .gitignore
+DIR_SERVER_PATH = os.path.join(DIR_PATH,'server_data')
+DIR_SANITIZED_PATH = os.path.join(DIR_SERVER_PATH,'sanitized_data')
 
 ### Load the data
-incidents_df = pd.read_csv(DIR_PATH+'phase1_scenarios.tsv', sep='\t')
+incidents_df = pd.read_csv(os.path.join(ROOT_RELATIVE_PATH,'phase1_scenarios.tsv'), sep='\t')
 
 defaultPersonalities = {
     "resilient":"They are organized and dependable. They tend to remain composed when facing challenges, but are prone to setting unrealistic expectations.",
@@ -40,33 +42,33 @@ def generate_empathetic_msg(incident_row):
     response_cw_emo = emo_agent.invoke({'complaint':reply, "chat_history": chat_history})
     response_row = {
         "user_id": "system",
-        "incident_id": incident_row['Incident ID'],
+        "incident_id": incident_row['ID'],
         "coworker_empathetic_msg": response_cw_emo['reframe']
     }
     responses.append(response_row)
-    print(f"Generated empathetic message for incident {incident_row['Incident ID']}")
+    print(f"Generated empathetic message for incident {incident_row['ID']}")
 
     for personality in defaultPersonalities:
         response_cw_emo_ctx = emo_agent_ctx_pers.invoke({'complaint':reply, "chat_history": chat_history, "personality": defaultPersonalities[personality]})
         response_row = {
             "user_id": "system",
-            "incident_id": incident_row['Incident ID'],
+            "incident_id": incident_row['ID'],
             "coworker_empathetic_msg": response_cw_emo_ctx['reframe'],
             "context_pers": defaultPersonalities[personality]
         }
         responses.append(response_row)
-        print(f"Generated empathetic message for incident {incident_row['Incident ID']} with personality {personality}")
+        print(f"Generated empathetic message for incident {incident_row['ID']} with personality {personality}")
 
     for behavior in defaultBehaviors:
         response_cw_emo_ctx = emo_agent_ctx_behv.invoke({'complaint':reply, "chat_history": chat_history, "behavior": defaultBehaviors[behavior]})
         response_row = {
             "user_id": "system",
-            "incident_id": incident_row['Incident ID'],
+            "incident_id": incident_row['ID'],
             "coworker_empathetic_msg": response_cw_emo_ctx['reframe'],
             "context_behv": defaultBehaviors[behavior]
         }
         responses.append(response_row)
-        print(f"Generated empathetic message for incident {incident_row['Incident ID']} with behavior {behavior}")
+        print(f"Generated empathetic message for incident {incident_row['ID']} with behavior {behavior}")
 
     print()
     return responses
@@ -77,19 +79,19 @@ Each message takes at max 9 seconds to generate
 7 messages for each incident: 1 default, 3 for each personality, 3 for each behavior
 Total time to generate messages for 1 incident: 7*9 = 63 seconds
 Total time to generate messages for 45 incidents: 45*63 = 2835 seconds = 47.25 minutes
-Adding 30 seconds in between each incident for a break
-Total time to generate messages for 45 incidents: 45*63 + 44*30 = 2835 + 1320 = 4155 seconds = 69.25 minutes
+Adding 15 seconds in between each incident for a break
+Total time to generate messages for 45 incidents: 45*78 = 3510 seconds = 58.5 minutes
 '''
 def generate_empathetic_msgs(incidents_df):
     responses = []
     for index, row in incidents_df.iterrows():
         responses += generate_empathetic_msg(row)
-        print("Taking a 30 second break...")
-        time.sleep(30)
+        print("Taking a 15 second break...")
+        time.sleep(15)
         print()
 
     responses_df = pd.DataFrame(responses)
     return responses_df
 
 responses_df = generate_empathetic_msgs(incidents_df)
-responses_df.to_csv(DIR_PATH+'phase1_empathetic_msgs.tsv', sep='\t', index=False)
+responses_df.to_csv(os.path.join(DIR_SANITIZED_PATH,'empathetic_msgs_ai.tsv'), sep='\t', index=False)

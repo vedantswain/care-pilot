@@ -3,8 +3,12 @@ from langchain_core.output_parsers import StrOutputParser
 import langchain_openai as lcai
 
 import os
+from dotenv import load_dotenv
+ROOT_RELATIVE_PATH = os.path.dirname(os.path.abspath(''))
+project_env = os.path.join(ROOT_RELATIVE_PATH, 'project.env')
+load_dotenv(project_env)
 
-DEBUG = True
+DEBUG = False
 
 llmemo = lcai.AzureChatOpenAI(
     openai_api_key=os.getenv("AZURE_OPENAI_KEY"),
@@ -507,8 +511,3 @@ class nAgentER_ctx_behv:
         chain = template | llmemo | StrOutputParser()
 
         return chain
-
-
-emo_agent_ctx = nAgentER_ctx_pers()
-emo_agent_ctx2 = nAgentER_ctx_behv()
-emo_agent = mAgentER_new()
