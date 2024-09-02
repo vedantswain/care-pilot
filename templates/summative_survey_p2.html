@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Writing Task</title>
+    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
+    <link rel="stylesheet" href="https://unpkg.com/bulma@0.9.3/css/bulma.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style_chat.css') }}">
+    <link rel="stylesheet" href="{{ url_for('static', filename='summative_p2.css') }}">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.7.1/jquery.min.js"></script>
+</head>
+<body>
+
+<div class="modal" id="transition-modal">
+        <div class="modal-card">
+            <div class="modal-content" >
+
+                <div class="block is-size-4" id="transition-blurb">
+                    <p>
+                        The subsequent screens contain evaluation tasks.
+                        In each task, the left column shows a conversation excerpt between a <i>Client</i> (yellow bubbles) and a <i>Representative</i> (grey bubbles).
+                        Please read these excerpts carefully.
+                    </p>
+                    <p>&nbsp;</p>
+                    <p>
+                        The right column includes prompts corresponding to the excerpt on the left.
+                        <b>You are being asked to evaluate the quality of support messages from different <i>Coworkers</i> of the <i>Representative</i>.</b>
+                        Follow the instructions in prompts below the excerpts and respond accordingly.
+                    </p>
+                    <p>&nbsp;</p>
+                    <p> </p>
+                    <p>&nbsp;</p>
+                    <p> <i>Complete the writing task in one sitting. Partial progress will NOT be saved. Refreshing the website will result in a restart.</i></p>
+                </div>
+
+
+            </div>
+            <footer class="modal-card-foot">
+                <button class="button is-success" id="summativeNextBtn">Next</button>
+            </footer>
+        </div>
+</div>
+
+
+<div class="modal" id="personality-modal">
+    <form id="summativePhaseIPersonality">
+        <div class="modal-card">
+            <header class="modal-card-head">
+            </header>
+            <div class="modal-content"  id="personality-survey">
+
+                <!-- Interaction -->
+                <div class="block survey-section" id="qPers">
+                    <div class="control content">
+                        <h5>Think of a coworker you have provided social support to in the past. Enter their initials into the box below.</h5>
+                        <input class="input" type="text" name="pers1" placeholder="Initials only" />
+                    </div>
+
+                    <div class="box control content">
+                        <h5>Which of the following does your coworker most embody?.</h5>
+                        <div class="radios">
+                            <label class="radio radio-pers">
+                                <input type="radio" name="personality" data-index="0"/>
+                                <p>They are organized and dependable. They tend to remain composed when facing challenges, but are prone to setting unrealistic expectations.</p>
+                            </label>
+                            <label class="radio radio-pers">
+                                <input type="radio" name="personality"  data-index="1"/>
+                                <p>They are outgoing, competitive, and high energy. They tend to work on impulse, but are also prone to frustration.</p>
+                            </label>
+                            <label class="radio radio-pers">
+                                <input type="radio" name="personality"  data-index="2"/>
+                                <p>They are detail-oriented and reliable but might appear distant. They tend to work carefully, but are prone to overthinking.</p>
+                            </label>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+            <footer class="modal-card-foot">
+                <button class="button is-success" type="submit" id="summativePersonalityBtn">Next</button>
+            </footer>
+        </div>
+    </form>
+</div>
+
+<div class="modal" id="survey-modal">
+    <form id="summativePhaseI">
+        <div class="modal-card">
+            <header class="modal-card-head">
+                <p id="instruction" style="font-size:medium;">Read the excerpt below carefully and respond to the prompts.</p>
+            </header>
+            <div class="modal-content"  id="main-survey">
+
+                <div class="columns">
+                    <div class="column is-6">
+                        <div class="block is-size-4" id="qContainer">
+                        </div>
+                    </div>
+                    <div class="column is-6">
+
+                        <!-- Interaction -->
+                        <div class="block is-size-4 survey-section" id="qPrompts">
+
+                            <div class="control content">
+                                <h5>Describe an emotion the representative would feel in this situation (1 word).</h5>
+                                <input class="input" type="text" name="dat1" placeholder="1 word" />
+
+                            </div>
+                            <div class="control content">
+                                <div class="support-msg">
+
+                                </div>
+                                <h6>Evaluate the effectiveness of the message above in helping the representative overcome their thought:</h6>
+                                <table class="table">
+                                    <tr>
+                                        <th>Insincere</th>
+                                        <td><input type="radio" name="sincerity" value="-3"></td>
+                                        <td><input type="radio" name="sincerity" value="-2"></td>
+                                        <td><input type="radio" name="sincerity" value="-1"></td>
+                                        <td><input type="radio" name="sincerity" value="0"></td>
+                                        <td><input type="radio" name="sincerity" value="1"></td>
+                                        <td><input type="radio" name="sincerity" value="2"></td>
+                                        <td><input type="radio" name="sincerity" value="3"></td>
+                                        <th>Sincere</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Not Comppassionate</th>
+                                        <td><input type="radio" name="compassionate" value="-3"></td>
+                                        <td><input type="radio" name="compassionate" value="-2"></td>
+                                        <td><input type="radio" name="compassionate" value="-1"></td>
+                                        <td><input type="radio" name="compassionate" value="0"></td>
+                                        <td><input type="radio" name="compassionate" value="1"></td>
+                                        <td><input type="radio" name="compassionate" value="2"></td>
+                                        <td><input type="radio" name="compassionate" value="3"></td>
+                                        <th>Compassionate</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Cold</th>
+                                        <td><input type="radio" name="warmth" value="-3"></td>
+                                        <td><input type="radio" name="warmth" value="-2"></td>
+                                        <td><input type="radio" name="warmth" value="-1"></td>
+                                        <td><input type="radio" name="warmth" value="0"></td>
+                                        <td><input type="radio" name="warmth" value="1"></td>
+                                        <td><input type="radio" name="warmth" value="2"></td>
+                                        <td><input type="radio" name="warmth" value="3"></td>
+                                        <th>Warm</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Unsupportive</th>
+                                        <td><input type="radio" name="supportive" value="-3"></td>
+                                        <td><input type="radio" name="supportive" value="-2"></td>
+                                        <td><input type="radio" name="supportive" value="-1"></td>
+                                        <td><input type="radio" name="supportive" value="0"></td>
+                                        <td><input type="radio" name="supportive" value="1"></td>
+                                        <td><input type="radio" name="supportive" value="2"></td>
+                                        <td><input type="radio" name="supportive" value="3"></td>
+                                        <th>Supportive</th>
+                                    </tr>
+                                    <tr>
+                                        <th>Unrelatable</th>
+                                        <td><input type="radio" name="relatable" value="-3"></td>
+                                        <td><input type="radio" name="relatable" value="-2"></td>
+                                        <td><input type="radio" name="relatable" value="-1"></td>
+                                        <td><input type="radio" name="relatable" value="0"></td>
+                                        <td><input type="radio" name="relatable" value="1"></td>
+                                        <td><input type="radio" name="relatable" value="2"></td>
+                                        <td><input type="radio" name="relatable" value="3"></td>
+                                        <th>Relatable</th>
+                                    </tr>
+                                </table>
+
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+
+
+            </div>
+            <footer class="modal-card-foot">
+                <button class="button is-success" type="submit" id="summativeSubmitBtn">Next</button>
+                <progress class="progress is-primary" value="0" max="100" id="progress-bar"></progress>
+                <progress class="progress is-small is-primary" max="100" id="progress-loader" style="display: none;"></progress>
+            </footer>
+        </div>
+    </form>
+</div>
+
+
+<div class="modal" id="end-modal">
+    <div class="modal-card">
+        <div class="modal-content" >
+
+            <div class="block is-size-4">
+                <p>Thank you for completing the task.</p>
+                <p>&nbsp;</p>
+                <p>Your responses will help improve technologies for worker wellbeing.</p>
+                <p>&nbsp;</p>
+                <p>Click "Complete" to be redirected back to Prolific with the completion code.</p>
+            </div>
+
+
+        </div>
+        <footer class="modal-card-foot">
+            <button class="button is-danger" id="completeBtn">Complete</button>
+        </footer>
+    </div>
+</div>
+
+
+<script src="{{ url_for('static', filename='phase2_survey.js') }}"></script>
+
+</body>
+</html>

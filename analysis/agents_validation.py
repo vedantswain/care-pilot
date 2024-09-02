@@ -511,3 +511,4 @@ class nAgentER_ctx_behv:
         chain = template | llmemo | StrOutputParser()
 
         return chain
+

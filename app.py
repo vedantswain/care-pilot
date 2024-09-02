@@ -152,6 +152,20 @@ def complete_summative_writing(prolific_id):
     redirect_url = "https://app.prolific.co/submissions/complete?cc=C19F0ZME"
     return jsonify({"url": redirect_url})
 
+@app.route('/summative/phase2/get-tsv/<filetype>/')
+def get_tsv2(filetype):
+    if filetype == 'scenarios':
+        return send_from_directory('', 'phase1_scenarios.tsv')
+    elif filetype == 'ai_msgs':
+        return send_from_directory('', 'empathetic_msgs_ai_v2.tsv')
+    elif filetype == 'human_msgs':
+        return send_from_directory('', 'empathetic_msg_human.tsv')
+@app.route('/summative/phase2/writing/')
+def start_scoring():
+    val_prolific = request.args.get('PROLIFIC_PID')
+    session[val_prolific] = 0
+    return render_template('summative_survey_p2.html')
+
 
 
 # End-point to test the pre-survey HTML
