@@ -157,6 +157,9 @@ def get_tsv2(filetype):
     if filetype == 'scenarios':
         return send_from_directory('', 'phase1_scenarios.tsv')
     elif filetype == 'ai_msgs':
+        # Read TSV file and remove newline in the "coworker_empathetic_msg" column
+
+
         return send_from_directory('', 'empathetic_msgs_ai_v2.tsv')
     elif filetype == 'human_msgs':
         return send_from_directory('', 'empathetic_msg_human.tsv')

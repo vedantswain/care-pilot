@@ -19,6 +19,7 @@ var currentIncidentIndex = 0;
 function getDataFromTSV(data) {
     data = data.replace(/\r/g, ""); // Remove carriage returns
     data = data.replace("\"\n", "\""); // Remove newlines within quotes
+    data = data.replace(/^\s*[\r\n]/gm, "");    // Remove empty lines
 
     var lines = data.split("\n");
     var result = [];
@@ -112,24 +113,21 @@ function createQuestionHTML(question_id, source) {
     msg.textContent = question["coworker_empathetic_msg"];
     container.appendChild(msg);
 
-    const header = document.createElement('h6');
-    header.textContent = "Evaluate the effectiveness of the message above in helping the representative overcome their thought:"
-    container.appendChild(header);
 
     var items = [
-        ("Insincere", "Sincere", 'sincerity'),
-        ("Not Compassionate", "Compassionate", 'compassion'),
-        ("Cold", "Warm", 'warmth'),
-        ("Not Supportive", "Supportive", 'supportiveness'),
-        ("Not Relatable", "Relatable", 'relatability')
+        ["Insincere", "Sincere", 'sincerity'],
+        ["Not Compassionate", "Compassionate", 'compassion'],
+        ["Cold", "Warm", 'warmth'],
+        ["Not Supportive", "Supportive", 'supportiveness'],
+        ["Not Relatable", "Relatable", 'relatability']
     ]
 
     const table = document.createElement('table');
     table.className = 'table';
 
     items.forEach((item) => {
-        const tr = document.createElement('tr');
-        const th = document.createElement('th');
+        var tr = document.createElement('tr');
+        var th = document.createElement('th');
         th.textContent = item[0];
         tr.appendChild(th);
 
@@ -140,19 +138,18 @@ function createQuestionHTML(question_id, source) {
             radio.type = 'radio';
             radio.name = item[2];
             radio.value = i;
-            radio.setAttribute('data-index', item[2]+question['_id']);
+            radio.setAttribute('data-index', item[2]+"_"+question['_id']);
             radio.setAttribute('data-source', source);
             td.appendChild(radio);
             tr.appendChild(td);
         }
 
-        const tr = document.createElement('tr');
-        const th = document.createElement('th');
+        var th = document.createElement('th');
         th.textContent = item[1];
         tr.appendChild(th);
 
         table.appendChild(tr);
-    }
+    });
 
     container.appendChild(table);
 
@@ -161,9 +158,6 @@ function createQuestionHTML(question_id, source) {
 
 
 function displayIncident() {
-    document.querySelector('input[name="dat1"]').value = "";
-    document.querySelector('input[name="dat1"]').disabled = false;
-
     var qContainer = document.getElementById("qContainer");
     qContainer.innerHTML = '';
 
@@ -200,25 +194,45 @@ function displayIncident() {
         }
         qContainer.appendChild(incidentHTML);
 
-
+        // Create the question prompts
         var qPrompts = document.getElementById("qPrompts");
-        // remove every child node from qPrompts, except for the first one
-        while (qPrompts.childNodes.length > 1) {
-            qPrompts.removeChild(qPrompts.lastChild);
-        }
+        qPrompts.innerHTML = '';
 
+        const prompt = document.createElement('div');
+        prompt.className = 'prompt';
+        prompt.classList.add('control', 'content');
+        const h5 = document.createElement('h5');
+        h5.textContent = "Describe an emotion the representative would feel in this situation (1 word).";
+        prompt.appendChild(h5);
+
+        const input = document.createElement('input');
+        input.className = 'input';
+        input.type = 'text';
+        input.name = 'dat1';
+        input.placeholder = '1 word';
+        prompt.appendChild(input);
+
+        // insert a line break after the input field
+        prompt.appendChild(document.createElement('p'));
+
+        const h6 = document.createElement('h6');
+        h6.textContent =  "Evaluate the effectiveness of the message below in helping the representative overcome their thought:";
+        prompt.appendChild(h6);
+        qPrompts.appendChild(prompt);
+
+        // Create message scores
         var questionList = []
-        questionList.push(createQuestionHTML(incidentData['msg_human_id'], 'human');
-        questionList.push(createQuestionHTML(incidentData['msg_ai_id'], 'ai');
-        if 'msg_ai_id_null' in incidentData:
-            questionList.push(createQuestionHTML(incidentData['msg_ai_id_null'], 'ai_null');
-
+        questionList.push(createQuestionHTML(incidentData['msg_human_id'], 'human'));
+        questionList.push(createQuestionHTML(incidentData['msg_ai_id'], 'ai'));
+        if ('msg_ai_id_null' in incidentData){
+            questionList.push(createQuestionHTML(incidentData['msg_ai_id_null'], 'ai'));
+        }
         // shuffle questionList
         questionList.sort(() => Math.random() - 0.5);
 
         questionList.forEach((question) => {
             qPrompts.appendChild(question);
-        }
+        });
 
     } else {
         console.error("Incident data missing.");
@@ -276,7 +290,7 @@ function createIncidentSet() {
 
         // if humanMsgsWithContext is not empty, add the index to selectedIndices
         if (humanMsgsWithContext.length > 0) {
-            console.log("Incident with huma behavior context: ", incident);
+            console.log("Incident with human behavior context: ", incident);
             selectedIndices.add(randomIndex);
             // Randomly select one human message with context_behav
             const randomHumanIndex = Math.floor(Math.random() * humanMsgsWithContext.length);
@@ -390,7 +404,7 @@ function createIncidentSet() {
     selectedQuestions.sort(() => Math.random() - 0.5);
     console.log("Selected Questions: ", selectedQuestions);
 
-    displayIncident();
+//    displayIncident();
 }
 
 function loadHumanMsgs(domainIds) {
