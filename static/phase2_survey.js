@@ -8,9 +8,9 @@ var defaultDomains = ["mobile-device", "hotel", "airlines"];
 
 var remainingBehaviors = [];
 
-const domainQuestions = [];
-const domainMessagesAI = [];
-const domainMessagesHuman = [];
+var domainQuestions = [];
+var domainMessagesAI = [];
+var domainMessagesHuman = [];
 
 const selectedQuestions = [];
 var currentIncidentIndex = 0;
@@ -45,15 +45,8 @@ function getDataFromTSV(data) {
     return result;
 }
 
-function getBehaviorContext() {
+function setBehaviorContext(selectedBehavior) {
     var qContainer = document.getElementById("qContainer");
-
-    if (remainingBehaviors.length === 0){
-        remainingBehaviors = defaultBehaviors;
-    }
-
-    var behaviorIndex = Math.floor(Math.random() * remainingBehaviors.length);
-    var selectedBehavior = remainingBehaviors.splice(behaviorIndex, 1)[0];
 
     var header = document.createElement('h2');
     header.classList.add("context-blurb");
@@ -64,12 +57,12 @@ function getBehaviorContext() {
     console.log("Behavior Header and Incident HTML appended to container");
 }
 
-function getPersonalityContext() {
+function setPersonalityContext(selectedPersonality) {
     var qContainer = document.getElementById("qContainer");
 
     var header = document.createElement('h2');
     header.classList.add("context-blurb");
-    header.textContent = persContext["personality"];
+    header.textContent = selectedPersonality;
 
     qContainer.prepend(header);
 
@@ -137,10 +130,10 @@ function displayIncident() {
         var personalityKnown = 'context_pers' in incidentData;
 
         if (behaviorKnown) {
-            getBehaviorContext();
+            setBehaviorContext(incidentData['context_behav']);
         }
         if (personalityKnown) {
-            getPersonalityContext();
+            setPersonalityContext(incidentData['context_pers']);
         }
 
         qContainer.appendChild(incidentHTML);
@@ -190,13 +183,13 @@ function createIncidentSet() {
             continue;
         }
 
-        incident = domainQuestions[randomIndex]['ID'];
+        var incident = domainQuestions[randomIndex]['ID'];
 
         // Find human message(s) for the selected incident
         const humanMsgs = domainMessagesHuman.filter(q => q['incident_id'] === incident);
 
         // Filter human messages where context_behav is not null
-        const humanMsgsWithContext = humanMsgs.filter(q => q['context_behav'] !== '');
+        const humanMsgsWithContext = humanMsgs.filter(q => q['context_behav']);
 
         // if humanMsgsWithContext is not empty, add the index to selectedIndices
         if (humanMsgsWithContext.length > 0) {
@@ -210,7 +203,7 @@ function createIncidentSet() {
             // Find one AI message for the selected incident and context
             const aiMsg = domainMessagesAI.find(q => q['incident_id'] === incident && q['context_behav'] === context_behav);
             // Find one AI message for the selected incident and context as null
-            const aiMsgNull = domainMessagesAI.find(q => q['incident_id'] === incident && q['context_behav'] === '');
+            const aiMsgNull = domainMessagesAI.find(q => q['incident_id'] === incident && !q['context_behav'] && !q['context_pers']);
 
             var incident_dict = {
                 'ID': incident,
@@ -236,13 +229,13 @@ function createIncidentSet() {
             continue;
         }
 
-        incident = domainQuestions[randomIndex]['ID'];
+        var incident = domainQuestions[randomIndex]['ID'];
 
         // Find human message(s) for the selected incident
         const humanMsgs = domainMessagesHuman.filter(q => q['incident_id'] === incident);
 
         // Filter human messages where context_pers is not null
-        const humanMsgsWithContext = humanMsgs.filter(q => q['context_pers'] !== '');
+        const humanMsgsWithContext = humanMsgs.filter(q => q['context_pers']);
 
         // if humanMsgsWithContext is not empty, add the index to selectedIndices
         if (humanMsgsWithContext.length > 0) {
@@ -256,7 +249,7 @@ function createIncidentSet() {
             // Find one AI message for the selected incident and context
             const aiMsg = domainMessagesAI.find(q => q['incident_id'] === incident && q['context_pers'] === context_pers);
             // Find one AI message for the selected incident and context as null
-            const aiMsgNull = domainMessagesAI.find(q => q['incident_id'] === incident && q['context_pers'] === '');
+            const aiMsgNull = domainMessagesAI.find(q => q['incident_id'] === incident && !q['context_behav'] && !q['context_pers']);
 
             var incident_dict = {
                 'ID': incident,
@@ -265,6 +258,9 @@ function createIncidentSet() {
                 'msg_ai_id_null': aiMsgNull['_id'],
                 'context_pers': context_pers
             };
+            selectedQuestions.push(incident_dict);
+
+            selectedIndices.add(randomIndex);
         }
     }
 
@@ -279,22 +275,22 @@ function createIncidentSet() {
             continue;
         }
 
-        incident = domainQuestions[randomIndex]['ID'];
+        var incident = domainQuestions[randomIndex]['ID'];
 
         // Find human message(s) for the selected incident
         const humanMsgs = domainMessagesHuman.filter(q => q['incident_id'] === incident);
 
         // Filter human messages where context_pers is null and context_behav is null
-        const humanMsgsWoContext = humanMsgs.filter(q => q['context_pers'] === '' && q['context_behav'] === '');
-        if (humanMsgsWithContext.length > 0) {
+        const humanMsgsWoContext = humanMsgs.filter(q => !q['context_pers'] && !q['context_behav']);
+        if (humanMsgsWoContext.length > 0) {
             console.log("Incident with no context", incident);
             selectedIndices.add(randomIndex);
             // Randomly select one human message with context_behav
-            const randomHumanIndex = Math.floor(Math.random() * humanMsgsWithContext.length);
-            const humanMsg = humanMsgsWithContext[randomHumanIndex];
+            const randomHumanIndex = Math.floor(Math.random() * humanMsgsWoContext.length);
+            const humanMsg = humanMsgsWoContext[randomHumanIndex];
 
             // Find one AI message for the selected incident and context
-            const aiMsg = domainMessagesAI.find(q => q['incident_id'] === incident && q['context_pers'] === '' && q['context_behav'] === '');
+            const aiMsg = domainMessagesAI.find(q => q['incident_id'] === incident && !q['context_pers'] && !q['context_behav']);
 
             var incident_dict = {
                 'ID': incident,
@@ -307,19 +303,29 @@ function createIncidentSet() {
         }
     }
 
+    // Shuffle the selected questions
+    selectedQuestions.sort(() => Math.random() - 0.5);
     console.log("Selected Questions: ", selectedQuestions);
+
     displayIncident();
 }
 
 function loadHumanMsgs(domainIds) {
 
-    var url = "/summative/phase2/get-tsv/human-msgs/";
+    var url = "/summative/phase2/get-tsv/human_msgs/";
 
-    jquery.ajax({
+    jQuery.ajax({
         url: url,
         dataType: "text",
         success: function(data) {
             var results = getDataFromTSV(data);
+
+            // Remove ".0" from the incident_id
+            results.forEach(q => {
+                if (q['incident_id'] && typeof q['incident_id'] === 'string') {
+                    q['incident_id'] = q['incident_id'].replace(".0", "");
+                }
+            });
 
             // Filter questions by selected domain
             domainMessagesHuman = results.filter(q => domainIds.includes(q['incident_id']));
@@ -333,13 +339,21 @@ function loadHumanMsgs(domainIds) {
 
 function loadAIMsgs(domainIds) {
 
-    var url = "/summative/phase2/get-tsv/ai-msgs/";
+    var url = "/summative/phase2/get-tsv/ai_msgs/";
 
     jQuery.ajax({
         url: url,
         dataType: "text",
         success: function(data) {
             var results = getDataFromTSV(data);
+
+            // Rename column "context_behv" to "context_behav"
+            results.forEach(q => {
+                if (q['context_behv']) {
+                    q['context_behav'] = q['context_behv'];
+                    delete q['context_behv'];
+                }
+            });
 
             // Filter questions by selected domain
             domainMessagesAI = results.filter(q => domainIds.includes(q['incident_id']));
@@ -376,8 +390,6 @@ function loadIncidents(domain){
             var categories = ["Service Quality", "Product Issues", "Pricing and Charges", "Policy", "Resolution"];
 
             loadAIMsgs(domainIds);
-
-            displayIncident();
 
         },
         error: function(jqXHR, textStatus, errorThrown) {
