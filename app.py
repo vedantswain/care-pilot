@@ -55,6 +55,7 @@ chat_client_info = db.chat_client_info
 chat_in_task = db.chat_in_task
 chat_pre_task = db.chat_pre_task
 summative_writing = db.summative_writing
+summative_scoring = db.summative_scoring
 
 sender_agent = None
 chat_history = [
@@ -169,6 +170,36 @@ def start_scoring():
     session[val_prolific] = 0
     return render_template('summative_survey_p2.html')
 
+@app.route('/store-summative-scoring/<prolific_id>/', methods=['POST'])
+def store_summative_scoring(prolific_id):
+    if prolific_id not in session:
+        return jsonify({"message": "Invalid session or session expired"}), 400
+
+    data = request.get_json()
+    if not data:
+        return jsonify({"message": "No data received"}), 400
+
+    data['prolific_id'] = prolific_id
+    data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
+
+    try:
+        result = summative_scoring.insert_one(data)
+        if result.inserted_id:
+            session[prolific_id] += 1
+            return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+        else:
+            return jsonify({"message": "Failed to save data"}), 500
+    except Exception as e:
+        return jsonify({"message": str(e)}), 500
+
+@app.route('/summative/phase2/complete/<prolific_id>/', methods=['GET'])
+def complete_summative_scoring(prolific_id):
+    completion_count = session[prolific_id]
+    if prolific_id not in session or completion_count < 10:
+        return jsonify({"message": "Invalid session or session expired"}), 400
+
+    redirect_url = "https://app.prolific.co/submissions/complete?cc=C19F0ZME"
+    return jsonify({"url": redirect_url})
 
 
 # End-point to test the pre-survey HTML

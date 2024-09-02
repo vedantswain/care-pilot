@@ -11,7 +11,8 @@ collections = {
     'chat_client_info': db.chat_client_info,
     'chat_in_task': db.chat_in_task,
     'chat_pre_task': db.chat_pre_task,
-    'summative_writing': db.summative_writing
+    'summative_writing': db.summative_writing,
+    'summative_scoring': db.summative_scoring
 }
 
 
@@ -41,3 +42,4 @@ mongo_to_tsv(db.chat_client_info, 'chat_client_info.tsv')
 mongo_to_tsv(db.chat_in_task, 'chat_in_task.tsv')
 mongo_to_tsv(db.chat_pre_task, 'chat_pre_task.tsv')
 mongo_to_tsv(db.summative_writing, 'summative_writing.tsv')
+mongo_to_tsv(db.summative_scoring, 'summative_scoring.tsv')

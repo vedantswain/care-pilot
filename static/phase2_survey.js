@@ -97,7 +97,7 @@ function createConversationHTML(conversation) {
 }
 
 
-function createQuestionHTML(question_id, source) {
+function createQuestionHTML(question_id, source, q_num) {
     const container = document.createElement('div');
     container.classList.add('control', 'content');
 
@@ -118,7 +118,7 @@ function createQuestionHTML(question_id, source) {
         ["Insincere", "Sincere", 'sincerity'],
         ["Not Compassionate", "Compassionate", 'compassion'],
         ["Cold", "Warm", 'warmth'],
-        ["Not Supportive", "Supportive", 'supportiveness'],
+        ["Not Supportive", "Supportive", 'support'],
         ["Not Relatable", "Relatable", 'relatability']
     ]
 
@@ -136,9 +136,9 @@ function createQuestionHTML(question_id, source) {
             const td = document.createElement('td');
             const radio = document.createElement('input');
             radio.type = 'radio';
-            radio.name = item[2];
+            radio.name = item[2]+'_'+q_num;
             radio.value = i;
-            radio.setAttribute('data-index', item[2]+"_"+question['_id']);
+            radio.setAttribute('data-index', question['_id']);
             radio.setAttribute('data-source', source);
             td.appendChild(radio);
             tr.appendChild(td);
@@ -222,10 +222,10 @@ function displayIncident() {
 
         // Create message scores
         var questionList = []
-        questionList.push(createQuestionHTML(incidentData['msg_human_id'], 'human'));
-        questionList.push(createQuestionHTML(incidentData['msg_ai_id'], 'ai'));
+        questionList.push(createQuestionHTML(incidentData['msg_human_id'], 'human',0));
+        questionList.push(createQuestionHTML(incidentData['msg_ai_id'], 'ai',1));
         if ('msg_ai_id_null' in incidentData){
-            questionList.push(createQuestionHTML(incidentData['msg_ai_id_null'], 'ai'));
+            questionList.push(createQuestionHTML(incidentData['msg_ai_id_null'], 'ai',2));
         }
         // shuffle questionList
         questionList.sort(() => Math.random() - 0.5);
@@ -255,12 +255,7 @@ function nextIncident() {
     document.querySelector('input[name="dat1"]').disabled = true;
 
     if (currentIncidentIndex < selectedQuestions.length) {
-        if (currentIncidentIndex === indexAtBehavior || currentIncidentIndex === indexAtPersonality) {
-            setTimeout(initiateTransition, TIMEOUT_DURATION);
-        }
-        else {
-            setTimeout(displayIncident, TIMEOUT_DURATION);
-        }
+        setTimeout(displayIncident, TIMEOUT_DURATION);
     } else {
         document.getElementById('end-modal').classList.add('is-active');
         document.getElementById('survey-modal').classList.remove('is-active');
@@ -496,49 +491,6 @@ function loadIncidents(domain){
     });
 }
 
-function validateAndStorePersonality(e, formElement) {
-    e.preventDefault();
-
-    summativeSubmitBtn = document.getElementById('summativePersonalityBtn');
-    summativeSubmitBtn.disabled = true;
-
-    const formData = new FormData(formElement);
-    const formValues = {};
-
-    // Check if the all radio questions were answered
-    inputKeysValidation = ["pers1"]
-    persContext["coworker_inits"] = document.querySelector('input[name="pers1"]').value.trim();
-    allKeysExist = inputKeysValidation.every(key => formValues[key]!="");
-    allKeysExist = true;
-    if (!allKeysExist){
-        alert("Please respond to all questions.");
-
-        summativeSubmitBtn.disabled = false;
-
-        return;
-    }
-
-    const radios = document.querySelectorAll('input[name="personality"]');
-    let selectedValue = null;
-
-    radios.forEach((radio) => {
-        if (radio.checked) {
-            selectedValue = radio.getAttribute('data-index');
-        }
-    });
-
-    if (selectedValue) {
-        personalityKnown = true;
-        persContext["personality"] = defaultPersonalities[selectedValue];
-        console.log('Selected personality:', selectedValue);
-        document.getElementById('personality-modal').classList.remove('is-active');
-
-        initiateTransition();
-    } else {
-        alert("Please respond to all questions.");
-        summativeSubmitBtn.disabled = false;
-    }
-}
 
 function validateAndSubmit(e, formElement) {
     e.preventDefault();
@@ -548,17 +500,35 @@ function validateAndSubmit(e, formElement) {
 
     const formData = new FormData(formElement);
     const formValues = {};
+    formData.forEach((value, key) => { formValues[key] = value; });
 
     // Check if the all radio questions were answered
-    inputKeysValidation = ["dat1"]
-    formValues["dat1"] = document.querySelector('input[name="dat1"]').value.trim();
-
-    allKeysExist = inputKeysValidation.every(key => formValues[key]!="");
+    var inputKeysValidation = ["dat1"]
+    var allKeysExist = inputKeysValidation.every(key => formValues[key]!="");
     if (!allKeysExist){
         alert("Please respond to all questions.");
-
         summativeSubmitBtn.disabled = false;
+        return;
+    }
 
+    var radioKeysValidation = []
+    var form_items = 2
+    if ('msg_ai_id_null' in selectedQuestions[currentIncidentIndex]){
+        form_items = 3
+    }
+    for (let i = 0; i < form_items; i++) {
+        radioKeysValidation.push('sincerity_'+i);
+        radioKeysValidation.push('compassion_'+i);
+        radioKeysValidation.push('warmth_'+i);
+        radioKeysValidation.push('support_'+i);
+        radioKeysValidation.push('relatability_'+i);
+    }
+
+
+    allKeysExist = radioKeysValidation.every(key => Object.keys(formValues).includes(key));
+    if (!allKeysExist){
+        alert("Please respond to all radio button questions.");
+        summativeSubmitBtn.disabled = false;
         return;
     }
 
@@ -569,14 +539,19 @@ function validateAndSubmit(e, formElement) {
     data['scenario_num'] = currentIncidentIndex
     data['incident_id'] = selectedQuestions[currentIncidentIndex]['ID']
 
-    if (behaviorKnown) {
-        data['context_behav'] = document.querySelector('.context-blurb').textContent;
-    }
-    if (personalityKnown) {
-        data['context_pers'] = document.querySelector('.context-blurb').textContent;
-    }
+    // Retrieve data-index and data-source from the radio buttons
+    const radios = document.querySelectorAll('input[type="radio"]');
+    radios.forEach((radio) => {
+        if (radio.checked) {
+            const prompt_num = radio.name.split('_')[1];
+            if (!("msg_"+prompt_num in data)){
+                data["msg_"+prompt_num] =radio.getAttribute('data-index');
+                data["msg_"+prompt_num+"_src"] = radio.getAttribute('data-source');
+            }
+        }
+    });
 
-    fetch(`/store-summative-writing/${prolific_id}/`, {
+    fetch(`/store-summative-scoring/${prolific_id}/`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
@@ -604,63 +579,9 @@ function initiateNextPart() {
     document.getElementById('transition-modal').classList.remove('is-active');
     document.getElementById('survey-modal').classList.add('is-active');
 
-    var instruction = document.getElementById('instruction');
-
-    if (currentIncidentIndex === indexAtBehavior) {
-
-        instruction.innerHTML = `
-        <p>Consider what the representative is going through below. Keep this information in mind as you read the excerpt below.</p>
-        <p>&nbsp;</p>
-        <p>Read carefully and respond to the prompts. </p>
-        `;
-    }
-    else if (currentIncidentIndex === indexAtPersonality) {
-        instruction.innerHTML = `
-        <p>Imagine that your coworker, `+persContext['coworker_inits']+` is the representative speaking to the client. Keep their personality in mind as you read the excerpt below. </p>
-        <p>&nbsp;</p>
-        <p>Read carefully and respond to the prompts.</p>
-        `;
-    }
-
-
     setTimeout(displayIncident, TIMEOUT_DURATION);
 }
 
-function initiateTransition() {
-    var transitionBlurb = document.getElementById('transition-blurb');
-
-    document.getElementById('survey-modal').classList.remove('is-active');
-
-    if (currentIncidentIndex === indexAtBehavior) {
-        transitionBlurb.innerHTML = `
-        <p>For the next set of conversation excerpts, you will be given <b>additional information</b> about the representative.</p>
-        <p>&nbsp;</p>
-        <p>Please read this information carefully and consider it when responding to the questions.</p>
-        `;
-        behaviorKnown = true;
-        personalityKnown = false;
-    }
-    if (currentIncidentIndex === indexAtPersonality) {
-        if (personalityKnown){
-            transitionBlurb.innerHTML = `
-            <p>For the next set of conversation excerpts, <b>imagine that `+persContext["coworker_inits"]+` is the representative</b> engaging with the client.</p>
-            <p>&nbsp;</p>
-            <p>Please consider their personality when responding to the questions.</p>`;
-        }
-        else{
-            transitionBlurb.innerHTML = '';
-            document.getElementById('personality-modal').classList.add('is-active');
-            const form = document.getElementById('summativePhaseIPersonality');
-            form.addEventListener('submit', function(e) {
-                validateAndStorePersonality(e, this);
-            });
-            behaviorKnown = false;
-        }
-    }
-
-
-    document.getElementById('transition-modal').classList.add('is-active');
-}
 
 function completeSummative() {
     var completeBtn = document.getElementById('completeBtn');
