@@ -51,7 +51,7 @@ function setBehaviorContext(selectedBehavior) {
 
     var header = document.createElement('h2');
     header.classList.add("context-blurb");
-    header.textContent = "" + selectedBehavior;
+    header.textContent = "About the representative:" + selectedBehavior;
 
     qContainer.prepend(header);
 
@@ -63,7 +63,7 @@ function setPersonalityContext(selectedPersonality) {
 
     var header = document.createElement('h2');
     header.classList.add("context-blurb");
-    header.textContent = selectedPersonality;
+    header.textContent = "About the workday:" + selectedPersonality;
 
     qContainer.prepend(header);
 
@@ -216,7 +216,7 @@ function displayIncident() {
         prompt.appendChild(document.createElement('p'));
 
         const h6 = document.createElement('h6');
-        h6.textContent =  "Evaluate the effectiveness of the message below in helping the representative overcome their thought:";
+        h6.textContent =  "Evaluate the effectiveness of the message below in helping the representative overcome their feeling:";
         prompt.appendChild(h6);
         qPrompts.appendChild(prompt);
 
