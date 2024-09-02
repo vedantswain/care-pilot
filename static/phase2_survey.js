@@ -95,14 +95,77 @@ function createConversationHTML(conversation) {
     return container;
 }
 
+
+function createQuestionHTML(question_id, source) {
+    const container = document.createElement('div');
+    container.classList.add('control', 'content');
+
+    if (source === 'human') {
+        question = domainMessagesHuman.find(q => q['_id'] === question_id);
+    }
+    else if (source === 'ai') {
+        question = domainMessagesAI.find(q => q['_id'] === question_id);
+    }
+
+    const msg = document.createElement('div');
+    msg.className = 'support-msg';
+    msg.textContent = question["coworker_empathetic_msg"];
+    container.appendChild(msg);
+
+    const header = document.createElement('h6');
+    header.textContent = "Evaluate the effectiveness of the message above in helping the representative overcome their thought:"
+    container.appendChild(header);
+
+    var items = [
+        ("Insincere", "Sincere", 'sincerity'),
+        ("Not Compassionate", "Compassionate", 'compassion'),
+        ("Cold", "Warm", 'warmth'),
+        ("Not Supportive", "Supportive", 'supportiveness'),
+        ("Not Relatable", "Relatable", 'relatability')
+    ]
+
+    const table = document.createElement('table');
+    table.className = 'table';
+
+    items.forEach((item) => {
+        const tr = document.createElement('tr');
+        const th = document.createElement('th');
+        th.textContent = item[0];
+        tr.appendChild(th);
+
+        // create 7 table cells with radio for values from -3 to 3
+        for (let i = -3; i <= 3; i++) {
+            const td = document.createElement('td');
+            const radio = document.createElement('input');
+            radio.type = 'radio';
+            radio.name = item[2];
+            radio.value = i;
+            radio.setAttribute('data-index', item[2]+question['_id']);
+            radio.setAttribute('data-source', source);
+            td.appendChild(radio);
+            tr.appendChild(td);
+        }
+
+        const tr = document.createElement('tr');
+        const th = document.createElement('th');
+        th.textContent = item[1];
+        tr.appendChild(th);
+
+        table.appendChild(tr);
+    }
+
+    container.appendChild(table);
+
+    return container;
+}
+
+
 function displayIncident() {
-    var qContainer = document.getElementById("qContainer");
+    document.querySelector('input[name="dat1"]').value = "";
+    document.querySelector('input[name="dat1"]').disabled = false;
 
     var qContainer = document.getElementById("qContainer");
     qContainer.innerHTML = '';
-    document.querySelector('input[name="dat1"]').value = "";
-
-    document.querySelector('input[name="dat1"]').disabled = false;
 
     summativeSubmitBtn = document.getElementById('summativeSubmitBtn');
     summativeSubmitBtn.disabled = false;
@@ -135,8 +198,28 @@ function displayIncident() {
         if (personalityKnown) {
             setPersonalityContext(incidentData['context_pers']);
         }
-
         qContainer.appendChild(incidentHTML);
+
+
+        var qPrompts = document.getElementById("qPrompts");
+        // remove every child node from qPrompts, except for the first one
+        while (qPrompts.childNodes.length > 1) {
+            qPrompts.removeChild(qPrompts.lastChild);
+        }
+
+        var questionList = []
+        questionList.push(createQuestionHTML(incidentData['msg_human_id'], 'human');
+        questionList.push(createQuestionHTML(incidentData['msg_ai_id'], 'ai');
+        if 'msg_ai_id_null' in incidentData:
+            questionList.push(createQuestionHTML(incidentData['msg_ai_id_null'], 'ai_null');
+
+        // shuffle questionList
+        questionList.sort(() => Math.random() - 0.5);
+
+        questionList.forEach((question) => {
+            qPrompts.appendChild(question);
+        }
+
     } else {
         console.error("Incident data missing.");
     }
