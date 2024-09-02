@@ -5,22 +5,6 @@ TIMEOUT_DURATION = 1000;
 
 var defaultDomains = ["mobile-device", "hotel", "airlines"];
 
-var personalityKnown = false;
-var persContext = {};
-
-var defaultPersonalities = [
-    "They are organized and dependable. They tend to remain composed when facing challenges, but are prone to setting unrealistic expectations.",
-    "They are outgoing, competitive, and high energy. They tend to work on impulse, but are also prone to frustration.",
-    "They are detail-oriented and reliable but might appear distant. They tend to work carefully, but are prone to overthinking."
-]
-
-var behaviorKnown = false;
-
-var defaultBehaviors = [
-    "The conversation takes place about 2 hours into the work shift. The representative has already addressed a few customer complaints before the following incident.",
-    "The conversation takes place in the second half of the work shift. The representative has been working longer hours over the past few days and has not been taking breaks.",
-    "The conversation takes place at the middle of the work shift. The representative has been spending minimal time on tasks and has been regularly checking their personal messages."
-];
 
 var remainingBehaviors = [];
 
@@ -140,13 +124,22 @@ function displayIncident() {
     var incidentData = selectedQuestions[incidentIndex];
     console.log("Incident Data for Block "+incidentIndex+": ", incidentData);
     if (incidentData) {
-        var question = incidentData;
+        var questionID = incidentData['ID'];
+        // Find the incident in domainQuestions
+        var question = domainQuestions.find(q => q['ID'] === questionID);
+
         var incidentHTML = createConversationHTML(question);
 
-        if (behaviorKnown && incidentIndex >= indexAtBehavior) {
+        // behaviorKnown is true when incidentData contains the key 'context_behav'
+        var behaviorKnown = 'context_behav' in incidentData;
+
+        // personalityKnown is true when incidentData contains the key 'context_pers'
+        var personalityKnown = 'context_pers' in incidentData;
+
+        if (behaviorKnown) {
             getBehaviorContext();
         }
-        if (personalityKnown && incidentIndex >= indexAtPersonality) {
+        if (personalityKnown) {
             getPersonalityContext();
         }
 
@@ -222,18 +215,100 @@ function createIncidentSet() {
             var incident_dict = {
                 'ID': incident,
                 'msg_human_id': humanMsg['_id'],
-                'msg_ai_id': aiMsg['_id']
-                'msg_ai_id_null': aiMsgNull['_id']
+                'msg_ai_id': aiMsg['_id'],
+                'msg_ai_id_null': aiMsgNull['_id'],
+                'context_behav': context_behav
             };
             selectedQuestions.push(incident_dict);
 
             selectedIndices.add(randomIndex);
         }
     }
-    selectedQuestions.length = 0; // Clear any existing questions
-    selectedIndices.forEach(index => selectedQuestions.push(domainQuestions[index]));
-    console.log("Selected Questions: ", selectedQuestions);
 
+    // Select 3 questions which have personalitu context in human messages
+    // Randomly select 3 incidents from domainQuestions
+    currentSize = selectedIndices.size;
+    while (selectedIndices.size < currentSize + 3) {
+        const randomIndex = Math.floor(Math.random() * domainQuestions.length);
+
+        // if randomIndex is already in selectedIndices, skip to the next iteration
+        if (selectedIndices.has(randomIndex)) {
+            continue;
+        }
+
+        incident = domainQuestions[randomIndex]['ID'];
+
+        // Find human message(s) for the selected incident
+        const humanMsgs = domainMessagesHuman.filter(q => q['incident_id'] === incident);
+
+        // Filter human messages where context_pers is not null
+        const humanMsgsWithContext = humanMsgs.filter(q => q['context_pers'] !== '');
+
+        // if humanMsgsWithContext is not empty, add the index to selectedIndices
+        if (humanMsgsWithContext.length > 0) {
+            console.log("Incident with human personality", incident);
+            selectedIndices.add(randomIndex);
+            // Randomly select one human message with context_behav
+            const randomHumanIndex = Math.floor(Math.random() * humanMsgsWithContext.length);
+            const humanMsg = humanMsgsWithContext[randomHumanIndex];
+            const context_pers = humanMsg['context_pers'];
+
+            // Find one AI message for the selected incident and context
+            const aiMsg = domainMessagesAI.find(q => q['incident_id'] === incident && q['context_pers'] === context_pers);
+            // Find one AI message for the selected incident and context as null
+            const aiMsgNull = domainMessagesAI.find(q => q['incident_id'] === incident && q['context_pers'] === '');
+
+            var incident_dict = {
+                'ID': incident,
+                'msg_human_id': humanMsg['_id'],
+                'msg_ai_id': aiMsg['_id'],
+                'msg_ai_id_null': aiMsgNull['_id'],
+                'context_pers': context_pers
+            };
+        }
+    }
+
+    // Select 4 questions which have no context in human messages
+    // Randomly select 4 incidents from domainQuestions
+    currentSize = selectedIndices.size;
+    while (selectedIndices.size < currentSize + 4) {
+        const randomIndex = Math.floor(Math.random() * domainQuestions.length);
+
+        // if randomIndex is already in selectedIndices, skip to the next iteration
+        if (selectedIndices.has(randomIndex)) {
+            continue;
+        }
+
+        incident = domainQuestions[randomIndex]['ID'];
+
+        // Find human message(s) for the selected incident
+        const humanMsgs = domainMessagesHuman.filter(q => q['incident_id'] === incident);
+
+        // Filter human messages where context_pers is null and context_behav is null
+        const humanMsgsWoContext = humanMsgs.filter(q => q['context_pers'] === '' && q['context_behav'] === '');
+        if (humanMsgsWithContext.length > 0) {
+            console.log("Incident with no context", incident);
+            selectedIndices.add(randomIndex);
+            // Randomly select one human message with context_behav
+            const randomHumanIndex = Math.floor(Math.random() * humanMsgsWithContext.length);
+            const humanMsg = humanMsgsWithContext[randomHumanIndex];
+
+            // Find one AI message for the selected incident and context
+            const aiMsg = domainMessagesAI.find(q => q['incident_id'] === incident && q['context_pers'] === '' && q['context_behav'] === '');
+
+            var incident_dict = {
+                'ID': incident,
+                'msg_human_id': humanMsg['_id'],
+                'msg_ai_id': aiMsg['_id'],
+            };
+            selectedQuestions.push(incident_dict);
+
+            selectedIndices.add(randomIndex);
+        }
+    }
+
+    console.log("Selected Questions: ", selectedQuestions);
+    displayIncident();
 }
 
 function loadHumanMsgs(domainIds) {
