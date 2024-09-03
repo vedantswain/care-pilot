@@ -565,7 +565,7 @@ function validateAndSubmit(e, formElement) {
         radioKeysValidation.push('sincerity_'+i);
         radioKeysValidation.push('compassion_'+i);
         radioKeysValidation.push('warmth_'+i);
-        radioKeysValidation.push('support_'+i);
+        radioKeysValidation.push('actionable_'+i);
         radioKeysValidation.push('relatability_'+i);
     }
 
