@@ -147,7 +147,7 @@ function createQuestionHTML(question_id, source, q_num) {
         ["Insincere", "Sincere", 'sincerity'],
         ["Not Compassionate", "Compassionate", 'compassion'],
         ["Cold", "Warm", 'warmth'],
-        ["Not Supportive", "Supportive", 'support'],
+        ["Not Actionable", "Actionable", 'actionable'],
         ["Not Relatable", "Relatable", 'relatability']
     ]
 
