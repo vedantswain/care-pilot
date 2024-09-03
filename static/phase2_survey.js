@@ -5,6 +5,35 @@ TIMEOUT_DURATION = 1000;
 
 var defaultDomains = ["mobile-device", "hotel", "airlines"];
 
+const sentiments = [
+    '',              // No Emotion
+    'Afraid',        // Fear/Anxiety
+    'Angry',         // Anger/Frustration
+    'Sad',           // Sadness/Disappointment
+    'Ashamed',       // Shame/Guilt
+    'Calm',          // Calm/Contentment
+    'Confused',      // Confusion/Uncertainty
+    'Disgust',       // Disgust/Contempt
+    'Tired',         // Fatigue/Exhaustion
+    'Apathetic',     // Indifference/Detachment
+    'Empathetic',    // Empathy/Understanding
+    'Apologetic',    // Apology/Regret
+    'Attentive',     // Attention/Focus
+    'Bitter',        // Bitterness/Resentment
+    'Bullied',       // Bullying/Victimization
+    'Careless',      // Carelessness/Neglect
+    'Curious',       // Curiosity/Interest
+    'Defensive',     // Defensiveness/Guardedness
+    'Discomfort',    // Discomfort/Pain
+    'Disconnected',  // Disconnection/Isolation
+    'Disrespected',  // Disrespect/Offense
+    'Distracted',    // Distraction/Inattention
+    'Happy',         // Happiness/Positivity
+    'Shocked',       // Shock/Surprise
+    'Resolute',      // Resolution/Determination
+    'Rushed'         // Rushed/Pressured
+];
+var selectedEmotion = ""
 
 var remainingBehaviors = [];
 
@@ -202,15 +231,35 @@ function displayIncident() {
         prompt.className = 'prompt';
         prompt.classList.add('control', 'content');
         const h5 = document.createElement('h5');
-        h5.textContent = "Describe an emotion the representative would feel in this situation (1 word).";
+        h5.textContent = "Select an emotion the representative would feel in this situation:";
         prompt.appendChild(h5);
 
-        const input = document.createElement('input');
-        input.className = 'input';
-        input.type = 'text';
-        input.name = 'dat1';
-        input.placeholder = '1 word';
-        prompt.appendChild(input);
+        // insert a dropdown menu for the emotions
+        selectedEmotion = "";
+        const select = document.createElement('div');
+        select.className = 'select';
+        const selectEmotion = document.createElement('select');
+        selectEmotion.name = 'dat1';
+        selectEmotion.required = true;
+
+        // create an option for each sentiment
+        sentiments.forEach((sentiment) => {
+            const option = document.createElement('option');
+            option.value = sentiment;
+            option.textContent = sentiment;
+            selectEmotion.appendChild(option);
+        });
+
+        // Add an event listener for the 'change' event
+        selectEmotion.addEventListener('change', (event) => {
+            // Get the selected text
+            selectedEmotion = event.target.options[event.target.selectedIndex].text;
+
+            console.log('Selected text:', selectedEmotion);
+        });
+
+        select.appendChild(selectEmotion);
+        prompt.appendChild(select);
 
         // insert a line break after the input field
         prompt.appendChild(document.createElement('p'));
@@ -252,8 +301,6 @@ function nextIncident() {
     var qContainer = document.getElementById("qContainer");
     qContainer.innerHTML = '';
 
-    document.querySelector('input[name="dat1"]').disabled = true;
-
     if (currentIncidentIndex < selectedQuestions.length) {
         setTimeout(displayIncident, TIMEOUT_DURATION);
     } else {
@@ -263,11 +310,11 @@ function nextIncident() {
 }
 
 function createIncidentSet() {
-    // Select 3 questions which have behavior context in human messages
-    // Randomly select 3 incidents from domainQuestions
+    // Select 2 questions which have behavior context in human messages
+    // Randomly select 2 incidents from domainQuestions
     const selectedIndices = new Set();
     var currentSize = selectedIndices.size;
-    while (selectedIndices.size < currentSize + 3) {
+    while (selectedIndices.size < currentSize + 2) {
         const randomIndex = Math.floor(Math.random() * domainQuestions.length);
 
         // if randomIndex is already in selectedIndices, skip to the next iteration
@@ -310,10 +357,10 @@ function createIncidentSet() {
         }
     }
 
-    // Select 3 questions which have personalitu context in human messages
-    // Randomly select 3 incidents from domainQuestions
+    // Select 2 questions which have personalitu context in human messages
+    // Randomly select 2 incidents from domainQuestions
     currentSize = selectedIndices.size;
-    while (selectedIndices.size < currentSize + 3) {
+    while (selectedIndices.size < currentSize + 2) {
         const randomIndex = Math.floor(Math.random() * domainQuestions.length);
 
         // if randomIndex is already in selectedIndices, skip to the next iteration
@@ -356,10 +403,10 @@ function createIncidentSet() {
         }
     }
 
-    // Select 4 questions which have no context in human messages
-    // Randomly select 4 incidents from domainQuestions
+    // Select 2 questions which have no context in human messages
+    // Randomly select 2 incidents from domainQuestions
     currentSize = selectedIndices.size;
-    while (selectedIndices.size < currentSize + 4) {
+    while (selectedIndices.size < currentSize + 2) {
         const randomIndex = Math.floor(Math.random() * domainQuestions.length);
 
         // if randomIndex is already in selectedIndices, skip to the next iteration
@@ -502,15 +549,13 @@ function validateAndSubmit(e, formElement) {
     const formValues = {};
     formData.forEach((value, key) => { formValues[key] = value; });
 
-    // Check if the all radio questions were answered
-    var inputKeysValidation = ["dat1"]
-    var allKeysExist = inputKeysValidation.every(key => formValues[key]!="");
-    if (!allKeysExist){
+    if (selectedEmotion === "") {
         alert("Please respond to all questions.");
         summativeSubmitBtn.disabled = false;
         return;
     }
 
+    // Check if the all radio questions were answered
     var radioKeysValidation = []
     var form_items = 2
     if ('msg_ai_id_null' in selectedQuestions[currentIncidentIndex]){
@@ -538,6 +583,7 @@ function validateAndSubmit(e, formElement) {
     data = formValues
     data['scenario_num'] = currentIncidentIndex
     data['incident_id'] = selectedQuestions[currentIncidentIndex]['ID']
+    data['dat1'] = selectedEmotion
 
     // Retrieve data-index and data-source from the radio buttons
     const radios = document.querySelectorAll('input[type="radio"]');
