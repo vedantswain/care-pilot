@@ -1,6 +1,6 @@
 Pro-Pilot
 ===============================
-description
+Description
 
 ## Installation
 Pre-requisite: In order to run the Flask app, please contact admin for access on AZURE_OPENAI_API.
