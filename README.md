@@ -1,33 +1,15 @@
 Pro-Pilot
 ===============================
-Description
 
 ## Installation
-Pre-requisite: In order to run the Flask app, please contact admin for access on AZURE_OPENAI_API.
+### Virtual Environment Setup
+Please setup a virtual environment to run the project:
+- Option 1: Create using Python: `python3.x -m venv {your_virtual_env_name}` and activate it: `source {your_virtual_env_name}/bin/activate` (Mac) / `.\venv\Scripts\activate` (Windows)
+- Option 2: Use Anaconda: `conda create --name {your_virtual_env_name} python=3.x` and activate it: `conda activate {your_virtual_env_name}`
 
-Make sure if Homebrew is installed by running `brew --version`. If not, install Homebrew from [brew.sh](https://brew.sh/).
-Navigate to your project directory where `Brewfile` and `requirements.txt` are located and execute the following commands:
-```
-brew bundle
-pip install -r requirements.txt
-```
+You can also execute Option 2 using the Anaconda Navigator GUI. `3.x` represents the Python version you want to use. I would recommend using Python 3.11 or higher.
 
-These commands will install all the necessary software and Python packages required for the application. Ensure that Redis and MongoDB are correctly installed by running:
-```
-redis-cli ping
-mongosh --version
-```
-
-Start the necessary services using Homebrew:
-```
-brew services start mongodb-community@7.0
-brew services start redis
-```
-
-To verify that the services are running, use:
-```
-brew services list
-```
+### Module Installation
 
 Once your access is approved, Create a `project.env` file in your project directory and add the following environment variables. Replace `YOURSECRETKEYGOESHERE` with your actual secret keys:
 ```

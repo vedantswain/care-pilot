@@ -3,8 +3,6 @@ from flask import Flask, request, jsonify, render_template, session, redirect, u
 import os, json
 import certifi
 import random
-from pymongo import MongoClient
-from flask_pymongo import PyMongo
 from langchain.schema import messages_from_dict, messages_to_dict
 
 import langchain_openai as lcai
@@ -21,10 +19,13 @@ from sentiment import analyze_sentiment_transformer, analyze_sentiment_decision
 
 import config as common
 
+# from pymongo import MongoClient
+# from flask_pymongo import PyMongo
+# import redis
+
 from dotenv import load_dotenv
 from uuid import uuid4
 import datetime
-import redis
 from flask_session import Session
 load_dotenv("project.env")
 
@@ -34,28 +35,26 @@ print(os.getenv("AZURE_OPENAI_ENDPOINT"))
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.secret_key = 'your_secret_key1'  # Required for session to work
-# app.config["MONGO_URI"] = os.getenv("AZURE_COSMOS_MONGO_CONNSTRING")
-# mongo = PyMongo(app, tlsCAFile=certifi.where())
-# client = mongo.cx
 app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
-app.config['SESSION_REDIS'] = redis.from_url('redis://localhost:6379')
+# app.config['SESSION_REDIS'] = redis.from_url('redis://localhost:6379')
 
 Session(app)
 
+### Mongo DB
 # db = client[DB_NAME]
 # print(client.list_databases())
-client = MongoClient('localhost', 27017)
+# client = MongoClient('localhost', 27017)
 
-db = client.flask_db
-chat_post_task = db.chat_post_task
-chat_history_collection = db.chat_history
-chat_client_info = db.chat_client_info
-chat_in_task = db.chat_in_task
-chat_pre_task = db.chat_pre_task
-summative_writing = db.summative_writing
-summative_scoring = db.summative_scoring
+# db = client.flask_db
+# chat_post_task = db.chat_post_task
+# chat_history_collection = db.chat_history
+# chat_client_info = db.chat_client_info
+# chat_in_task = db.chat_in_task
+# chat_pre_task = db.chat_pre_task
+# summative_writing = db.summative_writing
+# summative_scoring = db.summative_scoring
 
 sender_agent = None
 chat_history = [
@@ -135,10 +134,12 @@ def store_summative_writing(prolific_id):
     data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
 
     try:
-        result = summative_writing.insert_one(data)
-        if result.inserted_id:
-            session[prolific_id] += 1
-            return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+        # result = summative_writing.insert_one(data)
+        # if result.inserted_id:
+        #     session[prolific_id] += 1
+        #     return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+        if True:
+            return jsonify({"message": "Survey data received (no storage)"}), 200
         else:
             return jsonify({"message": "Failed to save data"}), 500
     except Exception as e:
@@ -183,10 +184,12 @@ def store_summative_scoring(prolific_id):
     data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
 
     try:
-        result = summative_scoring.insert_one(data)
-        if result.inserted_id:
-            session[prolific_id] += 1
-            return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+        # result = summative_scoring.insert_one(data)
+        # if result.inserted_id:
+        #     session[prolific_id] += 1
+        #     return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+        if True:
+            return jsonify({"message": "Survey data received (no storage)"}), 200
         else:
             return jsonify({"message": "Failed to save data"}), 500
     except Exception as e:
@@ -229,13 +232,15 @@ def storePreSurvey(session_id):
         data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
 
         try:
-            result = chat_pre_task.insert_one(data)
-            if result.inserted_id:
-                jsoninfo = {
-                    "message": "Survey data saved successfully",
-                    "id": str(result.inserted_id)
-                }
-                return redirect(url_for('index', session_id=session_id) + clientParam, 302, jsoninfo)
+            # result = chat_pre_task.insert_one(data)
+            # if result.inserted_id:
+            #     jsoninfo = {
+            #         "message": "Survey data saved successfully",
+            #         "id": str(result.inserted_id)
+            #     }
+            #     return redirect(url_for('index', session_id=session_id) + clientParam, 302, jsoninfo)
+            if True:
+                return redirect(url_for('index', session_id=session_id) + clientParam, 302)
             else:
                 return jsonify({"message": "Failed to save data"}), 500
         except Exception as e:
@@ -289,30 +294,30 @@ def getReply(session_id):
         turn_number = len(session[session_id][client_id]["chat_history"])
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-        chat_client_info.insert_one({
-            "session_id": session_id,
-            "client_id": client_id,
-            "client_name":val_name,
-            "domain": val_domain,
-            "category": val_category,
-            "grateful": val_grateful,
-            "ranting": val_ranting,
-            "expression": val_expression,
-            "civil": val_civil,
-            "emo": show_emo,
-            "timestamp": timestamp
-        })
+        # chat_client_info.insert_one({
+        #     "session_id": session_id,
+        #     "client_id": client_id,
+        #     "client_name":val_name,
+        #     "domain": val_domain,
+        #     "category": val_category,
+        #     "grateful": val_grateful,
+        #     "ranting": val_ranting,
+        #     "expression": val_expression,
+        #     "civil": val_civil,
+        #     "emo": show_emo,
+        #     "timestamp": timestamp
+        # })
 
         # Inserting first complaint message
-        chat_history_collection.insert_one({
-            "session_id": session_id,
-            "client_id": client_id,
-            "turn_number": turn_number,
-            "sender": "client",
-            "receiver": "representative",
-            "message": response.strip(),
-            "timestamp": timestamp
-        })
+        # chat_history_collection.insert_one({
+        #     "session_id": session_id,
+        #     "client_id": client_id,
+        #     "turn_number": turn_number,
+        #     "sender": "client",
+        #     "receiver": "representative",
+        #     "message": response.strip(),
+        #     "timestamp": timestamp
+        # })
 
 
     elif request.method == 'POST':
@@ -334,26 +339,26 @@ def getReply(session_id):
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
         # Insert representative response
-        chat_history_collection.insert_one({
-            "session_id": session_id,
-            "client_id": client_id,
-            "turn_number": turn_number - 1,
-            "sender": "representative",
-            "receiver": "client",
-            "message": prompt.strip(),
-            "timestamp": timestamp
-        })
+        # chat_history_collection.insert_one({
+        #     "session_id": session_id,
+        #     "client_id": client_id,
+        #     "turn_number": turn_number - 1,
+        #     "sender": "representative",
+        #     "receiver": "client",
+        #     "message": prompt.strip(),
+        #     "timestamp": timestamp
+        # })
 
         # Insert client reply to the response
-        chat_history_collection.insert_one({
-            "session_id": session_id,
-            "client_id": client_id,
-            "turn_number": turn_number,
-            "sender": "client",
-            "receiver": "representative",
-            "message": response.strip(),
-            "timestamp": timestamp
-        })
+        # chat_history_collection.insert_one({
+        #     "session_id": session_id,
+        #     "client_id": client_id,
+        #     "turn_number": turn_number,
+        #     "sender": "client",
+        #     "receiver": "representative",
+        #     "message": response.strip(),
+        #     "timestamp": timestamp
+        # })
 
     return jsonify({
         "client": client_id,
@@ -408,9 +413,11 @@ def storePostSurvey(session_id):
         data['timestamp'] = datetime.datetime.now(datetime.timezone.utc)
 
         try:
-            result = chat_post_task.insert_one(data)
-            if result.inserted_id:
-                return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+            # result = chat_post_task.insert_one(data)
+            # if result.inserted_id:
+            #     return jsonify({"message": "Survey data saved successfully", "id": str(result.inserted_id)}), 200
+            if True:
+                return jsonify({"message": "Survey data received (no storage)"}), 200
             else:
                 return jsonify({"message": "Failed to save data"}), 500
         except Exception as e:
@@ -440,9 +447,9 @@ def storeTroubleFeedback(session_id):
                 "timestamp_feedback": timestamp,
             }
         }
-        res = chat_in_task.update_one(query, update)
-        if res == 0:
-            return jsonify({"message": "No existing record found to update"}), 404
+        # res = chat_in_task.update_one(query, update)
+        # if res == 0:
+        #     return jsonify({"message": "No existing record found to update"}), 404
         return jsonify({"message": "Trouble feedback received"}), 200
     return jsonify({"message": "Invalid session or session expired"}), 400
    
@@ -468,9 +475,9 @@ def storeSentimentFeedback(session_id):
                 "timestamp_feedback": timestamp,
             }
         }
-        res = chat_in_task.update_one(query, update)
-        if res == 0:
-            return jsonify({"message": "No existing record found to update"}), 404
+        # res = chat_in_task.update_one(query, update)
+        # if res == 0:
+        #     return jsonify({"message": "No existing record found to update"}), 404
         return jsonify({"message": "Trouble feedback received"}), 200
     return jsonify({"message": "Invalid session or session expired"}), 400
 
@@ -497,9 +504,9 @@ def storeEmoFeedback(session_id):
             }
         }
 
-        res = chat_in_task.update_one(query, update)
-        if res == 0:
-            return jsonify({"message": "No existing record found to update"}), 404
+        # res = chat_in_task.update_one(query, update)
+        # if res == 0:
+        #     return jsonify({"message": "No existing record found to update"}), 404
         return jsonify({"message": "Feedback received"}), 200
     return jsonify({"message": "Invalid session or session expired"}), 400
 
@@ -522,23 +529,23 @@ def getEmoSupport(session_id):
             thought = response_cw_emo['thought']
             reframe = response_cw_emo['reframe']
             # Thought
-            chat_in_task.insert_one({
-                "session_id": session_id,
-                "client_id": client_id,
-                "turn_number": turn_number,
-                "support_type": "TYPE_EMO_THOUGHT",
-                "support_content": thought.strip(),
-                "timestamp_arrival":timestamp
-            })
+            # chat_in_task.insert_one({
+            #     "session_id": session_id,
+            #     "client_id": client_id,
+            #     "turn_number": turn_number,
+            #     "support_type": "TYPE_EMO_THOUGHT",
+            #     "support_content": thought.strip(),
+            #     "timestamp_arrival":timestamp
+            # })
             # Reframe
-            chat_in_task.insert_one({
-                "session_id": session_id,
-                "client_id": client_id,
-                "turn_number": turn_number,
-                "support_type": "TYPE_EMO_REFRAME",
-                "support_content": reframe.strip(),
-                "timestamp_arrival": timestamp
-            })
+            # chat_in_task.insert_one({
+            #     "session_id": session_id,
+            #     "client_id": client_id,
+            #     "turn_number": turn_number,
+            #     "support_type": "TYPE_EMO_REFRAME",
+            #     "support_content": reframe.strip(),
+            #     "timestamp_arrival": timestamp
+            # })
             return jsonify({
                 "message": {
                     'thought':thought,
@@ -548,14 +555,14 @@ def getEmoSupport(session_id):
         elif support_type=="TYPE_EMO_SHOES":
             response_cw_emo = ep_agent.invoke({'complaint':reply, "chat_history": chat_history})
             response = response_cw_emo
-            chat_in_task.insert_one({
-                "session_id": session_id,
-                "client_id": client_id,
-                "turn_number": turn_number,
-                "support_type": "Put Yourself in the Client's Shoes",
-                "support_content": response.strip(),
-                "timestamp_arrival": timestamp
-            })
+            # chat_in_task.insert_one({
+            #     "session_id": session_id,
+            #     "client_id": client_id,
+            #     "turn_number": turn_number,
+            #     "support_type": "Put Yourself in the Client's Shoes",
+            #     "support_content": response.strip(),
+            #     "timestamp_arrival": timestamp
+            # })
             return jsonify({
                 "message": response
             })
@@ -576,14 +583,14 @@ def sentiment(session_id):
         # sentiment_category = analyze_sentiment_transformer(reply)
         sentiment_category = analyze_sentiment_decision(reply)
 
-        chat_in_task.insert_one({
-            "session_id": session_id,
-            "client_id": client_id,
-            "turn_number": turn_number,
-            "support_type": "TYPE_SENTIMENT",
-            "support_content": sentiment_category,
-            "timestamp_arrival": timestamp
-        })
+        # chat_in_task.insert_one({
+        #     "session_id": session_id,
+        #     "client_id": client_id,
+        #     "turn_number": turn_number,
+        #     "support_type": "TYPE_SENTIMENT",
+        #     "support_content": sentiment_category,
+        #     "timestamp_arrival": timestamp
+        # })
 
         return jsonify({'message': sentiment_category})
     else:
@@ -608,14 +615,14 @@ def getInfoSupport(session_id):
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
 
-        chat_in_task.insert_one({
-            "session_id": session_id,
-            "client_id": client_id,
-            "turn_number": turn_number,
-            "support_type": "TYPE_INFO_CUE",
-            "support_content": response_cw_info,
-            "timestamp_arrival": timestamp
-        })
+        # chat_in_task.insert_one({
+        #     "session_id": session_id,
+        #     "client_id": client_id,
+        #     "turn_number": turn_number,
+        #     "support_type": "TYPE_INFO_CUE",
+        #     "support_content": response_cw_info,
+        #     "timestamp_arrival": timestamp
+        # })
         return jsonify({
             "message": response_cw_info
         })
@@ -638,14 +645,14 @@ def getTroubleSupport(session_id):
         turn_number = len(chat_history) // 2 + 1
         timestamp = datetime.datetime.now(datetime.timezone.utc)
 
-        chat_in_task.insert_one({
-            "session_id": session_id,
-            "client_id": client_id,
-            "turn_number": turn_number,
-            "support_type": "TYPE_INFO_GUIDE",
-            "support_content": response,
-            "timestamp_arrival": timestamp
-        })
+        # chat_in_task.insert_one({
+        #     "session_id": session_id,
+        #     "client_id": client_id,
+        #     "turn_number": turn_number,
+        #     "support_type": "TYPE_INFO_GUIDE",
+        #     "support_content": response,
+        #     "timestamp_arrival": timestamp
+        # })
 
         return jsonify({
             "message": response
@@ -668,12 +675,14 @@ def complete():
 
 @app.route('/history/<session_id>/<client_id>/')
 def getClientHistory(session_id, client_id):
-    chat_history = list(chat_history_collection.find({"session_id": session_id, "client_id": client_id}, {"_id": 0}))
+    # chat_history = list(chat_history_collection.find({"session_id": session_id, "client_id": client_id}, {"_id": 0}))
+    chat_history = []
     return jsonify({"chat_history": chat_history})
 
 @app.route('/history/<session_id>/')
 def getClientList(session_id):
-    clients_info = list(chat_client_info.find({"session_id": session_id}, {"_id": 0, "client_name": 1, "client_id": 1, "category":1}))
+    # clients_info = list(chat_client_info.find({"session_id": session_id}, {"_id": 0, "client_name": 1, "client_id": 1, "category":1}))
+    clients_info = []
     return jsonify({"chat_history": chat_history, "clients_info": clients_info})
 
 if __name__ == "__main__":
