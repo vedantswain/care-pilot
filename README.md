@@ -1,7 +1,13 @@
 Pro-Pilot
 ===============================
 
+Preferably use PyCharm/DataSpell (JetBrains) to open the project. These IDEs provide a better experience for working with Python projects. However, they are heavy and may not be suitable for all systems.
+Alternatively, you can use Visual Studio Code, which is lightweight and provides a good Python development experience. Or you can use any other IDE of your choice.
+
 ## Installation
+
+Make sure you have Python already installed in your machine.
+
 ### Virtual Environment Setup
 Please setup a virtual environment to run the project:
 - Option 1: Create using Python: `python3.x -m venv {your_virtual_env_name}` and activate it: `source {your_virtual_env_name}/bin/activate` (Mac) / `.\venv\Scripts\activate` (Windows)
@@ -10,6 +16,12 @@ Please setup a virtual environment to run the project:
 You can also execute Option 2 using the Anaconda Navigator GUI. `3.x` represents the Python version you want to use. I would recommend using Python 3.11 or higher.
 
 ### Module Installation
+
+Once you have activated your virtual environment, navigate to the project directory and execute the following commands to install the required modules. 
+If you are in the correct environment your shell should look something like this:
+```
+({your_virtual_env_name}) sh-3.2$ pip install -r requirements.txt
+```
 
 Once your access is approved, Create a `project.env` file in your project directory and add the following environment variables. Replace `YOURSECRETKEYGOESHERE` with your actual secret keys:
 ```
@@ -24,19 +36,30 @@ AZURE_COSMOS_MONGO_CONNSTRING=YOURSECRETKEYGOESHERE
 
 With all services running and the environment configured, you can start the Flask application by running:
 ```
-python run.py
+python3.x app.py
 ```
 
 ## Getting started
 ### Accessing Chatbot
-- Execute the command `python app.py`. This will start the local server and the application will be accessible at `http://localhost:8080`.
-- To interact with the chatbot, open a web browser and enter the URL `http://localhost:8080`. (Chrome Recommanded)
+- Execute the command `python app.py`. This will start the local server and the application will be accessible at `http://127.0.0.1:8080/`.
+- To interact with the chatbot, open a web browser and enter the URL `http://127.0.0.1:8080/launch/?pwd=491062`. (Chrome Recommanded)
+  - You will be required to fill out the baseline survey form before proceeding to the chatbot.
+  - Responses do not matter during testing
+- After this you will be launched into the chatbot interface where you can interact with a simulated client
+  - The client queue, their behavior, and how pro-pilot supports you is predetermined based on `config.py`.
+  - You can skip clients by clicking the **red dog** button on the top left
+  - You can end a client conversation forcefully by clicking the **yellow cat** button on the top left
 - The chatbot session can be configured using the following URL format: 
+    ```
+    http://127.0.0.1:8080/index/{session_id}?name={client_name}&domain={domain}&category={complaint_type}&grateful={client_grateful}&ranting={client_ranting}&expression={client_expressive}&civil={client_civility}&info={support_info}&emo={support_emo}
     ```
     http://localhost:8080/session_address/?product=YOURPRODUCT&grateful=YOURGRATEFUL&ranting=YOURRANTING&expression=YOUREXPRESSION
     ```
-- Replace `YOURPRODUCT` with the specific product name. 
-- The parameters `YOURGRATEFUL`, `YOURRANTING`, and `YOUREXPRESSION` accept values `0` or `1`, representing positive and negative sentiments, respectively.
+- Replace `domain` with the specific product name. 
+- The parameters `client_grateful`, `client_ranting`, `client_expressive` accept values `0` (false) or `1` (true) to determine simulated client behavior.
+- The 'client_civility' parameter accepts values `0` (false) or `1` (true) to determine the client's civility.
+- The 'support_info' parameter accepts values `0` (false) or `1` (true) to determine the support for informational responses (left panel)
+- The 'support_emo' parameter accepts values `0` (false) or `1` (true) to determine the support for emotional responses (right panel)
 
 ### Managing Data with MongoDB
 - Run `mongosh` in your terminal to start MongoDB Shell.
