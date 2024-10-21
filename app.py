@@ -1,21 +1,12 @@
 from flask import Flask, send_from_directory
 from flask import Flask, request, jsonify, render_template, session, redirect, url_for
 import os, json
-import certifi
-import random
-from langchain.schema import messages_from_dict, messages_to_dict
 
-import langchain_openai as lcai
-from utils import mLangChain
 from agents import *
 
-from langchain_community.document_loaders import WebBaseLoader
-from langchain.agents import AgentExecutor, create_openai_tools_agent
 from langchain_core.messages import AIMessage, HumanMessage
-from langchain_core.prompts import ChatPromptTemplate
-from langchain_core.runnables import RunnablePassthrough
-
-from sentiment import analyze_sentiment_transformer, analyze_sentiment_decision
+from langchain.schema import messages_from_dict, messages_to_dict
+from sentiment import analyze_sentiment_decision
 
 import config as common
 
@@ -35,9 +26,12 @@ print(os.getenv("AZURE_OPENAI_ENDPOINT"))
 
 app = Flask(__name__, static_url_path='/static', static_folder='static')
 app.secret_key = 'your_secret_key1'  # Required for session to work
-app.config['SESSION_TYPE'] = 'redis'
 app.config['SESSION_PERMANENT'] = False
 app.config['SESSION_USE_SIGNER'] = True
+
+### Redis
+app.config['SESSION_TYPE'] = 'filesystem'   ### Default Flask approach
+# app.config['SESSION_TYPE'] = 'redis'
 # app.config['SESSION_REDIS'] = redis.from_url('redis://localhost:6379')
 
 Session(app)
