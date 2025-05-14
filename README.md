@@ -4,6 +4,8 @@ Pro-Pilot
 Preferably use PyCharm/DataSpell (JetBrains) to open the project. These IDEs provide a better experience for working with Python projects. However, they are heavy and may not be suitable for all systems.
 Alternatively, you can use Visual Studio Code, which is lightweight and provides a good Python development experience. Or you can use any other IDE of your choice.
 
+All non-repository contents in Google Drive: [Link](https://drive.google.com/drive/folders/1UknPofAwXmd5VzKUrTRnFMN0ryh5ycyy?usp=drive_link)
+
 ## Installation
 
 Make sure you have Python already installed in your machine.
